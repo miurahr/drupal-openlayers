@@ -26,7 +26,7 @@ function openlayers_layers_help($path, $arg) {
 function openlayers_layers_menu() {
   $items = array();
   $items['admin/settings/openlayers/layers'] = array(
-    'title' => 'Layers Settings',
+    'title' => 'Layers',
     'description' => t('Set your API keys here'),
     'page callback' => 'drupal_get_form',
     'page arguments' => array('openlayers_layers_admin_settings'),

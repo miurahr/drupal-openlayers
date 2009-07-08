@@ -86,7 +86,9 @@ OL.CCK.populateMap = function(mapid) {
     // Check value
     if ($thisField.val() != '') {
       var newFeature = OL.CCK.loadFeatureFromTextarea(mapid, $thisField);
-      if (newFeature != false) featuresToAdd.push(newFeature);
+      if (newFeature != false) {
+        featuresToAdd.push(newFeature);
+      }
     }
   });
   
@@ -124,6 +126,8 @@ OL.CCK.loadFeatureFromTextarea = function(mapid, $textarea) {
     if (OL.maps[mapid].projection != OL.mapDefs[mapid].options.displayProjection) {
       newFeature.geometry.transform(OL.maps[mapid].displayProjection, OL.maps[mapid].projection);
     }
+    
+    // @@TODO: Add styling to feature
     
     // Link the feature to the field.
     newFeature.cckField = $textarea.attr('id');

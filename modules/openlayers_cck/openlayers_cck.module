@@ -36,11 +36,19 @@ function openlayers_cck_theme() {
         'element' => NULL
       ),
     ),
+    'openlayers_wkt_widget' => array(
+      'arguments' => array(
+        'element' => NULL
+      ),
+    ),
     'openlayers_cck_map' => array(
       'arguments' => array(
         'field' => NULL,
         'map' => NULL,
       ),
+    ),
+    'openlayers_cck_formatter_wkt_default' => array(
+      'arguments' => array('element' => NULL),
     ),
   );
     
@@ -48,7 +56,7 @@ function openlayers_cck_theme() {
   foreach (openlayers_get_presets() as $name => $title) {
     $themes['openlayers_cck_formatter_' . $name] = array(
       'arguments' => array('element' => NULL),
-      'function' => 'theme_openlayers_cck_formatter',
+      'function' => 'theme_openlayers_cck_formatter_map',
     );
   }
   
@@ -171,7 +179,13 @@ function openlayers_cck_widget_settings($op, $widget) {
       // Get Presets
       $presets = openlayers_get_presets();
       $default_preset = variable_get('openlayers_default_preset', 'default');
+      $features = array(
+        'point' => t('Point'),
+        'path' => t('Path'),
+        'polygon' => t('Polygon'),
+      );
       
+      // Define form elements
       $form['openlayers_cck_preset_map'] = array(
         '#type' => 'select',
         '#title' => t('Input Map Preset'),
@@ -179,11 +193,20 @@ function openlayers_cck_widget_settings($op, $widget) {
         '#options' => $presets,
         '#default_value' => isset($widget['openlayers_cck_preset_map']) ? $widget['openlayers_cck_preset_map'] : $default_preset,
       );
+      // What type of wkt to accept
+      $form['openlayers_cck_feature_types'] = array(
+        '#type' => 'checkboxes',
+        '#title' => t('Feature Types'),
+        '#description' => t('Choose the features that are allowed to be inputed on the map.'),
+        '#options' => $features,
+        '#required' => TRUE,
+        '#default_value' => isset($widget['openlayers_cck_feature_types']) ? $widget['openlayers_cck_feature_types'] : array('point', 'path', 'polygon'),
+      );
       // Return form
       return $form;
 
     case 'save':
-      return array('openlayers_cck_preset_map');
+      return array('openlayers_cck_preset_map', 'openlayers_cck_feature_types');
   }
 }
 
@@ -231,6 +254,8 @@ function openlayers_cck_wkt_element_process($element, $edit, &$form_state, &$for
   $field_name = $field['field_name'];
   $widget = $field['widget'];
   $field_label = $widget['label'];
+  $field_key = $element['#columns'][0];
+  $delta = $element['#delta'];
   static $map_included = FALSE;
 
   // Only include one map
@@ -249,11 +274,17 @@ function openlayers_cck_wkt_element_process($element, $edit, &$form_state, &$for
   $element['openlayers_wkt'] = array(
     '#type' => 'textarea',
     '#rows' => 2,
-    '#required' => $delta == 0 && $field['required'],
-    '#delta' => $delta,
-    '#field_name' => $field_name,
-    '#type_name' => $field['type_name'],
     '#attributes' => array('rel' => $rendered_map['id']),
+    '#default_value' => isset($element['#value'][$delta][$field_key]) ? $element['#value'][$delta][$field_key] : '',
+    // The following values were set by the content module and need
+    // to be passed down to the nested element.
+    '#title' => $element['#title'],
+    '#description' => $element['#description'],
+    '#required' => $element['#required'],
+    '#field_name' => $element['#field_name'],
+    '#type_name' => $element['#type_name'],
+    '#delta' => $element['#delta'],
+    '#columns' => $element['#columns'],
   );
 
   return $element;
@@ -264,10 +295,20 @@ function openlayers_cck_wkt_element_process($element, $edit, &$form_state, &$for
  */
 function openlayers_cck_field_formatter_info() {
   $formatters = array();
+  
+  // Default formatter  
+  $formatters['wkt_default'] = array(
+    'label' => t('Default WKT Value'),
+    'field types' => array('geo', 'openlayers_wkt'),
+    'multiple values' => CONTENT_HANDLE_CORE,
+  );
+    
+  // Map preset formatter
   foreach (openlayers_get_presets() as $name => $title) {
-    $formatters['openlayers_cck_formatter_' . $name] = array(
+    $formatters[$name] = array(
       'label' => t('OpenLayers Map: @preset', array('@preset' => check_plain($title))),
       'field types' => array('geo', 'openlayers_wkt'),
+      'multiple values' => CONTENT_HANDLE_CORE,
     );
   }
   return $formatters;
@@ -281,19 +322,53 @@ function theme_openlayers_cck_geo_field($element) {
 }
 
 /**
+ * Theme function for openlayers_wkt_widget element
+ */
+function theme_openlayers_wkt_widget($element) {
+  return $element['#children'];
+}
+
+/**
+ * Theme function for openlayers cck default formatters
+ */
+function theme_openlayers_cck_formatter_wkt_default($element) {
+  return $element['#item']['openlayers_wkt'];
+}
+
+/**
  * Theme function for openlayers cck formatters
  */
-function theme_openlayers_cck_formatter($element) {
+function theme_openlayers_cck_formatter_map($element) {
+  $field = content_fields($element['#field_name'], $element['#type_name']);
+
   // Get preset name from formatter
   $preset_name = str_replace('openlayers_cck_formatter_', '', $element['#formatter']);
   
   // Get map preset
   $map = openlayers_get_map($preset_name);
-  $rendered = openlayers_map_map($map);
   
+  // Add features and vector layer
+  $map['layers']['openlayers_cck_vector'] = array(
+    'id' => 'openlayers_cck_vector',
+    'name' => $field['widget']['label'],
+    'type' => 'Vector',
+    'options' => array(),
+    'features' => array(
+      'openlayers_cck_vector_feature_' . $element['#item']['#delta'] => array(
+        'wkt' => $element['#item']['openlayers_wkt'],
+      ),
+    ),    
+  );
+  $map['options'] = array(
+    'displayProjection' => ($field['srid'] != 0) ? $field['srid'] : '4326',
+  );
+  
+  // Render map
+  $rendered = openlayers_render_map($map);
+
   // Check for output
-  if (empty($map['errors']) && !empty($map['width'])) {
-    return $map['themed'];
+  if (!$map['errors'] && !empty($map['width'])) {
+    return $rendered['themed'];
   }
   else {
     return '';
@@ -306,6 +381,12 @@ function theme_openlayers_cck_formatter($element) {
 function theme_openlayers_cck_map($field = array(), $map = array()) {
   $title = check_plain(t($field['widget']['label']));
   $description = content_filter_xss(t($field['widget']['description']));
+  $output = '';
+  
+  // Check for errors
+  if (!empty($map['errors'])) {
+    return $output;
+  }
   
   $output = '
     <div id="openlayers-cck-map-container-' . $map['id'] . '" class="form-item openlayers-cck-map-container">
@@ -337,12 +418,19 @@ function theme_openlayers_cck_map($field = array(), $map = array()) {
  */
 function _openlayers_cck_render_element_map($field_name = '', $field_label = '', $values = array(), $field = array()) {
   $field_name_html = str_replace('_', '-', $field_name);
-  $map_id = OPENLAYERS_CCK_MAP_ID_PREFIX .'-'. $field_name;
+  $map_id = OPENLAYERS_CCK_MAP_ID_PREFIX . '-' . $field_name;
   $field_container = '';
+  $field_type = $field['type'];
+  $field_type_html = str_replace('_', '-', $field_type);
+  $widget = $field['widget'];
 
   // Get default map
-  // @TODO: Use widget settings when geo supports it
-  $map = openlayers_get_default_map();
+  if (isset($widget['openlayers_cck_preset_map'])) {
+    $map = openlayers_get_map($widget['openlayers_cck_preset_map']);
+  }
+  else {
+    $map = openlayers_get_default_map();
+  }
   
   // Put together map
   $map['id'] = $map_id;
@@ -350,12 +438,14 @@ function _openlayers_cck_render_element_map($field_name = '', $field_label = '',
   // Add main event for CCK processing
   $map['events']['beforeBehaviors'] = array('CCKProcess');
   
-  // Define beahvoirs
+  /*
+  // Define zoom to layer beahvior
   $map['behaviors']['openlayers_cck_zoom_to_layer'] = array(
     'id' => 'openlayers_cck_zoom_to_layer',
     'type' => 'openlayers_behaviors_zoom_to_layer',
     'layer' => 'openlayers_cck_vector',
   );
+  */
   
   // Make sure that our display projection matches the database projection
   $map['options'] = array(
@@ -374,9 +464,8 @@ function _openlayers_cck_render_element_map($field_name = '', $field_label = '',
     ),
   );
   
-  // Build default control without feature type
-  $map['behaviors']['openlayers_cck_edit_'. $field['geo_type']] = array(
-    'id' => 'openlayers_cck_edit_'. $field['geo_type'],
+  // Create base behavior array
+  $behavior_base = array(
     'type' => 'openlayers_behaviors_draw_features',
     'layer' => 'openlayers_cck_vector',
     'featureadded_handler' => array('OL.CCK.featureAdded'),
@@ -384,25 +473,44 @@ function _openlayers_cck_render_element_map($field_name = '', $field_label = '',
     'featureremoved_handler' => array('OL.CCK.featureRemoved'),
   );
   
-  // Determine type from geo type
-  switch ($field['geo_type']) {
-    case 'point':
-      $map['behaviors']['openlayers_cck_edit_'. $field['geo_type']]['feature_type'] = 'point';
-      break;
+  // Look for geo type
+  if ($type == 'geo' && isset($field['geo_type'])) {
+    // Add id to geo type and add base behavoir to map
+    $behavior_base['id'] = 'openlayers_cck_edit_' . $field['geo_type'];
+    $map['behaviors']['openlayers_cck_edit_' . $field['geo_type']] = $behavior_base;
     
-    case 'linestring':
-      $map['behaviors']['openlayers_cck_edit_'. $field['geo_type']]['feature_type'] = 'path';
-      break;
+    // Determine type from geo type
+    switch ($field['geo_type']) {
+      case 'point':
+        $map['behaviors']['openlayers_cck_edit_' . $field['geo_type']]['feature_type'] = 'point';
+        break;
       
-    case 'polygon':
-      $map['behaviors']['openlayers_cck_edit_'. $field['geo_type']]['feature_type'] = 'polygon';
-      break;
+      case 'linestring':
+        $map['behaviors']['openlayers_cck_edit_' . $field['geo_type']]['feature_type'] = 'path';
+        break;
+        
+      case 'polygon':
+        $map['behaviors']['openlayers_cck_edit_' . $field['geo_type']]['feature_type'] = 'polygon';
+        break;
+    }
+  }
+  else {
+    // Check which feature types are available
+    foreach ($widget['openlayers_cck_feature_types'] as $type) {
+      if (!empty($type)) {
+        $map['behaviors']['openlayers_cck_edit_' . $type] = $behavior_base + 
+          array(
+            'id' => 'openlayers_cck_edit_' . $type,
+            'feature_type' => $type,
+          );
+      }
+    }
   }
   
   // Check if multiple, as there are specific needs
   if (empty($field['multiple'])) {
     // If a single value
-    $field_container = 'edit-' . $field_name_html . '-0-geo-geo-wkt-wrapper';
+    $field_container = 'edit-' . $field_name_html . '-0-' . $field_type_html . '-wrapper';
   }
   else {
     // For multiples, we need to move out map widget outside of the fields

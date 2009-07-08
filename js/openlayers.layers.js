@@ -47,14 +47,14 @@ OL.Layers.Vector = function(layerOptions, mapid) {
   
   // Default styles
   var defaultStyles = new OpenLayers.StyleMap({
-    "default": new OpenLayers.Style({
+    'default': new OpenLayers.Style({
       pointRadius: 5,
       fillColor: "#ffcc66",
       strokeColor: "#ff9933",
       strokeWidth: 4,
       fillOpacity:0.5
     }),
-    "select": new OpenLayers.Style({
+    'select': new OpenLayers.Style({
       fillColor: "#66ccff",
       strokeColor: "#3399ff"
     })
@@ -70,8 +70,6 @@ OL.Layers.Vector = function(layerOptions, mapid) {
   else {
     styleMap = defaultStyles;
   }
-  
-  console.log(styleMap);
 
   // Define layer object
   var returnVector = new OpenLayers.Layer.Vector(layerOptions.name, {'styleMap': styleMap});
@@ -118,11 +116,11 @@ OL.Layers.Vector = function(layerOptions, mapid) {
         }
         
         // Go through new features
-        for (var i in newFeatureSet){
+        for (var i in newFeatureSet) {
           var newFeature = newFeatureSet[i];
           
           // Transform the geometry if the 'projection' property is different from the map projection
-          if (typeof(layerOptions.features[feat].projection) != 'undefined'){
+          if (typeof(layerOptions.features[feat].projection) != 'undefined') {
             if (layerOptions.features[feat].projection != OL.mapDefs[mapid].projection){
               var featureProjection = new OpenLayers.Projection("EPSG:" + layerOptions.features[feat].projection);
               var mapProjection = OL.maps[mapid].projection;

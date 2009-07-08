@@ -269,19 +269,23 @@ OL.Behaviors.drawFeatures = function(event) {
     });
   }
     
-  // Add Base Pan button
-  $('<a href="#"></a>')
-    .attr('id', 'openlayers-controls-pan-' + mapid)
-    .addClass('openlayers-controls-draw-feature-link')
-    .addClass('openlayers-controls-draw-feature-link-pan')
-    .addClass('openlayers-controls-draw-feature-link-on')
-    .data('type', 'pan')
-    .data('mapid', mapid)
-    .appendTo('#openlayers-controls-' + mapid);
+  // Add Base Pan button, if not already added
+  if ($('#openlayers-controls-pan-' + mapid).length == 0) {
+    $('<a href="#"></a>')
+      .attr('id', 'openlayers-controls-pan-' + mapid)
+      .attr('title', Drupal.t('Pan around map'))
+      .addClass('openlayers-controls-draw-feature-link')
+      .addClass('openlayers-controls-draw-feature-link-pan')
+      .addClass('openlayers-controls-draw-feature-link-on')
+      .data('type', 'pan')
+      .data('mapid', mapid)
+      .appendTo('#openlayers-controls-' + mapid);
+  }
   
   // Add other control link (button)
   $('<a href="#"></a>')
     .attr('id', 'openlayers-controls-draw-' + behavior.feature_type + '-' + mapid)
+    .attr('title', Drupal.t('Draw') + ' ' + behavior.feature_type)
     .addClass('openlayers-controls-draw-feature-link')
     .addClass('openlayers-controls-draw-feature-link-' + behavior.feature_type)
     .addClass('openlayers-controls-draw-feature-link-off')
@@ -347,56 +351,76 @@ OL.EventHandlers.drawFeaturesMapReady = function(event) {
 OL.Behaviors.fullscreen = function(event) {
   var mapDef = event.mapDef;
   var mapid = mapDef.id;
+  var $map = $('#' + mapid);
+  var $mapControls = $('#openlayers-controls-' + mapid);
   
-  // @@TODO: Drupal.theme
-  $('#openlayers-controls-' + mapid).append('<div id="openlayers-controls-fullscreen-' + mapid + '" class="openlayers-controls-fullscreen"></div>');
-  
-  $('#openlayers-controls-fullscreen-' + mapid).click(function() {
-    if (!OL.isSet(OL.Behaviors.fullscreenRegistry)) {
-      OL.Behaviors.fullscreenRegistry = [];
-    }
-    if (!OL.isSet(OL.Behaviors.fullscreenRegistry[mapid])) {
-      OL.Behaviors.fullscreenRegistry[mapid] = {};
-      OL.Behaviors.fullscreenRegistry[mapid].fullscreen = false;
-      OL.Behaviors.fullscreenRegistry[mapid].mapstyle = [];
-      OL.Behaviors.fullscreenRegistry[mapid].controlsstyle = [];
-    }
+  $('<a href="#"></a>')
+    .attr('id', 'openlayers-controls-fullscreen-' + mapid)
+    .addClass('openlayers-controls-fullscreen')
+    .data('mapid', mapid)
+    .appendTo('#openlayers-controls-' + mapid)
+    .click(function() {
+      var $thisElement = $(this);
     
-    if (!OL.Behaviors.fullscreenRegistry[mapid].fullscreen) {
-      OL.Behaviors.fullscreenRegistry[mapid].fullscreen = true;
-      
-      // Store old css values
-      var mapStylesToStore = ['position','top','left','width','height','z-index'];
-      var controlStylesToStore = ['position','top','right'];
-      for (var ms in mapStylesToStore) {
-        OL.Behaviors.fullscreenRegistry[mapid].mapstyle[mapStylesToStore[ms]] = $('#' + mapid).css(mapStylesToStore[ms]);
+      // Store data
+      if (!OL.isSet(OL.Behaviors.fullscreenRegistry)) {
+        OL.Behaviors.fullscreenRegistry = [];
       }
-      for (var cs in controlStylesToStore) {
-        OL.Behaviors.fullscreenRegistry[mapid].controlsstyle[controlStylesToStore[cs]] = $('#openlayers-controls-' + mapid).css(controlStylesToStore[cs]);
+      if (!OL.isSet(OL.Behaviors.fullscreenRegistry[mapid])) {
+        OL.Behaviors.fullscreenRegistry[mapid] = {};
+        OL.Behaviors.fullscreenRegistry[mapid].fullscreen = false;
+        OL.Behaviors.fullscreenRegistry[mapid].mapstyle = [];
+        OL.Behaviors.fullscreenRegistry[mapid].controlsstyle = [];
       }
       
-      // Resize the map.
-      $('#' + mapid).css('position','fixed').css('top','0px').css('left','0px').css('width','100%').css('height','100%').css('z-index','999');
-      $('#openlayers-controls-' + mapid).css('position','fixed').css('top','0px').css('right','0px');
+      // Check if fullscreen
+      if (!OL.Behaviors.fullscreenRegistry[mapid].fullscreen) {
+        OL.Behaviors.fullscreenRegistry[mapid].fullscreen = true;
       
-      $('#openlayers-controls-fullscreen-' + mapid).removeClass('openlayers-controls-fullscreen').addClass('openlayers-controls-unfullscreen');
+        // Store old css values
+        var mapStylesToStore = ['position','top','left','width','height','z-index'];
+        var controlStylesToStore = ['position','top','right'];
+        for (var ms in mapStylesToStore) {
+          OL.Behaviors.fullscreenRegistry[mapid].mapstyle[mapStylesToStore[ms]] = $('#' + mapid).css(mapStylesToStore[ms]);
+        }
+        for (var cs in controlStylesToStore) {
+          OL.Behaviors.fullscreenRegistry[mapid].controlsstyle[controlStylesToStore[cs]] = $('#openlayers-controls-' + mapid).css(controlStylesToStore[cs]);
+        }
       
-      event.map.updateSize();
-      
-    }
-    else {
-      // Restore styles, resizing the map.
-      for (var ms in OL.Behaviors.fullscreenRegistry[mapid].mapstyle) {
-        $('#' + mapid).css(ms,OL.Behaviors.fullscreenRegistry[mapid].mapstyle[ms]);
-      };
-      for (var cs in OL.Behaviors.fullscreenRegistry[mapid].controlsstyle) {
-        $('#openlayers-controls-' + mapid).css(cs,OL.Behaviors.fullscreenRegistry[mapid].controlsstyle[cs]);
-      };
-      
-      $('#openlayers-controls-fullscreen-' + mapid).removeClass('openlayers-controls-unfullscreen').addClass('openlayers-controls-fullscreen');
-
-      OL.Behaviors.fullscreenRegistry[mapid].fullscreen = false;
-      event.map.updateSize();
-    }
-  });
+        // Resize the map.
+        $map.css('position','fixed')
+          .css('top','0px')
+          .css('left','0px')
+          .css('width','100%')
+          .css('height','100%')
+          .css('z-index','999');
+        // Change CSS on map controls
+        $mapControls.css('position','fixed')
+          .css('top','0px')
+          .css('right','0px');
+        // Update classes
+        $thisElement.removeClass('openlayers-controls-fullscreen')
+          .addClass('openlayers-controls-unfullscreen');
+        
+        // Update size of OpenLayers
+        event.map.updateSize();
+      }
+      else {
+        // Restore styles, resizing the map.
+        for (var ms in OL.Behaviors.fullscreenRegistry[mapid].mapstyle) {
+          $('#' + mapid).css(ms,OL.Behaviors.fullscreenRegistry[mapid].mapstyle[ms]);
+        };
+        for (var cs in OL.Behaviors.fullscreenRegistry[mapid].controlsstyle) {
+          $('#openlayers-controls-' + mapid).css(cs,OL.Behaviors.fullscreenRegistry[mapid].controlsstyle[cs]);
+        };
+        
+        // Update classes
+        $thisElement.removeClass('openlayers-controls-unfullscreen')
+          .addClass('openlayers-controls-fullscreen');
+          
+        // Update stored registry and OpenLayers map size
+        OL.Behaviors.fullscreenRegistry[mapid].fullscreen = false;
+        event.map.updateSize();
+      }
+    });
 }

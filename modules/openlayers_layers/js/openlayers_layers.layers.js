@@ -163,7 +163,7 @@ OL.Layers.KML = function(layerOptions, mapid) {
 OL.Layers.XYZ = function(layerOptions, mapid) {
   var mapOptions = {
     sphericalMercator: true,
-    maxExtent: new OpenLayers.Bounds(-20037508.34,-20037508.34,20037508.34,20037508.34)
+    maxExtent: new OpenLayers.Bounds(-20037508.34, -20037508.34, 20037508.34, 20037508.34)
   };
   
   jQuery.extend(mapOptions, layerOptions.options);
@@ -183,12 +183,16 @@ OL.Layers.XYZ = function(layerOptions, mapid) {
  *   Valid OpenLayers layer
  */
 OL.Layers.CloudMade = function(layerOptions, mapid) {
-  var mapOptions = {
-  };
-  jQuery.extend(mapOptions, layerOptions.options);
-  
-console.log(layerOptions);
-
-  var cloudmade = new OpenLayers.Layer.CloudMade(layerOptions.name, layerOptions.options);
-  return cloudmade;
+  // @@TODO: Check for CloudMade definition since it is in another file
+  // Make sure there is options for a key
+  if (OL.isSet(layerOptions.options)) {
+    if (OL.isSet(layerOptions.options.key)) {
+      var mapOptions = {
+      };
+      jQuery.extend(mapOptions, layerOptions.options);
+    
+      var cloudmade = new OpenLayers.Layer.CloudMade(layerOptions.name, layerOptions.options);
+      return cloudmade;
+    }
+  }
 }

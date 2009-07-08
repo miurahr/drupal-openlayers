@@ -547,7 +547,7 @@ function openlayers_error_check_map($map, $log_errors = TRUE) {
   }
   
   // Check if any errors found to log
-  if (count($errors) > 0 && $log_errors){
+  if (count($errors) > 0 && $log_errors) {
     // Log the Error(s)
     watchdog('openlayers', implode(', ', $errors), array(), WATCHDOG_ERROR);
   }

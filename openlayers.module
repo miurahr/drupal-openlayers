@@ -312,47 +312,40 @@ function openlayers_save_preset($preset = array()) {
  * Given an a string or integer, get full preset array
  *
  * @ingroup openlayers_api
- * @param $id
- *   This can be a string or integer
+ * @param $name
+ *   Name of preset
+ * @param $reset
+ *   Boolean whether to reset cache
  * @return
  *   Array of preset data
  */
-function openlayers_get_preset($id = '') {
-  $return = array();
+function openlayers_get_preset($name = '', $reset = FALSE) {
+  $preset = array();
 
   // Check for value
-  if (empty($id)) {
-    return $return;
-  }
-
-  // Check for input and make query approriately
-  if (is_integer($id)) {
-    $query = "SELECT * FROM {openlayers_map_presets} WHERE preset_id = %d";
-  }
-  elseif (is_string($id)) {
-    $query = "SELECT * FROM {openlayers_map_presets} WHERE preset_name = '%s'";
-  }
-  else {
-    return $return;
+  if (empty($name)) {
+    return $preset;
   }
   
-  // Get data
-  $return = db_fetch_array(db_query($query, $id));
+  // Get presets
+  $presets = openlayers_get_presets('full', $reset);
+  $preset = $presets[$name];
   
-  // Check data
-  if (empty($return)) {
-    return $return;
+  if (empty($preset)) {
+    return array();
   }
   
   // Manipulate map
-  $return['preset_data'] = unserialize($return['preset_data']);
-  // Put preset id into map array for safe keeping
-  $return['preset_data']['preset_name'] = $return['preset_name'];
+  if (!is_array($preset['preset_data'])) {
+    $preset['preset_data'] = unserialize($preset['preset_data']);
+  }
+  // Put preset name into map array for safe keeping
+  $preset['preset_data']['preset_name'] = $preset['preset_name'];
   // Remove any map id or errors
-  unset($return['preset_data']['id']);
-  unset($return['preset_data']['errors']);
+  unset($preset['preset_data']['id']);
+  unset($preset['preset_data']['errors']);
   
-  return $return;
+  return $preset;
 }
 
 /**
@@ -380,13 +373,80 @@ function openlayers_get_map($id = '') {
 }
 
 /**
- * Get Presets
+ * Get Presets Array
  *
- * Get Presets from DB and format accordingly
+ * Get Presets from DB or code, via cache
+ *
+ * @ingroup openlayers_api
+ * @param $reset
+ *   Boolean whether to reset or not
+ * @return
+ *   Return formatted data
+ */
+function openlayers_presets($reset = FALSE) {
+  static $presets = array();
+  
+  // If reset, reset cache
+  if ($reset) {
+    $presets = array();
+    cache_clear_all('openlayers:presets', 'cache');
+    
+    // Clear the content.module cache 
+    // (refreshes the list of formatters provided by imagefield.module)
+    if (module_exists('content')) {
+      content_clear_type_cache();
+    }
+  }
+  
+  // Return presets if already exists (page request cache)
+  if (!empty($presets)) {
+    return $presets;
+  }
+  
+  // Attempt to get presets from cache
+  if ($cache = cache_get('openlayers:presets', 'cache')) {
+    $presets = $cache->data;
+  }
+  else {
+    // Get data from hooks
+    $presets = module_invoke_all('openlayers_presets');
+    
+    // Since data from hooks cannot be edited or deleted, we mark now
+    foreach ($presets as $name => $coded) {
+      $coded['preset_coded'] = TRUE;
+      $presets[$name] = $coded;
+    }
+  
+    // Get data from DB
+    $db_data = array();
+    $query = "SELECT * FROM {openlayers_map_presets} ORDER BY preset_title";
+    $results = db_query($query);
+    while ($row = db_fetch_array($results)) {
+      $db_data[$row['preset_name']] = $row;
+    }
+    
+    // Check for conflicting preset names, use DB over hook
+    foreach ($db_data as $name => $preset) {
+      $presets[$name] = $preset;
+    }
+
+    // Cache data
+    cache_set('openlayers:presets', $presets);
+  }
+  
+  return $presets;
+}
+
+/**
+ * Get Formatted Presets
+ *
+ * Get Presets and formats accordingly
  *
  * @ingroup openlayers_api
  * @param $format
  *   String to determine format of results
+ *   - simple: 'preset_name' => 'Preset Title'
+ *   - full: 'preset_name' => array( full preset data )
  * @param $reset
  *   Boolean whether to reset or not
  * @return
@@ -400,11 +460,7 @@ function openlayers_get_presets($format = 'simple', $reset = FALSE) {
   // Check if data has already been pulled 
   // (there should at least be the default)
   if (empty($data) || ($reset == TRUE)) {
-    $query = "SELECT * FROM {openlayers_map_presets} ORDER BY preset_title";
-    $results = db_query($query);
-    while ($row = db_fetch_array($results)) {
-      $data[$row['preset_id']] = $row;
-    }
+    $data = openlayers_presets($reset);
   }
   
   // Check if format variable has data
@@ -412,7 +468,7 @@ function openlayers_get_presets($format = 'simple', $reset = FALSE) {
     $return = array();
   
     // Go through results
-    foreach ($data as $id => $preset) {
+    foreach ($data as $name => $preset) {
       // Determine how to format data
       switch ($format) {
         case 'simple':
@@ -608,4 +664,43 @@ function openlayers_openlayers_styles_info() {
   );  
       
   return $info;
+}
+
+/**
+ * Implementation of hook_openlayers_presets
+ */
+function openlayers_openlayers_presets() {
+  $presets = array();
+
+  // Create map array
+  $default_map = array(
+    'projection' => '4326',
+    'width' => 'auto',
+    'default_layer' => 'openlayers_default_wms',
+    'height' => '300px',
+    'center' => array(
+      'lat' => '0',
+      'lon' => '0',
+      'zoom' => '2',
+    ),
+    'options' => array(
+      'displayProjection' => '4326',
+    ),
+    'controls' => array(
+      'LayerSwitcher' => TRUE,
+      'Navigation' => TRUE,
+      'PanZoomBar' => TRUE,
+      'MousePosition' => TRUE,
+    ),
+  );
+  
+  // Create full preset array
+  $presets['default'] = array(
+    'preset_name' => 'default',
+    'preset_title' => t('Default Map'),
+    'preset_description' => t('This is the default map preset that comes with the OpenLayers module.'),
+    'preset_data' => $default_map,
+  );
+  
+  return $presets;
 }

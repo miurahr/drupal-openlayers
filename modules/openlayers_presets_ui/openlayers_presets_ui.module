@@ -76,7 +76,7 @@ function openlayers_presets_ui_menu() {
     'type' => MENU_LOCAL_TASK,
     'weight' => -10,
   );
-  $items['admin/settings/openlayers/presets/add/%openlayers_presets_ui_preset_id'] = array(
+  $items['admin/settings/openlayers/presets/add/%openlayers_presets_ui_preset_name'] = array(
     'title' => 'Clone Preset',
     'description' => t('Add OpenLayers map preset.'),
     'page callback' => 'drupal_get_form',
@@ -86,7 +86,7 @@ function openlayers_presets_ui_menu() {
     'type' => MENU_NORMAL_ITEM,
     'weight' => -10,
   );
-  $items['admin/settings/openlayers/presets/%openlayers_presets_ui_preset_id/%openlayers_presets_ui_preset_action'] = array(
+  $items['admin/settings/openlayers/presets/%openlayers_presets_ui_preset_name/%openlayers_presets_ui_preset_action'] = array(
     'title' => 'Manage Preset',
     'description' => t('Manage OpenLayers map preset.'),
     'page callback' => 'openlayers_presets_ui_presets_manage',
@@ -119,9 +119,9 @@ function openlayers_presets_ui_menu() {
 /**
  * Menu wildcard loader for preset id
  */
-function openlayers_presets_ui_preset_id_load($preset_id = '') {
+function openlayers_presets_ui_preset_name_load($preset_name = '') {
   // Attempt to get preset
-  $preset = openlayers_get_preset($preset_id);
+  $preset = openlayers_get_preset($preset_name, TRUE);
   
   // Check Preset
   if (empty($preset)) {

@@ -22,7 +22,7 @@ function openlayers_presets_ui_presets_manage_list() {
   );
   
   // Get presets
-  $presets = openlayers_get_presets('full');
+  $presets = openlayers_get_presets('full', TRUE);
   
   // Create table rows
   foreach ($presets as $name => $preset) {
@@ -30,8 +30,8 @@ function openlayers_presets_ui_presets_manage_list() {
     $links = array();
     $row[] = $preset['preset_title'];
     $row[] = $preset['preset_description'];
-    // Only add edit and delete actions if not default
-    if ($preset['preset_name'] != 'default') {
+    // Only add edit and delete actions if not coded presets
+    if ($preset['preset_coded'] != TRUE) {
       $links[] = l(t('Edit'), 'admin/settings/openlayers/presets/' . $preset['preset_name'] . '/edit');
       $links[] = l(t('Delete'), 'admin/settings/openlayers/presets/' . $preset['preset_name'] .'/delete');
     }
@@ -93,8 +93,8 @@ function openlayers_presets_ui_presets_manage_add(&$form_state, $preset = array(
   $styles = openlayers_styles_get_info();
   $available_styles = array();
   
-  // Ensure we are not editing the default
-  if ($preset['preset_name'] == 'default' && $edit) {
+  // Ensure we are not editing any coded presets
+  if ($preset['preset_coded'] && $edit) {
     drupal_set_message(t('Cannot edit default preset.'), 'error');
     drupal_goto('admin/settings/openlayers/presets');
   }
@@ -210,6 +210,13 @@ function openlayers_presets_ui_presets_manage_add(&$form_state, $preset = array(
   $form['preset_edit'] = array(
     '#type' => 'value',
     '#value' => $edit,
+  );
+  
+  // Pass along map data, since it can hold stuff 
+  // that the UI cannot account for
+  $form['default_map'] = array(
+    '#type' => 'value',
+    '#value' => $default_map,
   );
   
   // Preview of map
@@ -583,7 +590,7 @@ function openlayers_presets_ui_presets_manage_add_validate($form, &$form_state) 
   }
   
   // Check if adding and name already exists
-  $existing = openlayers_get_preset($values['preset_name']);
+  $existing = openlayers_get_preset($values['preset_name'], TRUE);
   if (!empty($existing) && (!$form_state['values']['preset_edit'])) {
     form_set_error('preset_name', t('The Preset Name already exists.'));
     $found_error = TRUE;
@@ -629,6 +636,17 @@ function openlayers_presets_ui_presets_manage_add_submit($form, &$form_state) {
   if ($form_state['clicked_button']['#id'] == 'edit-openlayers-save') {
     // Convert values to map array
     $map = _openlayers_presets_ui_convert_form_to_map($form_state['values']);
+    
+    // Merge with original map data to account for data
+    // that cannot be accounted for UI
+    if (!empty($form_state['values']['default_map'])) {
+      $default_map = $form_state['values']['default_map'];
+      unset($default_map['preset_name']);
+      unset($default_map['preset_title']);
+      unset($default_map['preset_description']);
+      $map = openlayers_merge_maps($form_state['values']['default_map'], $map);
+    }
+    
     // Create preset array
     $preset = array(
       'preset_name' => $form_state['values']['preset_name'],
@@ -654,8 +672,8 @@ function openlayers_presets_ui_presets_manage_add_submit($form, &$form_state) {
  * Menu Callback for Preset Delete Form
  */
 function openlayers_presets_ui_presets_manage_delete(&$form_state, $preset = array()) {
-  // Ensure we are not deleting the default
-  if ($preset['preset_name'] == 'default') {
+  // Ensure we are not deleting any coded presets
+  if ($preset['preset_coded']) {
     drupal_set_message(t('Cannot delete default preset.'), 'error');
     drupal_goto('admin/settings/openlayers/presets');
   }
@@ -679,18 +697,24 @@ function openlayers_presets_ui_presets_manage_delete(&$form_state, $preset = arr
  * Form Submit Callback for Preset Delete Form
  */
 function openlayers_presets_ui_presets_manage_delete_submit($form, &$form_state) {
-  $preset = openlayers_get_preset($form_state['values']['preset_name']);
-
-  // Create query
-  $query = "DELETE FROM {openlayers_map_presets} WHERE preset_id = %d";
-  $result = db_query($query, $preset['preset_id']);
+  $preset = openlayers_get_preset($form_state['values']['preset_name'], TRUE);
   
-  // Check query results
-  if ($result) {
-    drupal_set_message(t('Preset %name was deleted.', array('%name' => $preset['preset_name'])));
+  // Check if coded
+  if ($preset['preset_coded']) {
+    drupal_set_message(t('Cannot delete %name because it is provided by a module.', array('%name' => $preset['preset_name'])));
   }
   else {
-    drupal_set_message(t('Error when attempting to delete preset.'), 'error');
+    // Create query
+    $query = "DELETE FROM {openlayers_map_presets} WHERE preset_id = %d";
+    $result = db_query($query, $preset['preset_id']);
+  
+    // Check query results
+    if ($result) {
+      drupal_set_message(t('Preset %name was deleted.', array('%name' => $preset['preset_name'])));
+    }
+    else {
+      drupal_set_message(t('Error when attempting to delete preset.'), 'error');
+    }
   }
     
   // Redirect

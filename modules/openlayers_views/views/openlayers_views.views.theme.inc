@@ -11,12 +11,10 @@
 /**
  * Implementation of theme function
  */
-function theme_openlayers_views_map($view, $options, $map, $title) {
-  $title = ($title) ? '<h3>'. $title .'</h3>' : '';
+function theme_openlayers_views_map($view, $options = array(), $map = array()) {
   $output = '
-    '. $title .'
     <div class="openlayers-views-map">
-      '. $map['themed'] .'
+      ' . $map['themed'] . '
     </div>
   ';
   

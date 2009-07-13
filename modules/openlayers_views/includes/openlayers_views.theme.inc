@@ -11,7 +11,7 @@
 /**
  * Theme function for openlayers_views_feature_style
  */
-function theme_openlayers_views_feature_style($view = NULL, $row = NULL) {
+function theme_openlayers_views_feature_style($view = NULL, $row = NULL, $group = NULL) {
   $output = array();
 
   // Here is where styles based on the view or row can be created 

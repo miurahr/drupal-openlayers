@@ -35,6 +35,7 @@ function openlayers_views_theme($existing, $type, $theme, $path) {
       'arguments' => array(
         'view' => NULL,
         'row' => NULL,
+        'group' => NULL,
       ),
       'file' => 'includes/openlayers_views.theme.inc',
     ),

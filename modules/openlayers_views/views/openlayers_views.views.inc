@@ -25,6 +25,7 @@ function openlayers_views_views_plugins() {
         'path' => drupal_get_path('module', 'openlayers_views') .'/views',
         'uses fields' => TRUE,
         'uses options' => TRUE,
+		'uses grouping' => TRUE,
         'type' => 'normal',
         'even empty' => TRUE,
       ),

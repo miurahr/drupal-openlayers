@@ -455,7 +455,7 @@ class openlayers_views_style_map extends views_plugin_style {
         $map['behaviors']['openlayers_views_zoom_to_layer'] = array(
           'id' => 'openlayers_views_zoom_to_layer',
           'type' => 'openlayers_behaviors_zoom_to_layer',
-          'layer' => 'openlayers_views_layer'. $this->view->name,
+          'layer' => 'openlayers_views_layer_'. $this->view->name,
         );
       }
       // Full screen

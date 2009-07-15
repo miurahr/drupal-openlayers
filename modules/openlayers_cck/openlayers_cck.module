@@ -286,7 +286,7 @@ function openlayers_cck_wkt_element_process($element, $edit, &$form_state, &$for
     '#delta' => $element['#delta'],
     '#columns' => $element['#columns'],
   );
-
+  
   return $element;
 }
 
@@ -423,7 +423,7 @@ function _openlayers_cck_render_element_map($field_name = '', $field_label = '',
   $field_type = $field['type'];
   $field_type_html = str_replace('_', '-', $field_type);
   $widget = $field['widget'];
-
+    
   // Get default map
   if (isset($widget['openlayers_cck_preset_map'])) {
     $map = openlayers_get_map($widget['openlayers_cck_preset_map']);
@@ -496,15 +496,20 @@ function _openlayers_cck_render_element_map($field_name = '', $field_label = '',
   }
   else {
     // Check which feature types are available
-    foreach ($widget['openlayers_cck_feature_types'] as $type) {
-      if (!empty($type)) {
-        $map['behaviors']['openlayers_cck_edit_' . $type] = $behavior_base + 
-          array(
-            'id' => 'openlayers_cck_edit_' . $type,
-            'feature_type' => $type,
-          );
+    if ($widget['openlayers_cck_feature_types']){
+      foreach ($widget['openlayers_cck_feature_types'] as $type) {
+        if (!empty($type)) {
+          $map['behaviors']['openlayers_cck_edit_' . $type] = $behavior_base + 
+            array(
+              'id' => 'openlayers_cck_edit_' . $type,
+              'feature_type' => $type,
+            );
+        }
       }
     }
+    // @@TODO: Allow default values using a map
+    // We are in the widget settings screen and it wants default values
+    else return false;
   }
   
   // Check if multiple, as there are specific needs

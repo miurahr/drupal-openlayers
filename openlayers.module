@@ -151,6 +151,11 @@ function openlayers_render_map($map = array(), $render = TRUE) {
     return FALSE;
   }
   
+  // If the map array is empty, then load the default preset.
+  if (empty($map)){
+    $map = openlayers_get_default_map();
+  }
+  
   // Intialize
   if (openlayers_intialize() == FALSE) {
     return FALSE;

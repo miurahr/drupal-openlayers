@@ -211,20 +211,6 @@ class openlayers_views_style_map extends views_plugin_style {
       }
     }
     
-    // Variable Styles
-    $form['style'] = array(
-        '#type' => 'fieldset',
-        '#title' => t('Feature Styles'),
-        '#collapsible' => TRUE,
-        '#collapsed' => FALSE,
-    );
-    $form['style']['enable_styling'] = array(
-      '#type' => 'checkbox',
-      '#title' => t('Enable Variable Styling'),
-      '#description' => t('This will enable the view to run the features through the theming styles functions to determine each feature\'s style.  This allows for variable styling, such as changing the color based on another field in the view.  See the OpenLayers theming documentation for details.'),
-      '#default_value' => $this->options['style']['enable_styling'],
-    );
-    
     // Grouping
     $form['grouping_set'] = array(
       '#type' => 'fieldset',
@@ -240,6 +226,22 @@ class openlayers_views_style_map extends views_plugin_style {
       '#default_value' => $this->options['grouping_set']['grouping'],
       '#description' => t('You can group features by field.  This means that each group will be a separate layer with those specific features.'),
     );
+    
+    // Variable Styles
+    $form['style'] = array(
+        '#type' => 'fieldset',
+        '#title' => t('Feature Styles'),
+        '#description' => t('For advanced users only'),
+        '#collapsible' => TRUE,
+        '#collapsed' => TRUE,
+    );
+    $form['style']['snippet'] = array(
+      '#type' => 'textarea',
+      '#title' => t('Feature Styles function'),
+      '#description' => t('Enter PHP code that returns a style array for each feature. This will overrirde theme feature styling functions. <br/> $fields contains your defined fields, $row contains instances of those fields along with geometries. Array should be of the form \'styleProperty\' => \'styleValue\'. You may return false to use defaults. See documentation for available style Properties.'),
+      '#default_value' => $this->options['style']['snippet'],
+    );
+    
   }
      
   /**
@@ -324,14 +326,20 @@ class openlayers_views_style_map extends views_plugin_style {
         $feature['attributes']['openlayers_tooltip'] = $row->$tooltip_field_alias;
       }
       
-      // Check for varable styling
-      if (!empty($this->options['style']['enable_styling'])) {
-        $feature_style = theme('openlayers_views_feature_style', $this, $row, $group);
-        if (is_array($feature_style) && !empty($feature_style)) {
+      // Run feature styles through theme function
+      $feature_style = theme('openlayers_views_feature_style', $this, $row, $group);
+      if (is_array($feature_style) && !empty($feature_style)) {
+        $feature['style'] = $feature_style;
+      }
+      
+      // Run feature styles through custom php function
+      if ($this->options['style']['snippet']) {
+        $feature_style = eval($this->options['style']['snippet']);
+        if (is_array($feature_style)){
           $feature['style'] = $feature_style;
         }
       }
-      
+            
       // Only add features with WKT data
       if (!empty($feature['wkt'])) {
         $features[] = $feature;

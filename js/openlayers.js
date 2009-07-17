@@ -84,11 +84,18 @@ OL.loadMaps = function() {
 OL.renderMap = function(map) {
   // Create Projection objects
   OL.maps[map.id].projection = new OpenLayers.Projection('EPSG:' + map.projection);
-  OL.maps[map.id].displayProjection = new OpenLayers.Projection('EPSG:' + map.options.displayProjection);
-
-  // Create base map options
-  var options = OL.createMapOptions(map.options, map.controls, map.id);
-
+  
+  if (OL.isSet(map.options)){
+    OL.maps[map.id].displayProjection = new OpenLayers.Projection('EPSG:' + map.options.displayProjection);
+  
+    // Create base map options
+    var options = OL.createMapOptions(map.options, map.controls, map.id);
+  }
+  else {
+    OL.maps[map.id].displayProjection = OL.maps[map.id].projection;
+    var options = [];
+  }
+  
   // Store map in our registry of active OpenLayers objects
   OL.maps[map.id].map = new OpenLayers.Map(map.id, options);
   
@@ -127,9 +134,11 @@ OL.renderMap = function(map) {
   
   // Zoom to Center
   // @@TODO: Do this in the map options -- As isthis will result in a bug in the zoom map helper in the map form
-  var center = new OpenLayers.LonLat(map.center.lon, map.center.lat);
-	var zoom = parseInt(map.center.zoom);
-  OL.maps[map.id].map.setCenter(center, zoom, false, false);
+  if (OL.isSet(map.center)){
+    var center = new OpenLayers.LonLat(map.center.lon, map.center.lat);
+	  var zoom = parseInt(map.center.zoom);
+    OL.maps[map.id].map.setCenter(center, zoom, false, false);
+  }
   
   // Set our default base layer
   OL.maps[map.id].map.setBaseLayer(OL.maps[map.id].layers[map.default_layer]);

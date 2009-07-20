@@ -27,21 +27,6 @@ function openlayers_behaviors_process_zoom_to_layer($behavior, &$map) {
 }
 
 /**
- * Callback for OpenLayers Behaviors (Fullscreen)
- *
- * @param $behavoir
- *   Data about behavoir
- * @param $map
- *   Map array
- * @return
- *   Behavior array
- */
-function openlayers_behaviors_process_fullscreen($behavior, &$map) {
-  drupal_add_css(drupal_get_path('module', 'openlayers_behaviors') .'/openlayers_behaviors.css', 'module');
-  return $behavior;
-}
-
-/**
  * Callback for OpenLayers Behaviors (Tooltip)
  *
  * @param $behavoir
@@ -86,6 +71,45 @@ function openlayers_behaviors_process_draw_features($behavior, &$map) {
     $map['events'] = ($map['events']) ? $map['events'] : array();
     $map['events']['mapReady'] = ($map['events']['mapReady']) ? $map['events']['mapReady'] : array();
     $map['events']['mapReady'][] = 'drawFeaturesMapReady';
+    
+    return $behavior;
+  }
+}
+
+/**
+ * Callback for OpenLayers Behaviors (Fullscreen)
+ *
+ * @param $behavoir
+ *   Data about behavoir
+ * @param $map
+ *   Map array
+ * @return
+ *   Behavior array
+ */
+function openlayers_behaviors_process_fullscreen($behavior, &$map) {
+  drupal_add_css(drupal_get_path('module', 'openlayers_behaviors') .'/openlayers_behaviors.css', 'module');
+  return $behavior;
+}
+
+/**
+ * Callback for OpenLayers Behaviors (De-clutter)
+ *
+ * @param $behavoir
+ *   Data about behavoir
+ * @param $map
+ *   Map array
+ * @return
+ *   Behavior array
+ */
+function openlayers_behaviors_process_declutter($behavior, &$map) {
+  if ($behavior['layer'] && $map['layers'][$behavior['layer']]) {
+    
+    // Add Events to map
+    $map['events'] = ($map['events']) ? $map['events'] : array();
+    $map['events']['zoomend'] = ($map['events']['zoomend']) ? $map['events']['zoomend'] : array();
+    $map['events']['zoomend'][] = 'declutterZoomEnd';
+    
+    // @@TODO: Add Events to layer (features added + removed)
     
     return $behavior;
   }

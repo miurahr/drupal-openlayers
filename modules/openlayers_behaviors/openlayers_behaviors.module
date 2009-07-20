@@ -61,6 +61,14 @@ function openlayers_behaviors_openlayers_behaviors_info() {
     'js_file' => $js_file,
     'js_callback' => 'fullscreen',
   );
+  $info['openlayers_behaviors_declutter'] = array(
+    'name' => t('De-clutter'),
+    'description' => t('When points are overlapping, de-clutter will space them out so the user can see all of them.'),
+    'file' => $file,
+    'callback' => 'openlayers_behaviors_process_declutter',
+    'js_file' => $js_file,
+    'js_callback' => 'declutter',
+  );
   
   return $info;
 }

@@ -424,3 +424,233 @@ OL.Behaviors.fullscreen = function(event) {
       }
     });
 }
+
+
+
+/**
+ * De-clutter Behavoir
+ * 
+ * This function sets up the behavior - making a copy of the original geometry,
+ * and calling the first SortAndMove
+ *
+ * @param event
+ *   Event Object
+ */
+OL.Behaviors.declutter = function(event) {
+  for (var l in event.map.layers) {
+    if (event.map.layers[l].drupalId == event.behavior.layer) var layer = event.map.layers[l];
+  }
+  for (var f in layer.features) {
+    if (layer.features[f].geometry.CLASS_NAME == 'OpenLayers.Geometry.Point'){
+      layer.features[f].originalGeometry = layer.features[f].geometry.clone();
+    }
+  }
+  OL.Behaviors.declutterSortAndMove(layer);
+}
+
+
+/**
+ * De-Clutter Sort and Move
+ * 
+ * Given a layer, find all the points and move them so they are not overlapping.
+ * 
+ * @param layer
+ *   Layer Object
+ */
+
+OL.Behaviors.declutterSortAndMove = function(layer) {
+  var points = [];
+  // Gather up our points. declutter currently only works with points.
+  for (var f in layer.features){
+    if (layer.features[f].geometry.CLASS_NAME == 'OpenLayers.Geometry.Point'){
+      points.push(layer.features[f]);
+    }
+  }
+  
+  // Get the max pixel size of the icon or the vector representation
+  for (var p in points){
+    if (points[p].style){
+      var pointRadius     = parseInt(points[p].style.pointRadius);
+      var strokeWidth     = parseInt(points[p].style.strokeWidth);
+      var externalGraphic = points[p].style.externalGraphic;
+      var graphicWidth    = parseInt(points[p].style.graphicWidth);
+      var graphicHeight   = parseInt(points[p].style.graphicHeight);
+    }
+    else {
+    // We are using the default layer style
+      var pointRadius     = parseInt(layer.styleMap.styles.default.defaultStyle.pointRadius);
+      var strokeWidth     = parseInt(layer.styleMap.styles.default.defaultStyle.strokeWidth);
+      var externalGraphic = layer.styleMap.styles.default.defaultStyle.externalGraphic;
+      var graphicWidth    = parseInt(layer.styleMap.styles.default.defaultStyle.graphicWidth);
+      var graphicHeight   = parseInt(layer.styleMap.styles.default.defaultStyle.graphicHeight);
+    }
+    
+    if (OL.isSet(externalGraphic)){
+      // We are using a graphic
+      if (graphicWidth < graphicHeight){
+        points[p].pixelSize = intvalgraphicHeight -2;
+      }
+      else {
+        points[p].pixelSize = graphicWidth -2;
+      }
+    }
+    else {
+      // We are using a vector style
+      points[p].pixelSize = (strokeWidth * 2) + pointRadius + 2;
+    }
+
+    
+  }
+  
+  // Get the pixel coordinates of the points
+  for (var p in points) {
+    var centroidPixel = layer.map.getPixelFromLonLat(new OpenLayers.LonLat(points[p].geometry.x, points[p].geometry.y));
+    points[p].pixelX = centroidPixel.x;
+    points[p].pixelY = centroidPixel.y;
+  }
+  
+  // Check to see if there is a collision, and if there is then 'move' the point by adjusting the pixel
+  for (var p in points) {
+    if (OL.EventHandlers.declutterCollision(points[p], points) == true){
+      // We have a collision. Try moving the point.
+      var testPoint = { 'pixelX': points[p].pixelX, 'pixelY': points[p].pixelY, 'pixelSize': points[p].pixelSize, 'id': points[p].id };
+      var emptyPlace = OL.EventHandlers.declutterFindFreeSpace(testPoint, points, 0, 1);
+      points[p].pixelX = emptyPlace.pixelX;
+      points[p].pixelY = emptyPlace.pixelY;
+      var newPixelCoord = new OpenLayers.Pixel(points[p].pixelX, points[p].pixelY);
+      var newLonLat = layer.map.getLonLatFromPixel(newPixelCoord);
+      // We've found an empty spot, move the point to it!
+      points[p].geometry.x = newLonLat.lon;
+      points[p].geometry.y = newLonLat.lat;
+    }
+  }
+  layer.redraw();
+}
+
+/**
+ * De-Clutter Find Free Space
+ * 
+ * Given a point, and a array of points, find the closet place that is has
+ * enough free space to fit the point. It does this by recursively calling
+ * itself, spiralling out to find a free spot.
+ * 
+ * @param testPoint
+ *   Point we should find a free space for
+ * @param points
+ *   Array of points that the TetPoint should not overlap with.
+ * @param direction
+ *   Direction (1 - 8) to try to find a free space at.
+ * @param distance
+ *   Distance to try to find a free space at
+ */
+OL.EventHandlers.declutterFindFreeSpace = function(testPoint, points, direction, distance){
+  var tempPoint = testPoint;
+  //@@TODO: Fix the use of direction instead of using math.random
+  //var angle = (direction/8) * 2 * 3.1415;
+  var angle = (Math.random()) * 2 * 3.141569;
+  tempPoint.pixelY = tempPoint.pixelY + (((distance * tempPoint.pixelSize) + 4) * (Math.sin(angle)));
+  tempPoint.pixelX = tempPoint.pixelX + (((distance * tempPoint.pixelSize) + 4) * (Math.cos(angle)));
+  
+  if (OL.EventHandlers.declutterCollision(tempPoint, points) == true){
+    // We didn't find a free spot, adjust direction (and possibly distance) and try again.
+    if (direction == 9) {
+      // We have exausted all directions. Try furthur a-field.
+      direction = 1;
+      distance = distance + 1;
+    }
+    else {
+      direction = direction + 1; 
+    }
+    // Try again recursively.
+    return OL.EventHandlers.declutterFindFreeSpace(testPoint, points, direction, distance);
+  }
+  else {
+    return tempPoint;
+  }
+}
+
+/**
+ * De-Clutter Collision
+ * 
+ * Determine whether a given point collides with an array of points
+ * 
+ * @param testPoint
+ *   Point we should find a free space for
+ * @param points
+ *   Array of points that the TetPoint should not overlap with.
+ */
+OL.EventHandlers.declutterCollision = function(testPoint, points){
+  // Go through points and see if there is a collision with this point.
+  for (var p in points){
+    if (points[p].id != testPoint.id){
+      // Distance as per Pythagorean theorem
+      var distance = Math.sqrt(Math.pow((testPoint.pixelX - points[p].pixelX),2) + Math.pow((testPoint.pixelY - points[p].pixelY),2));
+      if (distance < testPoint.pixelSize) return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * De-Clutter Zoom End
+ * 
+ * Event Handler for when the user zooms. We reset all the points to their original location,
+ * then call declutterSortAndMove to seperate them out again.
+ * 
+ * @param event
+ *   Event Object
+ */
+OL.EventHandlers.declutterZoomEnd = function(event) {
+  mapid = event.object.mapid;
+  // Go through all declutter behaviors and trigger declutterSortAndMove
+  for (var b in OL.mapDefs[mapid].behaviors){
+    var behavior = OL.mapDefs[mapid].behaviors[b];
+    if (behavior.type == 'openlayers_behaviors_declutter'){
+      for (var l in event.object.layers) {
+        if (event.object.layers[l].drupalId == behavior.layer) var layer = event.object.layers[l];
+      }
+      
+        // Go through features and put them back to their original place, so that we can shuffle them again for the next zoom.
+      for (var f in layer.features) {
+        if (layer.features[f].geometry.CLASS_NAME == 'OpenLayers.Geometry.Point'){
+          layer.features[f].geometry.x = layer.features[f].originalGeometry.x;
+          layer.features[f].geometry.y = layer.features[f].originalGeometry.y;
+        }
+      }
+      OL.Behaviors.declutterSortAndMove(layer);
+    }
+  }
+}
+
+
+
+/**
+ * Dump Variables -- This is a JS developer tool
+ */
+function openlayersVarDump(element, limit, depth) {
+  limit = limit ? limit : 1;
+  depth = depth ? depth : 0;
+  returnString = '<ol>';
+  
+  for (property in element) {
+    //Property domConfig isn't accessable
+    if (property != 'domConfig') {
+      returnString += '<li><strong>'+ property + '</strong> <small>(' + (typeof element[property]) + ')</small>';
+      if (typeof element[property] == 'number' || typeof element[property] == 'boolean')
+        returnString += ' : <em>' + element[property] + '</em>';
+      if (typeof element[property] == 'string' && element[property])
+        returnString += ': <div style="background:#C9C9C9;border:1px solid black; overflow:auto;"><code>' +
+                  element[property].replace(/</g, '<').replace(/>/g, '>') + '</code></div>';
+      if ((typeof element[property] == 'object') && (depth <limit))
+        returnString += openlayersVarDump(element[property], limit, (depth + 1));
+      returnString += '</li>';
+    }
+  }
+  returnString += '</ol>';
+  if (depth == 0) {
+    winpop = window.open("", "","width=800,height=600,scrollbars,resizable");
+    winpop.document.write('<pre>' + returnString + '</pre>');
+    winpop.document.close();
+  }
+  return returnString;
+}

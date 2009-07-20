@@ -5,3 +5,8 @@ core = 6.x
 package = OpenLayers
 dependencies[] = openlayers
 dependencies[] = views
+; Information added by drupal.org packaging script on 2009-07-18
+version = "6.x-1.x-dev"
+core = "6.x"
+project = "openlayers"
+datestamp = "1247876400"

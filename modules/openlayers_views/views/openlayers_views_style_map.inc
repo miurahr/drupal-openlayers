@@ -198,6 +198,12 @@ class openlayers_views_style_map extends views_plugin_style {
         '#description' => t('Allow map to be viewed fullscreen'),
         '#default_value' => $this->options['behaviors']['fullscreen'], 
       );
+      $form['behaviors']['declutter'] = array(
+        '#type' => 'checkbox',
+        '#title' => t('Declutter'),
+        '#description' => t('Automagically space points so they do not overlap.'),
+        '#default_value' => $this->options['behaviors']['declutter'], 
+      );
       // Tooltip options if fields
       if (count($fields) > 0) {
         $tooltip_options = array_merge(array('0' => t('<none>')), $fields);
@@ -261,6 +267,8 @@ class openlayers_views_style_map extends views_plugin_style {
           
     // Build feature. We create one feature per field per row.
     foreach ($rows as $id => $row) {
+      $feature = array();
+      
       // Go through data sources
       // @@TODO: In theory, there could be multiple features per row., allow for multiple features per row
       foreach ($data_source['value'] as $data_source_value) {
@@ -339,12 +347,12 @@ class openlayers_views_style_map extends views_plugin_style {
           $feature['style'] = $feature_style;
         }
       }
-            
+      
       // Only add features with WKT data
       if (!empty($feature['wkt'])) {
         $features[] = $feature;
       }
-    }    
+    }
     return $features;    
   }
   
@@ -471,6 +479,14 @@ class openlayers_views_style_map extends views_plugin_style {
         $map['behaviors']['openlayers_views_fullscreen'] = array(
           'id' => 'openlayers_views_fullscreen',
           'type' => 'openlayers_behaviors_fullscreen'
+        );
+      }
+      // Declutter
+      if ($this->options['behaviors']['declutter']) {
+        $map['behaviors']['openlayers_views_declutter'] = array(
+          'id' => 'openlayers_views_declutter',
+          'type' => 'openlayers_behaviors_declutter',
+          'layer' => 'openlayers_views_layer_'. $this->view->name,
         );
       }
     }

@@ -186,6 +186,25 @@ class openlayers_views_style_map extends views_plugin_style {
         '#collapsible' => TRUE,
         '#collapsed' => FALSE,
       );
+
+      // Tooltip and Pop-up options if fields
+      if (count($fields) > 0) {
+        $tooltip_options = array_merge(array('0' => t('<none>')), $fields);
+        $form['behaviors']['tooltip'] = array(
+          '#type' => 'select',
+          '#title' => t('Tooltip Field'),
+          '#title' => t('Select the field you would like to use as a tooltip'),
+          '#options' => $tooltip_options,
+          '#default_value' => $this->options['behaviors']['tooltip'], 
+        );
+        $form['behaviors']['popup'] = array(
+          '#type' => 'select',
+          '#title' => t('Pop-up ooltip Field'),
+          '#title' => t('Select the field you would like to use as a popup'),
+          '#options' => $tooltip_options,
+          '#default_value' => $this->options['behaviors']['popup'], 
+        );
+      }
       $form['behaviors']['zoom_to_layer'] = array(
         '#type' => 'checkbox',
         '#title' => t('Zoom to Features'),
@@ -212,18 +231,6 @@ class openlayers_views_style_map extends views_plugin_style {
         '#process' => array('views_process_dependency'),
         '#dependency' => array('edit-style-options-behaviors-declutter' => array('1')),
       );
-
-      // Tooltip options if fields
-      if (count($fields) > 0) {
-        $tooltip_options = array_merge(array('0' => t('<none>')), $fields);
-        $form['behaviors']['tooltip'] = array(
-          '#type' => 'select',
-          '#title' => t('Tooltip Field'),
-          '#title' => t('Select the field you would like to use as a tooltip'),
-          '#options' => $tooltip_options,
-          '#default_value' => $this->options['behaviors']['tooltip'], 
-        );
-      }
     }
     
     // Grouping
@@ -342,6 +349,13 @@ class openlayers_views_style_map extends views_plugin_style {
         $tooltip_field_alias = $fields[$tooltip_field]['field_alias'];
         $feature['attributes']['openlayers_tooltip'] = $row->$tooltip_field_alias;
       }
+ 
+       // Fill in popup attribute
+      if (!empty($this->options['behaviors']['popup'])) {
+        $popup_field = $this->options['behaviors']['popup'];
+        $popup_field_alias = $fields[$popup_field]['field_alias'];
+        $feature['attributes']['openlayers_popup'] = $row->$popup_field_alias;
+      }
       
       // Run feature styles through theme function
       $feature_style = theme('openlayers_views_feature_style', $this, $row, $group);
@@ -453,8 +467,9 @@ class openlayers_views_style_map extends views_plugin_style {
         'features' => $features,
       );
       
-      // Set up tooltip behavior
+      // Set up per-layer behaviors
       if (module_exists('openlayers_behaviors')) {
+        // Set up tooltip behavior
         if (!empty($this->options['behaviors']['tooltip'])) {
           $map['behaviors'] = is_array($map['behaviors']) ? $map['behaviors'] : array();
           $field_id = $this->view->display_handler->get_handler('field', $this->options['behaviors']['tooltip'])->field_alias;
@@ -464,6 +479,30 @@ class openlayers_views_style_map extends views_plugin_style {
             'layer' => $layer_id,
             'attribute' => 'openlayers_tooltip',
           );
+        }
+        // Set up popup behaviors
+        if (!empty($this->options['behaviors']['popup'])) {
+          $map['behaviors'] = is_array($map['behaviors']) ? $map['behaviors'] : array();
+          $field_id = $this->view->display_handler->get_handler('field', $this->options['behaviors']['popup'])->field_alias;
+          $map['behaviors']['openlayers_views_popup_' . $layer_id] = array(
+            'id' => 'openlayers_views_popup_' . $layer_id,
+            'type' => 'openlayers_behaviors_popup',
+            'layer' => $layer_id,
+            'attribute' => 'openlayers_popup',
+          );
+        }
+        // Set up declutter behaviors
+        if ($this->options['behaviors']['declutter']) {
+          $map['behaviors'] = is_array($map['behaviors']) ? $map['behaviors'] : array();
+          $map['behaviors']['openlayers_views_declutter_' . $layer_id] = array(
+            'id' => 'openlayers_views_declutter_' . $layer_id,
+            'type' => 'openlayers_behaviors_declutter',
+            'layer' => $layer_id,
+          );
+          
+          if ($this->options['behaviors']['declutter_adjustment']) {
+            $map['behaviors']['openlayers_views_declutter_' . $layer_id]['adjustment'] = intval($this->options['behaviors']['declutter_adjustment']);
+          }
         }
       }
     }
@@ -489,18 +528,6 @@ class openlayers_views_style_map extends views_plugin_style {
           'id' => 'openlayers_views_fullscreen',
           'type' => 'openlayers_behaviors_fullscreen'
         );
-      }
-      // Declutter
-      if ($this->options['behaviors']['declutter']) {
-        $map['behaviors']['openlayers_views_declutter'] = array(
-          'id' => 'openlayers_views_declutter',
-          'type' => 'openlayers_behaviors_declutter',
-          'layer' => 'openlayers_views_layer_'. $this->view->name,
-        );
-        
-        if ($this->options['behaviors']['declutter_adjustment']) {
-          $map['behaviors']['openlayers_views_declutter']['adjustment'] = intval($this->options['behaviors']['declutter_adjustment']);
-        }
       }
     }
     

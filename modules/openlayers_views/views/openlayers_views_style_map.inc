@@ -189,19 +189,19 @@ class openlayers_views_style_map extends views_plugin_style {
 
       // Tooltip and Pop-up options if fields
       if (count($fields) > 0) {
-        $tooltip_options = array_merge(array('0' => t('<none>')), $fields);
+        $tooltip_popup_options = array_merge(array('0' => t('<none>'), '#all_fields' => t('<all> (render entire row)')), $fields);
         $form['behaviors']['tooltip'] = array(
           '#type' => 'select',
           '#title' => t('Tooltip Field'),
           '#title' => t('Select the field you would like to use as a tooltip'),
-          '#options' => $tooltip_options,
+          '#options' => $tooltip_popup_options,
           '#default_value' => $this->options['behaviors']['tooltip'], 
         );
         $form['behaviors']['popup'] = array(
           '#type' => 'select',
-          '#title' => t('Pop-up ooltip Field'),
+          '#title' => t('Pop-up Field'),
           '#title' => t('Select the field you would like to use as a popup'),
-          '#options' => $tooltip_options,
+          '#options' => $tooltip_popup_options,
           '#default_value' => $this->options['behaviors']['popup'], 
         );
       }
@@ -269,10 +269,10 @@ class openlayers_views_style_map extends views_plugin_style {
   /**
    * Map features
    */
-  function map_features($rows = array(), $group = NULL) {  
+  function map_features($records = array(), $rows = array(), $group = NULL) {  
     $features = array();    
     $data_source = $this->options['data_source'];
-            
+    
     // Get list of fields in this view
     $handlers = $this->display->handler->get_handlers('field');
     $fields = array();
@@ -280,9 +280,8 @@ class openlayers_views_style_map extends views_plugin_style {
       $fields[$field_id] = $handler->definition;
       $fields[$field_id]['field_alias'] = $handler->field_alias;
     }
-          
     // Build feature. We create one feature per field per row.
-    foreach ($rows as $id => $row) {
+    foreach ($records as $id => $record) {
       $feature = array();
       
       // Go through data sources
@@ -291,8 +290,8 @@ class openlayers_views_style_map extends views_plugin_style {
         switch ($data_source_value) {
           case 'node_locations':
             // @@TODO: These fields are provided only if the fields are chosen in the interface.
-            if (!empty($row->location_longitude) && !empty($row->location_latitude)) {
-              $wkt_string = 'POINT(' . $row->location_longitude . ' ' . $row->location_latitude . ')';
+            if (!empty($record->location_longitude) && !empty($record->location_latitude)) {
+              $wkt_string = 'POINT(' . $record->location_longitude . ' ' . $record->location_latitude . ')';
               $feature['wkt'] = $wkt_string;
               $feature['projection'] = '4326';
             }
@@ -303,8 +302,8 @@ class openlayers_views_style_map extends views_plugin_style {
             foreach ($data_source['geo_fields'] as $geo_field) {            
               $wkt_field = $geo_field . '_wkt';
               
-              if ($row->$wkt_field) {
-                $feature['wkt'] = $row->$wkt_field;
+              if ($record->$wkt_field) {
+                $feature['wkt'] = $record->$wkt_field;
                 $feature['projection'] ='4326';
               }
             }
@@ -314,9 +313,11 @@ class openlayers_views_style_map extends views_plugin_style {
             // @@TODO
             break;
             
-          case 'other_latlon':   
-            $lon = $row->$fields[$data_source['other_lon']]['field_alias'];
-            $lat = $row->$fields[$data_source['other_lat']]['field_alias'];
+          case 'other_latlon':
+            $lat_field = $fields[$data_source['other_lon']]['field_alias'];
+            $lon_field = $fields[$data_source['other_lat']]['field_alias'];
+            $lon = $record->$lat_field;
+            $lat = $record->$lon_field;
             
             if (!empty($lat) && !empty($lon)) {
               $feature['wkt'] = 'POINT(' . $lon . ' ' . $lat . ')';
@@ -327,8 +328,9 @@ class openlayers_views_style_map extends views_plugin_style {
           case 'other_wkt':
             // Go through selected field
             foreach ($data_source['other_wkt'] as $wkt_field) {
-              if (!empty($row->$fields[$wkt_field]['field_alias'])) {
-                $feature['wkt'] = $row->$fields[$wkt_field]['field_alias'];
+              if (!empty($record->$wkt_field)) {
+                $feature['wkt'] = $record->$wkt_field;
+                // @@TODO: Allow different projections
                 $feature['projection'] ='4326';
               }
             }
@@ -340,25 +342,35 @@ class openlayers_views_style_map extends views_plugin_style {
       // Fill in all attributes
       foreach ($fields as $fid => $field) {
         $field_alias = $field['field_alias'];
-        $feature['attributes'][$field_alias] = $row->$field_alias;
+        $feature['attributes'][$field_alias] = $record->$field_alias;
       }
       
       // Fill in tooltip attribute
       if (!empty($this->options['behaviors']['tooltip'])) {
-        $tooltip_field = $this->options['behaviors']['tooltip'];
-        $tooltip_field_alias = $fields[$tooltip_field]['field_alias'];
-        $feature['attributes']['openlayers_tooltip'] = $row->$tooltip_field_alias;
+        if ($this->options['behaviors']['tooltip'] == '#all_fields'){
+          $feature['attributes']['openlayers_tooltip'] = $this->row_plugin->render($record);
+        }
+        else {
+          $tooltip_field = $this->options['behaviors']['tooltip'];
+          $tooltip_field_alias = $fields[$tooltip_field]['field_alias'];
+          $feature['attributes']['openlayers_tooltip'] = $record->$tooltip_field_alias;
+        }
       }
  
        // Fill in popup attribute
       if (!empty($this->options['behaviors']['popup'])) {
-        $popup_field = $this->options['behaviors']['popup'];
-        $popup_field_alias = $fields[$popup_field]['field_alias'];
-        $feature['attributes']['openlayers_popup'] = $row->$popup_field_alias;
+        if ($this->options['behaviors']['popup'] == '#all_fields'){
+          $feature['attributes']['openlayers_popup'] = $this->row_plugin->render($record);
+        }
+        else {
+          $popup_field = $this->options['behaviors']['popup'];
+          $popup_field_alias = $fields[$popup_field]['field_alias'];
+          $feature['attributes']['openlayers_popup'] = $record->$popup_field_alias;
+        }
       }
       
       // Run feature styles through theme function
-      $feature_style = theme('openlayers_views_feature_style', $this, $row, $group);
+      $feature_style = theme('openlayers_views_feature_style', $this, $record, $group);
       if (is_array($feature_style) && !empty($feature_style)) {
         $feature['style'] = $feature_style;
       }
@@ -412,7 +424,8 @@ class openlayers_views_style_map extends views_plugin_style {
     }
     
     // Check row plugin if using it.
-    if ($this->uses_row_plugin() && empty($this->row_plugin)) {
+    if (empty($this->row_plugin)) {
+      drupal_set_message("Mising Row Plug-in","error");
       vpr('views_plugin_style_default: Missing row plugin');
       return;
     }
@@ -434,7 +447,7 @@ class openlayers_views_style_map extends views_plugin_style {
     foreach ($sets as $group_title => $records) {
       // Make 'machine readable' format
       $group_name = strtolower(str_replace(' ', '_', $group_title));
-    
+      
       // Get rows
       if ($this->uses_row_plugin()) {
         $rows = array();
@@ -449,7 +462,7 @@ class openlayers_views_style_map extends views_plugin_style {
       // @@TODO: Reduce and sort duplicates
       
       // Style the features based on group (can override this with the theme hook)
-      $features = $this->map_features($rows, $group_name);
+      $features = $this->map_features($records, $rows, $group_name);
       
       // Create name of layer and id
       $layer_name = $grouped ? $group_title . ' layer' : $this->display->display_title;

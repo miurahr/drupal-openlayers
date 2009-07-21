@@ -204,6 +204,15 @@ class openlayers_views_style_map extends views_plugin_style {
         '#description' => t('Automagically space points so they do not overlap.'),
         '#default_value' => $this->options['behaviors']['declutter'], 
       );
+      $form['behaviors']['declutter_adjustment'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Declutter Distance Adjustment'),
+        '#description' => t('Set to a negative number to have icons cluster closer together. Set to a positive number to have them furthur apart. Leave blank for default.'),
+        '#default_value' => $this->options['behaviors']['declutter_adjustment'],
+        '#process' => array('views_process_dependency'),
+        '#dependency' => array('edit-style-options-behaviors-declutter' => array('1')),
+      );
+
       // Tooltip options if fields
       if (count($fields) > 0) {
         $tooltip_options = array_merge(array('0' => t('<none>')), $fields);
@@ -488,6 +497,10 @@ class openlayers_views_style_map extends views_plugin_style {
           'type' => 'openlayers_behaviors_declutter',
           'layer' => 'openlayers_views_layer_'. $this->view->name,
         );
+        
+        if ($this->options['behaviors']['declutter_adjustment']) {
+          $map['behaviors']['openlayers_views_declutter']['adjustment'] = intval($this->options['behaviors']['declutter_adjustment']);
+        }
       }
     }
     

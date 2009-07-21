@@ -13,6 +13,70 @@
 var OL = OL || {};
 OL.Behaviors = OL.Behaviors || {};
 
+
+/**
+ * OL Popup Behavior
+ *
+ * @param event
+ *   Event Object
+ */
+OL.Behaviors.popup = function(event) {
+  var mapDef = event.mapDef;
+  var mapid = mapDef.id;
+  var map = event.map;
+  var behavior = event.behavior;
+  
+  // Set up the hover triggers
+  var layer = OL.maps[mapid].layers[behavior.layer];
+  var options = {
+    onSelect: OL.Behaviors.popupFeatureSelected, 
+    onUnselect: OL.Behaviors.popupFeatureUnselected
+  };
+  layer.drupalData.popupAttribute = behavior.attribute;
+  OL.maps[mapid].controls[behavior.id] = new OpenLayers.Control.SelectFeature(layer, options);
+  // Add control
+  map.addControl(OL.maps[mapid].controls[behavior.id]);
+  OL.maps[mapid].controls[behavior.id].activate();
+}
+
+/**
+ * OL Popup Behavior - Feature Clicked Handler
+ *
+ * @param feature
+ *   Feature Object
+ */
+OL.Behaviors.popupFeatureSelected = function(feature) {
+  popup = new OpenLayers.Popup.FramedCloud("popup", 
+    feature.geometry.getBounds().getCenterLonLat(),
+    null,
+    "<div class='openlayers-popup'>"+ feature.attributes[feature.layer.drupalData.popupAttribute] +"</div>",
+    null, true);
+  feature.popup = popup;
+  feature.layer.map.addPopup(popup);
+}
+
+/**
+ * OL Popup Behavior - Feature Unselected
+ *
+ * @param feature
+ *   Feature Object
+ */
+OL.Behaviors.popupFeatureUnselected = function(feature) {
+  feature.layer.map.removePopup(feature.popup);
+  feature.popup.destroy();
+  feature.popup = null;
+}
+
+/**
+ * OL Popup Behavior - Popup closed handler
+ *
+ * @param event
+ *   Event Object
+ */
+OL.Behaviors.popupClosed = function(event) {
+  // @@TODO: Currently the feature is not unselect when the popup is closed. This function should do that.
+}
+
 /**
  * OL Tooltip Behavior
  *
@@ -522,6 +586,7 @@ OL.Behaviors.declutterSortAndMove = function(layer) {
       // We've found an empty spot, move the point to it!
       points[p].geometry.x = newLonLat.lon;
       points[p].geometry.y = newLonLat.lat;
+      points[p].geometry.calculateBounds();
     }
   }
   layer.redraw();
@@ -628,6 +693,50 @@ OL.EventHandlers.declutterZoomEnd = function(event) {
  * Dump Variables -- This is a JS developer tool
  */
 function openlayersVarDump(element, limit, depth) {
+  limit = limit ? limit : 1;
+  depth = depth ? depth : 0;
+  returnString = '<ol>';
+  
+  for (property in element) {
+    //Property domConfig isn't accessable
+    if (property != 'domConfig') {
+      returnString += '<li><strong>'+ property + '</strong> <small>(' + (typeof element[property]) + ')</small>';
+      if (typeof element[property] == 'number' || typeof element[property] == 'boolean')
+        returnString += ' : <em>' + element[property] + '</em>';
+      if (typeof element[property] == 'string' && element[property])
+        returnString += ': <div style="background:#C9C9C9;border:1px solid black; overflow:auto;"><code>' +
+                  element[property].replace(/</g, '<').replace(/>/g, '>') + '</code></div>';
+      if ((typeof element[property] == 'object') && (depth <limit))
+        returnString += openlayersVarDump(element[property], limit, (depth + 1));
+      returnString += '</li>';
+    }
+  }
+  returnString += '</ol>';
+  if (depth == 0) {
+    winpop = window.open("", "","width=800,height=600,scrollbars,resizable");
+    winpop.document.write('<pre>' + returnString + '</pre>');
+    winpop.document.close();
+  }
+  return returnString;
+}
+
+
+
+
+
+
+
+/**
+ * Dump Variables -- This is a JS developer tool
+ * 
+ * @param element
+ *   The element to dump
+ * @param limit
+ *   The depth we should go to.
+ * @param depth
+ *   The depth we should start at.
+ */
+OL.dump = function(element, limit, depth) {
   limit = limit ? limit : 1;
   depth = depth ? depth : 0;
   returnString = '<ol>';

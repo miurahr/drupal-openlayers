@@ -69,6 +69,14 @@ function openlayers_behaviors_openlayers_behaviors_info() {
     'js_file' => $js_file,
     'js_callback' => 'declutter',
   );
+  $info['openlayers_behaviors_popup'] = array(
+    'name' => t('Pop-up'),
+    'description' => t('When the user clicks a feature, pop-up some content.'),
+    'file' => $file,
+    'callback' => 'openlayers_behaviors_process_popup',
+    'js_file' => $js_file,
+    'js_callback' => 'popup',
+  );
   
   return $info;
 }

@@ -269,7 +269,7 @@ class openlayers_views_style_map extends views_plugin_style {
   /**
    * Map features
    */
-  function map_features($records = array(), $rows = array(), $group = NULL) {  
+  function map_features($records = array(), $group = NULL) {  
     $features = array();    
     $data_source = $this->options['data_source'];
     
@@ -360,7 +360,7 @@ class openlayers_views_style_map extends views_plugin_style {
        // Fill in popup attribute
       if (!empty($this->options['behaviors']['popup'])) {
         if ($this->options['behaviors']['popup'] == '#all_fields'){
-          $feature['attributes']['openlayers_popup'] = $this->row_plugin->render($record);
+          $feature['attributes']['openlayers_popup'] = $this->row_plugin->render($record);
         }
         else {
           $popup_field = $this->options['behaviors']['popup'];
@@ -448,21 +448,10 @@ class openlayers_views_style_map extends views_plugin_style {
       // Make 'machine readable' format
       $group_name = strtolower(str_replace(' ', '_', $group_title));
       
-      // Get rows
-      if ($this->uses_row_plugin()) {
-        $rows = array();
-        foreach ($records as $label => $row) {
-          $rows[] = $this->row_plugin->render($row);
-        }
-      }
-      else {
-        $rows = $records;
-      }
-      
       // @@TODO: Reduce and sort duplicates
       
       // Style the features based on group (can override this with the theme hook)
-      $features = $this->map_features($records, $rows, $group_name);
+      $features = $this->map_features($records, $group_name);
       
       // Create name of layer and id
       $layer_name = $grouped ? $group_title . ' layer' : $this->display->display_title;

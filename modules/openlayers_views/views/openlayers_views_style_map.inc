@@ -348,24 +348,26 @@ class openlayers_views_style_map extends views_plugin_style {
       // Fill in tooltip attribute
       if (!empty($this->options['behaviors']['tooltip'])) {
         if ($this->options['behaviors']['tooltip'] == '#all_fields'){
-          $feature['attributes']['openlayers_tooltip'] = $this->row_plugin->render($record);
+          $feature['attributes']['openlayers_tooltip'] = '<div class="map-tooltip openlayers-map-tooltip"><div class="map-pop-up-inner">' . $this->row_plugin->render($record) . '</div></div>';
         }
         else {
           $tooltip_field = $this->options['behaviors']['tooltip'];
           $tooltip_field_alias = $fields[$tooltip_field]['field_alias'];
-          $feature['attributes']['openlayers_tooltip'] = $record->$tooltip_field_alias;
+          // @@TODO: run this through a theme function. Right now it outputs raw data.
+          $feature['attributes']['openlayers_tooltip'] = '<div class="map-tooltip openlayers-map-tooltip"><div class="map-pop-up-inner">' . $record->$tooltip_field_alias . '</div></div>';
         }
       }
  
        // Fill in popup attribute
       if (!empty($this->options['behaviors']['popup'])) {
         if ($this->options['behaviors']['popup'] == '#all_fields'){
-          $feature['attributes']['openlayers_popup'] = $this->row_plugin->render($record);
+          $feature['attributes']['openlayers_popup'] = '<div class="map-pop-up openlayers-map-pop-up"><div class="map-pop-up-inner">' . $this->row_plugin->render($record) . '</div></div>';
         }
         else {
           $popup_field = $this->options['behaviors']['popup'];
           $popup_field_alias = $fields[$popup_field]['field_alias'];
-          $feature['attributes']['openlayers_popup'] = $record->$popup_field_alias;
+          // @@TODO: run this through a theme function. Right now it outputs raw data.
+          $feature['attributes']['openlayers_popup'] = '<div class="map-pop-up openlayers-map-pop-up"><div class="map-pop-up-inner">' . $record->$popup_field_alias. '</div></div>';
         }
       }
       

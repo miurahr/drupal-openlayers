@@ -33,6 +33,7 @@ OL.Behaviors.popup = function(event) {
     onUnselect: OL.Behaviors.popupFeatureUnselected
   };
   layer.drupalData.popupAttribute = behavior.attribute;
+  layer.drupalData.popupId = behavior.id;
   OL.maps[mapid].controls[behavior.id] = new OpenLayers.Control.SelectFeature(layer, options);
   // Add control
   map.addControl(OL.maps[mapid].controls[behavior.id]);
@@ -50,7 +51,13 @@ OL.Behaviors.popupFeatureSelected = function(feature) {
     feature.geometry.getBounds().getCenterLonLat(),
     null,
     "<div class='openlayers-popup'>"+ feature.attributes[feature.layer.drupalData.popupAttribute] +"</div>",
-    null, true);
+    null, true,
+	  function () {
+	    var mapid = feature.layer.map.mapid;
+		  OL.maps[mapid].controls[feature.layer.drupalData.popupId].unselect(feature);
+	  }
+	);
+  
   feature.popup = popup;
   feature.layer.map.addPopup(popup);
 }

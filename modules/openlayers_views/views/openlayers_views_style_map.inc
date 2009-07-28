@@ -284,14 +284,23 @@ class openlayers_views_style_map extends views_plugin_style {
     foreach ($records as $id => $record) {
       $feature = array();
       
+      // In order for any kind of substitution/replacement token/convert to link/trim/etc. functionality to work, we
+      // have to call advanced_render on each field in the record in order and use its output to generate the attributes
+      // for features. 
+      // (brynbellomy)
+      $rendered_record = array();
+      foreach ($handlers as $hid => $handler) {
+        $rendered_record[$handler->field_alias] = $handler->advanced_render($record);
+      }
+      
       // Go through data sources
       // @@TODO: In theory, there could be multiple features per row., allow for multiple features per row
       foreach ($data_source['value'] as $data_source_value) {
         switch ($data_source_value) {
           case 'node_locations':
             // @@TODO: These fields are provided only if the fields are chosen in the interface.
-            if (!empty($record->location_longitude) && !empty($record->location_latitude)) {
-              $wkt_string = 'POINT(' . $record->location_longitude . ' ' . $record->location_latitude . ')';
+            if (!empty($record->location_longitude) && !empty($record->location_latitude)) {
+              $wkt_string = 'POINT(' . $record->location_longitude . ' ' . $record->location_latitude . ')';
               $feature['wkt'] = $wkt_string;
               $feature['projection'] = '4326';
             }
@@ -302,8 +311,9 @@ class openlayers_views_style_map extends views_plugin_style {
             foreach ($data_source['geo_fields'] as $geo_field) {            
               $wkt_field = $geo_field . '_wkt';
               
-              if ($record->$wkt_field) {
-                $feature['wkt'] = $record->$wkt_field;
+              if ($record->$wkt_field) {
+                $feature['wkt'] = 
+                $record->$wkt_field;
                 $feature['projection'] ='4326';
               }
             }
@@ -328,8 +338,9 @@ class openlayers_views_style_map extends views_plugin_style {
           case 'other_wkt':
             // Go through selected field
             foreach ($data_source['other_wkt'] as $wkt_field) {
-              if (!empty($record->$wkt_field)) {
-                $feature['wkt'] = $record->$wkt_field;
+              if (!empty($record->$wkt_field)) {
+                $feature['wkt'] = 
+                $record->$wkt_field;
                 // @@TODO: Allow different projections
                 $feature['projection'] ='4326';
               }
@@ -342,7 +353,8 @@ class openlayers_views_style_map extends views_plugin_style {
       // Fill in all attributes
       foreach ($fields as $fid => $field) {
         $field_alias = $field['field_alias'];
-        $feature['attributes'][$field_alias] = $record->$field_alias;
+        $feature['attributes'][$field_alias] = $record->$field_alias;
+        $feature['attributes'][$field_alias . "_rendered"] = $rendered_record[$field_alias];
       }
       
       // Fill in tooltip attribute
@@ -353,8 +365,7 @@ class openlayers_views_style_map extends views_plugin_style {
         else {
           $tooltip_field = $this->options['behaviors']['tooltip'];
           $tooltip_field_alias = $fields[$tooltip_field]['field_alias'];
-          // @@TODO: run this through a theme function. Right now it outputs raw data.
-          $feature['attributes']['openlayers_tooltip'] = '<div class="map-tooltip openlayers-map-tooltip"><div class="map-pop-up-inner">' . $record->$tooltip_field_alias . '</div></div>';
+          $feature['attributes']['openlayers_tooltip'] = '<div class="map-tooltip openlayers-map-tooltip"><div class="map-pop-up-inner">' . $rendered_record[$tooltip_field_alias] . '</div></div>';
         }
       }
  
@@ -366,13 +377,12 @@ class openlayers_views_style_map extends views_plugin_style {
         else {
           $popup_field = $this->options['behaviors']['popup'];
           $popup_field_alias = $fields[$popup_field]['field_alias'];
-          // @@TODO: run this through a theme function. Right now it outputs raw data.
-          $feature['attributes']['openlayers_popup'] = '<div class="map-pop-up openlayers-map-pop-up"><div class="map-pop-up-inner">' . $record->$popup_field_alias. '</div></div>';
+          $feature['attributes']['openlayers_popup'] = '<div class="map-pop-up openlayers-map-pop-up"><div class="map-pop-up-inner">' . $rendered_record[$popup_field_alias]. '</div></div>';
         }
       }
       
       // Run feature styles through theme function
-      $feature_style = theme('openlayers_views_feature_style', $this, $record, $group);
+      $feature_style = theme('openlayers_views_feature_style', $this, $record, $group);
       if (is_array($feature_style) && !empty($feature_style)) {
         $feature['style'] = $feature_style;
       }

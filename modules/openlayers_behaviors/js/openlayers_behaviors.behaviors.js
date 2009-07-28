@@ -75,16 +75,6 @@ OL.Behaviors.popupFeatureUnselected = function(feature) {
 }
 
 /**
- * OL Popup Behavior - Popup closed handler
- *
- * @param event
- *   Event Object
- */
-OL.Behaviors.popupClosed = function(event) {
-  // @@TODO: Currently the feature is not unselect when the popup is closed. This function should do that.
-}
-
-/**
  * OL Tooltip Behavior
  *
  * @param event

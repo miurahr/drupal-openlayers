@@ -73,7 +73,7 @@ function openlayers_cck_gis_input_info($gis_type = NULL) {
   // 'multiple values' => CONTENT_HANDLE_MODULE,
   $inputs = array(
     'openlayers_cck_geo_field' => array(
-      'label' => t('OpenLayers Map'),
+      'label' => t('OpenLayers Map (NOT WORKING OR TESETED)'),
       'gis input' => 'wkt',
       'safe reverse' => TRUE,
       'gis types' => array('point', 'linestring', 'polygon'),
@@ -96,7 +96,8 @@ function openlayers_cck_field_info() {
       'callbacks' => array(
         'tables' => CONTENT_CALLBACK_DEFAULT,
         'arguments' => CONTENT_CALLBACK_DEFAULT,
-        ),
+      ),
+      // TODO: ,'content_icon' => '',
     ),
   );
 }
@@ -162,7 +163,7 @@ function openlayers_cck_widget_info() {
     'openlayers_wkt_widget' => array(
       'label' => t('OpenLayers WKT Map Widget'),
       'field types' => array('openlayers_wkt'),
-      'multiple values' => CONTENT_HANDLE_CORE,
+      'multiple values' => CONTENT_HANDLE_MODULE,
       'callbacks' => array(
         'default value' => CONTENT_CALLBACK_DEFAULT,
       ),
@@ -255,27 +256,19 @@ function openlayers_cck_wkt_element_process($element, $edit, &$form_state, &$for
   $widget = $field['widget'];
   $field_label = $widget['label'];
   $field_key = $element['#columns'][0];
-  $delta = $element['#delta'];
-  static $map_included = FALSE;
-
-  // Only include one map
-  if ($map_included == FALSE) {
-    // Make map for input
-    $rendered_map = _openlayers_cck_render_element_map($field_name, $field_label, $element['#value'], $field);
-    // Create map element
-    $element['map'] = array(
-      '#value' => theme('openlayers_cck_map', $field, $rendered_map),
-    );
-    // Mark as included
-    $map_included = TRUE;
-  }
+  
+  // Make map for input
+  $rendered_map = _openlayers_cck_render_element_map($field_name, $field_label, $element['#value'], $field);
+  // Create map element
+  $element['map'] = array(
+    '#value' => theme('openlayers_cck_map', $field, $rendered_map),
+  );
   
   // Create storage element
   $element['openlayers_wkt'] = array(
     '#type' => 'textarea',
     '#rows' => 2,
     '#attributes' => array('rel' => $rendered_map['id']),
-    '#default_value' => isset($element['#value'][$delta][$field_key]) ? $element['#value'][$delta][$field_key] : '',
     // The following values were set by the content module and need
     // to be passed down to the nested element.
     '#title' => $element['#title'],
@@ -287,7 +280,78 @@ function openlayers_cck_wkt_element_process($element, $edit, &$form_state, &$for
     '#columns' => $element['#columns'],
   );
   
+  // Make default value.  It will be stored in hidden field
+  $default_value = '';
+  if (is_array($element['#value'])  && count($element['#value']) > 0) {
+    // Look for actual values
+    $values = array();
+    foreach ($element['#value'] as $id => $data_array) {
+      $values[$id] = $data_array['openlayers_wkt'];
+    }
+    // Create string
+    if (is_array($values)  && count($values) > 0) {
+      $default_value = implode('||', $values);
+    }
+  }
+  
+  // Hidden element.  This is used to store a more distinctly
+  // delimited dataset
+  $element['openlayers_wkt_hidden'] = array(
+    '#type' => 'hidden',
+    '#default_value' => $default_value,
+  );
+  
+  // Set #element_validate in a way that it will not wipe out other
+  // validation functions already set by other modules.
+  if (empty($element['#element_validate'])) {
+    $element['#element_validate'] = array();
+  }
+  array_unshift($element['#element_validate'], 'openlayers_cck_validate');
+
+  // Make sure field info will be available to the validator which
+  // does not get the values in $form.
+  $form_state['#field_info'][$field['field_name']] = $field;
   return $element;
+}
+
+/**
+ * FAPI validate function for custom element
+ */
+function openlayers_cck_validate($element, &$form_state) {
+  // Transpose selections from field => delta to delta => field,
+  // turning multiple selected options into multiple parent elements.
+  // Immediate parent is the delta, need to get back to parent's parent
+  // to create multiple elements.
+  
+  // Get field array
+  $field = $form_state['#field_info'][$element['#field_name']];
+  // Convert data to array of values
+  $items = _openlayers_cck_convert_form_data($element, $field);
+  // Set value in form
+  form_set_value($element, $items, $form_state);
+
+  // Check we don't exceed the allowed number of values.
+  if ($field['multiple'] >= 2) {
+    if (count($items) > $field['multiple']) {
+      $field_key  = $element['#columns'][0];
+      form_error($element[$field_key], t('%name: this field cannot hold more that @count values.', array('%name' => t($field['widget']['label']), '@count' => $field['multiple'])));
+    }
+  }
+}
+
+/**
+ *
+ */
+function _openlayers_cck_convert_form_data($element, $field) {
+  $field_key = $element['#columns'][0];
+  $items = explode('||', $element['#value'][$field_key . '_hidden']);
+  $result = array();
+
+  if (empty($items)) {
+    $items[] = NULL;
+  }
+  $result = content_transpose_array_rows_cols(array($field_key => $items));
+  return $result;
 }
 
 /**
@@ -300,7 +364,7 @@ function openlayers_cck_field_formatter_info() {
   $formatters['wkt_default'] = array(
     'label' => t('Default WKT Value'),
     'field types' => array('geo', 'openlayers_wkt'),
-    'multiple values' => CONTENT_HANDLE_CORE,
+    'multiple values' => CONTENT_HANDLE_MODULE,
   );
     
   // Map preset formatter
@@ -308,7 +372,7 @@ function openlayers_cck_field_formatter_info() {
     $formatters[$name] = array(
       'label' => t('OpenLayers Map: @preset', array('@preset' => check_plain($title))),
       'field types' => array('geo', 'openlayers_wkt'),
-      'multiple values' => CONTENT_HANDLE_CORE,
+      'multiple values' => CONTENT_HANDLE_MODULE,
     );
   }
   return $formatters;
@@ -331,15 +395,36 @@ function theme_openlayers_wkt_widget($element) {
 /**
  * Theme function for openlayers cck default formatters
  */
-function theme_openlayers_cck_formatter_wkt_default($element) {
-  return $element['#item']['openlayers_wkt'];
+function theme_openlayers_cck_formatter_wkt_default($element) {  $features = array();
+  $features = array();
+  $output = '';
+
+  // Create array of $features
+  foreach (element_children($element) as $delta) {
+    $features[$delta] = $element[$delta]['#item']['openlayers_wkt'];
+  }
+  
+  // Check count and build geomtry collection
+  if (count($features) > 0) {
+    $output = 'GEOMETRYCOLLECTION(' . implode(',', $features) . ')';
+  }
+
+  return $output;
 }
 
 /**
  * Theme function for openlayers cck formatters
  */
 function theme_openlayers_cck_formatter_map($element) {
+  $features = array();
   $field = content_fields($element['#field_name'], $element['#type_name']);
+
+  // Create array of $features
+  foreach (element_children($element) as $delta) {
+    $features['openlayers_cck_vector_feature_' . $delta] = array(
+      'wkt' => $element[$delta]['#item']['openlayers_wkt'],
+    );
+  }
 
   // Get preset name from formatter
   $preset_name = str_replace('openlayers_cck_formatter_', '', $element['#formatter']);
@@ -348,20 +433,16 @@ function theme_openlayers_cck_formatter_map($element) {
   $map = openlayers_get_map($preset_name);
   
   // Add features and vector layer
-  $map['layers']['openlayers_cck_vector'] = array(
-    'id' => 'openlayers_cck_vector',
-    'name' => $field['widget']['label'],
-    'type' => 'Vector',
-    'options' => array(),
-    'features' => array(
-      'openlayers_cck_vector_feature_' . $element['#item']['#delta'] => array(
-        'wkt' => $element['#item']['openlayers_wkt'],
-      ),
-    ),    
-  );
-  $map['options'] = array(
-    'displayProjection' => ($field['srid'] != 0) ? $field['srid'] : '4326',
-  );
+  if (count($features) > 0) {
+    $map['layers']['openlayers_cck_vector'] = array(
+      'id' => 'openlayers_cck_vector',
+      'name' => $field['widget']['label'],
+      'type' => 'Vector',
+      'options' => array(),
+      'features' => $features,  
+    );
+    $map['options']['displayProjection'] = ($field['srid'] != 0) ? $field['srid'] : '4326';
+  }
   
   // Render map
   $rendered = openlayers_render_map($map);
@@ -419,12 +500,14 @@ function theme_openlayers_cck_map($field = array(), $map = array()) {
 function _openlayers_cck_render_element_map($field_name = '', $field_label = '', $values = array(), $field = array()) {
   $field_name_html = str_replace('_', '-', $field_name);
   $map_id = OPENLAYERS_CCK_MAP_ID_PREFIX . '-' . $field_name;
-  $field_container = '';
   $field_type = $field['type'];
   $field_type_html = str_replace('_', '-', $field_type);
   $widget = $field['widget'];
-    
-  // Get default map
+  $field_container = 'edit-' . $field_name_html . '-' . $field_type_html . '-wrapper';
+  $field_id = 'edit-' . $field_name_html . '-' . $field_type_html;
+  $hidden_field_id = 'edit-' . $field_name_html . '-openlayers-wkt-hidden';
+
+  // Get map to use for field
   if (isset($widget['openlayers_cck_preset_map'])) {
     $map = openlayers_get_map($widget['openlayers_cck_preset_map']);
   }
@@ -438,19 +521,8 @@ function _openlayers_cck_render_element_map($field_name = '', $field_label = '',
   // Add main event for CCK processing
   $map['events']['beforeBehaviors'] = array('CCKProcess');
   
-  /*
-  // Define zoom to layer beahvior
-  $map['behaviors']['openlayers_cck_zoom_to_layer'] = array(
-    'id' => 'openlayers_cck_zoom_to_layer',
-    'type' => 'openlayers_behaviors_zoom_to_layer',
-    'layer' => 'openlayers_cck_vector',
-  );
-  */
-  
   // Make sure that our display projection matches the database projection
-  $map['options'] = array(
-    'displayProjection' => ($field['srid'] != 0) ? $field['srid'] : '4326',
-  );
+  $map['options']['displayProjection'] = ($field['srid'] != 0) ? $field['srid'] : '4326';
   
   // Define a vector layer for our features
   $map['layers']['openlayers_cck_vector'] = array(
@@ -512,18 +584,6 @@ function _openlayers_cck_render_element_map($field_name = '', $field_label = '',
     else return false;
   }
   
-  // Check if multiple, as there are specific needs
-  if (empty($field['multiple'])) {
-    // If a single value
-    $field_container = 'edit-' . $field_name_html . '-0-' . $field_type_html . '-wrapper';
-  }
-  else {
-    // For multiples, we need to move out map widget outside of the fields
-    $field_container = $field_name . '_values';
-    // Call Move Map event
-    $map['events']['beforeEverything'] = array('CCKMoveMap');
-  }
-  
   // Render Map
   $rendered_map = openlayers_render_map($map);
   
@@ -544,6 +604,8 @@ function _openlayers_cck_render_element_map($field_name = '', $field_label = '',
             'field_name_js' => $field_name_html,
             'field_container' => $field_container,
             'field_items' => $items,
+            'field_id' => $field_id,
+            'hidden_field_id' => $hidden_field_id,
             'map_container' => 'openlayers-cck-map-container-' . $map_id,
           ),
         ),

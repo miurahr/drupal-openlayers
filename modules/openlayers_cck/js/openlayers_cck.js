@@ -14,26 +14,6 @@ var OL = OL || {};
 OL.CCK = OL.CCK || {};
 
 /**
- * Move Map Event Handler
- *
- * This event is called when before map is rendered
- * in order to move the elemnts outside of the fields.
- *
- * @param event
- *   Event object
- */
-OL.EventHandlers.CCKMoveMap = function(event) {
-  var mapid = event.mapDef.id;
-  var fieldContainer = Drupal.settings.openlayers_cck.maps[mapid].field_container;
-  var mapContainer = Drupal.settings.openlayers_cck.maps[mapid].map_container;
-  var $fieldContainer = $('#' + fieldContainer);
-  var $mapFull = $('#' + mapContainer);
-  var $clonedMap = $mapFull.clone(true);
-  $mapFull.remove();
-  $fieldContainer.before($clonedMap);
-}
-
-/**
  * Main Setup Event for CCK Processing
  *
  * Evnet callback for map.
@@ -44,10 +24,17 @@ OL.EventHandlers.CCKMoveMap = function(event) {
 OL.EventHandlers.CCKProcess = function(event) {
   OL.CCK.maps = OL.CCK.maps || Drupal.settings.openlayers_cck.maps || [];
   var mapid = event.mapDef.id;
+  var fieldContainer = OL.CCK.maps[mapid].field_container;
   var $map = $('#' + mapid);
   var $textareas = $('textarea[rel=' + mapid + ']');
   var $wktSwitcher = $('#' + mapid + '-wkt-switcher');
-  var fieldContainer = OL.CCK.maps[mapid].field_container;
+  var $field = $('#' + OL.CCK.maps[mapid].field_id);
+  
+  // Define a space for data from the map
+  OL.CCK.maps[mapid].features = OL.CCK.maps[mapid].features || {};
+  
+  // Define a count for features
+  OL.CCK.maps[mapid].featureID = 1;
 
   // WKT Switcher event
   $wktSwitcher.click(function() {
@@ -60,11 +47,6 @@ OL.EventHandlers.CCKProcess = function(event) {
   
   // Populate any existing fields
   OL.CCK.populateMap(mapid);
-  
-  // Add blur events to textareas
-  $textareas.blur(function() {
-    OL.CCK.alterFeatureFromField($(this));
-  });
 }
 
 /**
@@ -77,131 +59,57 @@ OL.EventHandlers.CCKProcess = function(event) {
  */
 OL.CCK.populateMap = function(mapid) {  
   var featuresToAdd = [];
-  var fieldContainer = OL.CCK.maps[mapid].field_container;
+  var $hiddenField = $('#' + OL.CCK.maps[mapid].hidden_field_id);
+  var collectionString = $hiddenField.val();
+  var collection = [];
+	var wktFormat = new OpenLayers.Format.WKT();
   
-  // Cycle through the fieldContainer item and read WKT from all the textareas
-  $('#' + fieldContainer + ' textarea').each(function() {
-    var $thisField = $(this);
+  // Check if collection
+  if (collectionString) {
+    // Get array collection and go through
+    collection = collectionString.split('||');
+    for (var wkt in collection) {
+      // Update id for collection item
+      OL.CCK.maps[mapid].featureID = OL.CCK.maps[mapid].featureID + 1;
+      var featureID = 'feature_id_' + OL.CCK.maps[mapid].featureID.toString();
+      
+      // Create feature
+      var newFeature = wktFormat.read(collection[wkt]);
+	
+    	// Check if feature is defined
+      if (typeof(newFeature) == "undefined") {
+        // TODO: Notification a little less harsh
+        alert(Drupal.t('WKT is not valid'));
+        return false;
+      }
+      else {
+      	// Project the geometry if our map has a different geospatial 
+      	// projection as our CCK geo data.
+        if (OL.maps[mapid].projection != OL.mapDefs[mapid].options.displayProjection) {
+          newFeature.geometry.transform(OL.maps[mapid].displayProjection, OL.maps[mapid].projection);
+        }
     
-    // Check value
-    if ($thisField.val() != '') {
-      var newFeature = OL.CCK.loadFeatureFromTextarea(mapid, $thisField);
-      if (newFeature != false) {
-        featuresToAdd.push(newFeature);
+        // Link the feature to the field.
+        newFeature.cckID = featureID;
+    		featuresToAdd.push(newFeature);
+
+        // Update collection
+        OL.CCK.updateCollection(mapid, 'add', featureID, collection[wkt]);
       }
     }
-  });
-  
-  // Add features to vector
-  if (featuresToAdd.length != 0) {
-    OL.maps[mapid].layers['openlayers_cck_vector'].addFeatures(featuresToAdd);
-  }
-}
-
-/**
- * OpenLayers CCK Load Feature From Textarea
- * 
- * This function loads the WKT from a textarea, and returns an OpenLayers feature
- *
- * @param mapid
- *   String ID of map
- * @param textarea
- *   jQuery element
- * @return
- *   New feature object or false if error
- */
-OL.CCK.loadFeatureFromTextarea = function(mapid, $textarea) {
-	var wktFormat = new OpenLayers.Format.WKT();
-  var newFeature = wktFormat.read($textarea.val());
-	
-	// Check if feature is defined
-  if (typeof(newFeature) == "undefined") {
-    // TODO: Notification a little less harsh
-    alert(Drupal.t('WKT is not valid'));
-    return false;
-  }
-  else {
-  	// Project the geometry if our map has a different geospatial 
-  	// projection as our CCK geo data.
-    if (OL.maps[mapid].projection != OL.mapDefs[mapid].options.displayProjection) {
-      newFeature.geometry.transform(OL.maps[mapid].displayProjection, OL.maps[mapid].projection);
-    }
     
-    // @@TODO: Add styling to feature
-    
-    // Link the feature to the field.
-    newFeature.cckField = $textarea.attr('id');
-		return newFeature;
-  }
-}
-
-/**
- * OpenLayers CCK Feature Selected
- * 
- * When a feature is selected, make the WKT field light 
- * up so we know which field we are editing
- *
- * @param event
- *   Event object
- */
-OL.EventHandlers.CCKFeaturesSelected = function(event) {
-  var feature = event.feature;
-  $("#" + feature.cckField).addClass('openlayers-cck-feature-selected');
-}
-
-/**
- * OpenLayers CCK Feature Unselected
- * 
- * When a feature is selected, make the WKT field light 
- * up so we know which field we are editing
- *
- * @param event
- *   Event object
- */
-OL.EventHandlers.CCKFeaturesUnselected = function(event) {
-  var feature = event.feature;
-  $("#" + feature.cckField).removeClass('openlayers-cck-feature-selected');
-}
-
-/**
- * OpenLayers CCK Alter Feature from Field
- * 
- * This will generally be called by an onblur event so that 
- * when users change the raw WKT fields, the map gets updated 
- * in real time
- *
- * @param $textarea
- *   jQuery object
- */
-OL.CCK.alterFeatureFromField = function($textarea) {
-  var mapid = $textarea.attr('rel');
-  var wkt = $textarea.val();
-  
-  // Create the new feature
-  if ($textarea.val() != '') {
-    var newFeature = OL.CCK.loadFeatureFromTextarea(mapid, $textarea);
-  }
-  
-  // Delete the existing feature
-  for (var l in OL.maps[mapid].layers['openlayers_cck_vector'].features) {
-	  if (OL.maps[mapid].layers['openlayers_cck_vector'].features[l].cckField == $textarea.attr('id')) {
-	    OL.maps[mapid].layers['openlayers_cck_vector'].features[l].destroy();
+    // Add new features
+    if (featuresToAdd.length != 0) {
+      OL.maps[mapid].layers['openlayers_cck_vector'].addFeatures(featuresToAdd);
     }
   }
-    
-  // Repopulate with a new feature.
-   if (wkt != '') {
-    $textarea.val(wkt);
-    if (newFeature != false) {
-      OL.maps[mapid].layers['openlayers_cck_vector'].addFeatures([newFeature]);
-    }
-	}
 }
 
 /**
  * OpenLayers CCK Feature Added Handler
  * 
- * This function is triggered when a feature is added by the user
+ * This function is triggered when a feature is added by the user;
+ * it adds the feature and new ID to cck feature collection
  *
  * @param event
  *   Event object
@@ -209,69 +117,28 @@ OL.CCK.alterFeatureFromField = function($textarea) {
 OL.CCK.featureAdded = function(event) {
   var feature = event.feature;
   var mapid = feature.layer.map.mapid;
-  var fieldName = OL.CCK.maps[mapid].field_name_js;
-  var fieldContainer = OL.CCK.maps[mapid].field_container;
-  var $textareas = $('#' + fieldContainer + ' textarea');
-  var $addMore = $('#' + 'edit-' + fieldName + '-' + fieldName + '-add-more');
-  var inputCount = $textareas.length;
-  var isMultiple = $addMore.length;
-  var newNode = true;
-  var found = false;
-  var firstTextareaID = $textareas.filter(':first').attr('id');
-  var lastTextareaID = $textareas.filter(':last').attr('id');
-  var newFeatureID = firstTextareaID;
   var geometry = feature.geometry.clone();
-
-  // Check if there is an add more button
-  if (isMultiple) {
-    // Check if new field
-    if (!newNode) {
-      $addMore.trigger('mousedown');
-    }
-  }
-  else {
-    // Get next empty textarea
-    $textareas.each(function(i) {
-      var $thisField = $(this);
-      if (($thisField.val() == '')) {
-        newFeatureID = $thisField.attr('id');
-        found = true;
-        return false;
-      }
-    });
-    
-    // If empty textarea not found, use last one
-    if (found == false) {
-      // Make new feature ID, last counted textarea
-      newFeatureID = lastTextareaID;
-      // Clear out current feature
-      $('#' + newFeatureID).val('').trigger('blur');
-    }
-    
-    // This is the object of the textfield we will be assigning this feature to.
-    var $wktFieldNew = $('#' + newFeatureID);
   
-    // Assign field to feature
-    feature.cckField = newFeatureID;
-    
-    // Project the geometry if our map has a different geospatial projection as our CCK geo data.
-    if (OL.maps[mapid].projection != OL.mapDefs[mapid].options.displayProjection){
-      geometry.transform(OL.maps[mapid].projection, OL.maps[mapid].displayProjection);
-    }
-    
-    // Update CCK field with WKT values
-    $wktFieldNew.val(geometry.toString());
-    
-    // Link the field to the map
-    $wktFieldNew.attr('rel', feature.layer.map.mapid);
+  // Get new feature ID 
+  OL.CCK.maps[mapid].featureID = OL.CCK.maps[mapid].featureID + 1;
+
+  // Assign field to feature
+  feature.cckID = 'feature_id_' + OL.CCK.maps[mapid].featureID.toString();
+  
+  // Project the geometry if our map has a different geospatial projection as our CCK geo data.
+  if (OL.maps[mapid].projection != OL.mapDefs[mapid].options.displayProjection){
+    geometry.transform(OL.maps[mapid].projection, OL.maps[mapid].displayProjection);
   }
+  
+  // Add new field
+  OL.CCK.updateCollection(mapid, 'add', feature.cckID, geometry.toString());
 }
 
 /**
  * OpenLayers CCK Feaure Modified Handler
  * 
- * When the any feature on the layer is modified, fill in 
- * the WKT values into the text fields.
+ * When a feature on the layer is modified, update
+ * the corresponding feature in the collection
  *
  * @param event
  *   Event object
@@ -288,23 +155,126 @@ OL.CCK.featureModified = function(event) {
     geometry.transform(OL.maps[mapid].projection, OL.maps[mapid].displayProjection);
   }
   
-  // update CCK fields
-  var wkt = geometry.toString();
-  $('#' + feature.cckField).val(wkt);
+  // Update collection
+  OL.CCK.updateCollection(mapid, 'update', feature.cckID, geometry.toString());
 }
 
 /**
  * OpenLayers CCK Feaure Removed Handler
  * 
- * When the any feature on the layer is deleted, strip out the 
- * WKT values from the CCK value fields.
+ * When a feature on the layer is deleted, remove it from
+ * CCK feature array and update collection
  *
  * @param event
  *   Event object
  */
 OL.CCK.featureRemoved = function(event) {
   var feature = event.feature;
+  var mapid = feature.layer.map.mapid;
   
-  // Empty the CCK field values.
-  $('#' + feature.cckField).val('').removeClass('openlayers-cck-feature-selected');
+  // Update collection
+  OL.CCK.updateCollection(mapid, 'delete', feature.cckID);
+}
+
+/**
+ * Add Feature to CCK Feature Collection
+ *
+ * Given map id, add new feature to collecion.  The logic of
+ * adding a feature neeeds to account for 
+ *
+ * @param mapid
+ *   ID of map being referenced
+ * @param action
+ *   String of action to perform ('add', 'update', 'delete')
+ * @param featureID
+ *   New ID of feature
+ * @param wkt
+ *   WKT to add
+ */
+OL.CCK.updateCollection = function(mapid, action, featureID, wkt) {
+  var multiple = OL.CCK.maps[mapid].field_data.multiple;
+  var collectionLength = 0;
+  var collection = [];
+  var hiddenCollection = [];
+  var output = '';
+  var $field = $('#' + OL.CCK.maps[mapid].field_id);
+  var $hiddenField = $('#' + OL.CCK.maps[mapid].hidden_field_id);  // Assign field to feature
+  var newestFeatureIDNum = OL.CCK.maps[mapid].featureID - 1;
+  var newestFeatureID = 'feature_id_' + newestFeatureIDNum.toString();
+
+  // Check action
+  if (action == 'add') {
+    // Check multiple to see how many features we can add
+    // multiple = 0, then 1 value
+    // multiple = 1, then unlimited
+    // multiple > 1, then a specific number
+    if (multiple == 0) {
+      // Remove any features in layer
+      for (var l in OL.maps[mapid].layers['openlayers_cck_vector'].features) {
+        if (OL.maps[mapid].layers['openlayers_cck_vector'].features[l].cckID != featureID) {
+          OL.maps[mapid].layers['openlayers_cck_vector'].features[l].destroy();
+        }
+      }
+      // Simple remake object
+      OL.CCK.maps[mapid].features = {};
+      OL.CCK.maps[mapid].features[featureID] = wkt;
+    }
+    else if (multiple == 1) {
+      // Unlimited, just add new wkt
+      OL.CCK.maps[mapid].features[featureID] = wkt;
+    }
+    else if (multiple > 1) {
+      // Since using associative array (object), have to manually get size
+      for (var id in OL.CCK.maps[mapid].features) {
+        collectionLength++;
+      }
+      
+      // Check current length of features
+      if (collectionLength < multiple) {
+        OL.CCK.maps[mapid].features[featureID] = wkt;
+      }
+      else {
+        // Remove newest features in layer
+        for (var l in OL.maps[mapid].layers['openlayers_cck_vector'].features) {
+          if (OL.maps[mapid].layers['openlayers_cck_vector'].features[l].cckID == newestFeatureID) {
+            OL.maps[mapid].layers['openlayers_cck_vector'].features[l].destroy();
+          }
+        }
+        
+        // Add new feature
+        OL.CCK.maps[mapid].features[featureID] = wkt;
+        
+        // Delete newest feature
+        delete OL.CCK.maps[mapid].features[newestFeatureID];
+      }
+    }
+  }
+  else if (action == 'update') {
+    // Update CCK features
+    OL.CCK.maps[mapid].features[featureID] = wkt;
+  }
+  else if (action == 'delete') {
+    // Remove from features object
+    delete OL.CCK.maps[mapid].features[featureID];
+  }
+
+  // Make an array of wkt
+  for (var wkt in OL.CCK.maps[mapid].features) {
+    collection.push(OL.CCK.maps[mapid].features[wkt]);
+  }
+  
+  // Make geomotry collection
+  if (collection.length > 0) {
+    output = 'GEOMETRYCOLLECTION(' + collection.join(',') + ')';
+  }
+  
+  // Update field
+  $field.val(output);
+  
+  // Update hidden field.  The hidden field is used because
+  // it is a lot easier to track data with a distinct delimiter
+  for (var wkt in OL.CCK.maps[mapid].features) {
+    hiddenCollection.push(OL.CCK.maps[mapid].features[wkt]);
+  }
+  $hiddenField.val(hiddenCollection.join('||'));
 }

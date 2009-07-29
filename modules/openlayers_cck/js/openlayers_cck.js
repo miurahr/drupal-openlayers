@@ -265,7 +265,12 @@ OL.CCK.updateCollection = function(mapid, action, featureID, wkt) {
   
   // Make geomotry collection
   if (collection.length > 0) {
-    output = 'GEOMETRYCOLLECTION(' + collection.join(',') + ')';
+    if (collection.length > 1) {
+      output = 'GEOMETRYCOLLECTION(' + collection.join(',') + ')';
+    }
+    else {
+      output = collection[0];
+    }
   }
   
   // Update field

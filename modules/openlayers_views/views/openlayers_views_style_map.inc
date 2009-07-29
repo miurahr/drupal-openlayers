@@ -283,11 +283,9 @@ class openlayers_views_style_map extends views_plugin_style {
     // Build feature. We create one feature per field per row.
     foreach ($records as $id => $record) {
       $feature = array();
-      
       // In order for any kind of substitution/replacement token/convert to link/trim/etc. functionality to work, we
       // have to call advanced_render on each field in the record in order and use its output to generate the attributes
       // for features. 
-      // (brynbellomy)
       $rendered_record = array();
       foreach ($handlers as $hid => $handler) {
         $rendered_record[$handler->field_alias] = $handler->advanced_render($record);
@@ -338,9 +336,10 @@ class openlayers_views_style_map extends views_plugin_style {
           case 'other_wkt':
             // Go through selected field
             foreach ($data_source['other_wkt'] as $wkt_field) {
-              if (!empty($record->$wkt_field)) {
+              $wkt_alias = $fields[$wkt_field]['field_alias'];
+              if (!empty($record->$wkt_alias)) {
                 $feature['wkt'] = 
-                $record->$wkt_field;
+                $record->$wkt_alias;
                 // @@TODO: Allow different projections
                 $feature['projection'] ='4326';
               }

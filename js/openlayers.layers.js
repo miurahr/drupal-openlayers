@@ -89,7 +89,7 @@ OL.Layers.Vector = function(layerOptions, mapid) {
         if (typeof(layerOptions.features[feat].wkt) == "string") {
           wkt = layerOptions.features[feat].wkt;
         }
-        if (typeof(layerOptions.features[feat].wkt) == "object" && layerOptions.features[feat].wkt.length != 0) {
+        if (typeof(layerOptions.features[feat].wkt) == "object" && layerOptions.features[feat].wkt != null && layerOptions.features[feat].wkt.length != 0) {
           wkt = "GEOMETRYCOLLECTION(" + layerOptions.features[feat].wkt.join(',') + ")";
         }
         

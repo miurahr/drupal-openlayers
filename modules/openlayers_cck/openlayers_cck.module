@@ -434,6 +434,7 @@ function theme_openlayers_cck_formatter_map($element) {
   foreach (element_children($element) as $delta) {
     $features['openlayers_cck_vector_feature_' . $delta] = array(
       'wkt' => $element[$delta]['#item']['openlayers_wkt'],
+      'projection' => '4326',
     );
   }
 

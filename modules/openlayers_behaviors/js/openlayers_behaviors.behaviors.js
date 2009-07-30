@@ -25,16 +25,23 @@ OL.Behaviors.popup = function(event) {
   var mapid = mapDef.id;
   var map = event.map;
   var behavior = event.behavior;
+  var layers = Array();
   
   // Set up the hover triggers
-  var layer = OL.maps[mapid].layers[behavior.layer];
-  var options = {
+  for(layer in OL.maps[mapid].map.layers) {
+    if(OL.maps[mapid].map.layers[layer].drupalData.type == 'Vector') {
+	    OL.maps[mapid].map.layers[layer].drupalData.popupAttribute = behavior.attribute;
+        OL.maps[mapid].map.layers[layer].drupalData.popupId = behavior.id;
+        layers.push(OL.maps[mapid].map.layers[layer]); // have to use push so it stores the reference instead of value
+    }
+  }
+
+  var selectControlOptions = {
     onSelect: OL.Behaviors.popupFeatureSelected, 
     onUnselect: OL.Behaviors.popupFeatureUnselected
   };
-  layer.drupalData.popupAttribute = behavior.attribute;
-  layer.drupalData.popupId = behavior.id;
-  OL.maps[mapid].controls[behavior.id] = new OpenLayers.Control.SelectFeature(layer, options);
+
+  OL.maps[mapid].controls[behavior.id] = new OpenLayers.Control.SelectFeature(layers, selectControlOptions);
   // Add control
   map.addControl(OL.maps[mapid].controls[behavior.id]);
   OL.maps[mapid].controls[behavior.id].activate();

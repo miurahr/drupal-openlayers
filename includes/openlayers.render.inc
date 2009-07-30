@@ -131,6 +131,7 @@ function _openlayers_behaviors_process($behaviors = array(), &$map = array()) {
       if (function_exists($info['callback'])) {
         // Call function and give it the behavior array
         $result = $info['callback']($behavior, $map);
+
         // Check for result
         if (isset($result) && is_array($result)) {
           $result['js_callback'] = $info['js_callback'];

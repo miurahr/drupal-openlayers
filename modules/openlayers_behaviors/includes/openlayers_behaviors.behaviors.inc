@@ -62,8 +62,6 @@ function openlayers_behaviors_process_tooltip($behavior, &$map) {
  *   Behavior array
  */
 function openlayers_behaviors_process_popup($behavior, &$map) {
-  // Check to make sure the layer attribute is properly set.
-  if ($behavior['layer'] && $map['layers'][$behavior['layer']]) {   
     // Assume we want to display the name attribute if no attribute is specified
     if (!$behavior['attribute']) {
       $behavior['attribute'] = 'name';
@@ -71,7 +69,6 @@ function openlayers_behaviors_process_popup($behavior, &$map) {
     
     return $behavior;
   }
-}
 
 /**
  * Callback for OpenLayers Behaviors (Draw Features)

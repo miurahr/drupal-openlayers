@@ -493,17 +493,7 @@ class openlayers_views_style_map extends views_plugin_style {
             'attribute' => 'openlayers_tooltip',
           );
         }
-        // Set up popup behaviors
-        if (!empty($this->options['behaviors']['popup'])) {
-          $map['behaviors'] = is_array($map['behaviors']) ? $map['behaviors'] : array();
-          $field_id = $this->view->display_handler->get_handler('field', $this->options['behaviors']['popup'])->field_alias;
-          $map['behaviors']['openlayers_views_popup_' . $layer_id] = array(
-            'id' => 'openlayers_views_popup_' . $layer_id,
-            'type' => 'openlayers_behaviors_popup',
-            'layer' => $layer_id,
-            'attribute' => 'openlayers_popup',
-          );
-        }
+
         // Set up declutter behaviors
         if ($this->options['behaviors']['declutter']) {
           $map['behaviors'] = is_array($map['behaviors']) ? $map['behaviors'] : array();
@@ -518,14 +508,26 @@ class openlayers_views_style_map extends views_plugin_style {
           }
         }
       }
-    }
+    } // end foreach views-group/layer
     
     // Sort layers by id
     ksort($map['layers']);
     
-    // Check other beahvior options
+    // Check other behavior options
     if (module_exists('openlayers_behaviors')) {
       $map['behaviors'] = is_array($map['behaviors']) ? $map['behaviors'] : array();
+
+      // Popups, which apply to all Vector layers when activated
+      // @@TODO: Put checkboxes in the style plugin interface to choose layers to use popups with?
+      if (!empty($this->options['behaviors']['popup'])) {
+        $map['behaviors'] = is_array($map['behaviors']) ? $map['behaviors'] : array();
+        $map['behaviors']['openlayers_views_popup'] = array(
+          'id' => 'openlayers_views_popup',
+          'type' => 'openlayers_behaviors_popup',
+          'attribute' => 'openlayers_popup',
+        );
+      
+
       // Zoom to layer., assuming last layer
       // @@TODO: Use better logic or use options
       if ($this->options['behaviors']['zoom_to_layer']) {
@@ -542,6 +544,7 @@ class openlayers_views_style_map extends views_plugin_style {
           'type' => 'openlayers_behaviors_fullscreen'
         );
       }
+    }
     }
     
     // Render map

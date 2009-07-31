@@ -31,7 +31,11 @@ function openlayers_presets_ui_presets_manage_list() {
     $row[] = $preset['preset_title'];
     $row[] = $preset['preset_description'];
     // Only add edit and delete actions if not coded presets
-    if ($preset['preset_coded'] != TRUE) {
+    if ($preset['type'] == OPENLAYERS_STORAGE_OVERRIDE) {
+      $links[] = l(t('Edit'), 'admin/settings/openlayers/presets/' . $preset['preset_name'] . '/edit');
+      $links[] = l(t('Revert'), 'admin/settings/openlayers/presets/' . $preset['preset_name'] .'/delete');
+    }
+    elseif ($preset['type'] == OPENLAYERS_STORAGE_NORMAL) {
       $links[] = l(t('Edit'), 'admin/settings/openlayers/presets/' . $preset['preset_name'] . '/edit');
       $links[] = l(t('Delete'), 'admin/settings/openlayers/presets/' . $preset['preset_name'] .'/delete');
     }
@@ -591,7 +595,7 @@ function openlayers_presets_ui_presets_manage_add_validate($form, &$form_state) 
   
   // Check if adding and name already exists
   $existing = openlayers_get_preset($values['preset_name'], TRUE);
-  if (!empty($existing) && (!$form_state['values']['preset_edit'])) {
+  if (!empty($existing) && (!$form_state['values']['preset_edit']) && $existing['type'] != t('Default')) {
     form_set_error('preset_name', t('The Preset Name already exists.'));
     $found_error = TRUE;
   }
@@ -673,7 +677,7 @@ function openlayers_presets_ui_presets_manage_add_submit($form, &$form_state) {
  */
 function openlayers_presets_ui_presets_manage_delete(&$form_state, $preset = array()) {
   // Ensure we are not deleting any coded presets
-  if ($preset['preset_coded']) {
+  if ($preset['type'] == OPENLAYERS_STORAGE_DEFAULT) {
     drupal_set_message(t('Cannot delete default preset.'), 'error');
     drupal_goto('admin/settings/openlayers/presets');
   }
@@ -681,16 +685,31 @@ function openlayers_presets_ui_presets_manage_delete(&$form_state, $preset = arr
   // Create delete form
   $form = array();
   $form['preset_name'] = array('#type' => 'value', '#value' => $preset['preset_name']);
-  return confirm_form(
-    $form,
-    t('Are you sure you want to delete the preset %preset?',
-      array('%preset' => $preset['preset_title'])
-    ),
-    'admin/settings/openlayers/presets',
-    t('This action cannot be undone.'),
-    t('Delete'),
-    t('Cancel')
-  );
+  if ($preset['type'] == OPENLAYERS_STORAGE_OVERRIDE) {
+    return confirm_form(
+      $form,
+      t('Are you sure you want to revert the preset %preset?',
+        array('%preset' => $preset['preset_title'])
+      ),
+      'admin/settings/openlayers/presets',
+      t('This will delete the preset in the database and revert to the preset in a feature or code. This action cannot be undone.'),
+      t('Delete'),
+      t('Cancel')
+    );
+    
+  }
+  else {
+    return confirm_form(
+      $form,
+      t('Are you sure you want to delete the preset %preset?',
+        array('%preset' => $preset['preset_title'])
+      ),
+      'admin/settings/openlayers/presets',
+      t('This action cannot be undone.'),
+      t('Delete'),
+      t('Cancel')
+    );
+  }
 }
 
 /**
@@ -700,7 +719,7 @@ function openlayers_presets_ui_presets_manage_delete_submit($form, &$form_state)
   $preset = openlayers_get_preset($form_state['values']['preset_name'], TRUE);
   
   // Check if coded
-  if ($preset['preset_coded']) {
+  if ($preset['type'] == OPENLAYERS_STORAGE_DEFAULT) {
     drupal_set_message(t('Cannot delete %name because it is provided by a module.', array('%name' => $preset['preset_name'])));
   }
   else {

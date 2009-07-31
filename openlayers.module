@@ -29,6 +29,22 @@
 define('OPENLAYERS_MAP_ID_PREFIX', 'openlayers-map-auto-id');
 
 /**
+ * OpenLayers preset storage constant for user-defined presets in the DB.
+ */
+define('OPENLAYERS_STORAGE_NORMAL', 0);
+
+/**
+ * OpenLayers preset storage constant for module-defined presets in code.
+ */
+define('OPENLAYERS_STORAGE_DEFAULT', 1);
+
+/**
+ * OpenLayers preset storage constant for user-defined presets that override
+ * module-defined presets.
+ */
+define('OPENLAYERS_STORAGE_OVERRIDE', 2);
+
+/**
  * Implementation of hook_help
  */
 function openlayers_help($path, $arg) {
@@ -168,7 +184,6 @@ function openlayers_render_map($map = array(), $render = TRUE) {
   if (!$map['id']) {
     $map['id'] = _openlayers_create_map_id();
   }
-  
   // Process layers
   $map['layers'] = _openlayers_layers_process($map['layers'], $map);
   // Process behaviors
@@ -414,12 +429,12 @@ function openlayers_presets($reset = FALSE) {
   }
   else {
     // Get data from hooks
-    $presets = module_invoke_all('openlayers_presets');
+    $defaults = module_invoke_all('openlayers_presets');
     
     // Since data from hooks cannot be edited or deleted, we mark now
-    foreach ($presets as $name => $coded) {
-      $coded['preset_coded'] = TRUE;
-      $presets[$name] = $coded;
+    foreach ($defaults as $name => $preset) {
+      $preset['type'] = OPENLAYERS_STORAGE_DEFAULT;
+      $presets[$name] = $preset;
     }
   
     // Get data from DB
@@ -432,7 +447,14 @@ function openlayers_presets($reset = FALSE) {
     
     // Check for conflicting preset names, use DB over hook
     foreach ($db_data as $name => $preset) {
-      $presets[$name] = $preset;
+      if (!empty($presets[$name])) {
+        $preset['type'] = OPENLAYERS_STORAGE_OVERRIDE;
+        $presets[$name] = $preset;
+      }
+      else {
+        $preset['type'] = OPENLAYERS_STORAGE_NORMAL;
+        $presets[$name] = $preset;
+      }
     }
 
     // Cache data
@@ -708,4 +730,18 @@ function openlayers_openlayers_presets() {
   );
   
   return $presets;
+}
+
+
+/**
+ * Implementation of
+ * hook_features_api
+ * For features integration: provides map presets
+ * to the features module for programmatic export.
+ */
+function openlayers_features_api() {
+  return array(
+    'file' => drupal_get_path('module', 'openlayers') . '/includes/openlayers.features.inc',
+    'default_hook' => 'openlayers_get_presets',
+  );
 }

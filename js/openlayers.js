@@ -104,7 +104,7 @@ OL.renderMap = function(map) {
 
   // Change image path if specified
   if (OL.isSet(map.image_path) && map.image_path) {
-    OL.maps[map.id].map.ImgPath = map.image_path;
+    OpenLayers.ImgPath = map.image_path;
   }
   
   // On MouseOver mark the map as "active".

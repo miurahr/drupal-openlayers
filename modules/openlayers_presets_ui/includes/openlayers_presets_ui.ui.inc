@@ -595,7 +595,7 @@ function openlayers_presets_ui_presets_manage_add_validate($form, &$form_state) 
   
   // Check if adding and name already exists
   $existing = openlayers_get_preset($values['preset_name'], TRUE);
-  if (!empty($existing) && (!$form_state['values']['preset_edit']) && $existing['type'] != t('Default')) {
+  if (!empty($existing) && (!$form_state['values']['preset_edit']) && $existing['type'] != OPENLAYERS_STORAGE_DEFAULT) {
     form_set_error('preset_name', t('The Preset Name already exists.'));
     $found_error = TRUE;
   }

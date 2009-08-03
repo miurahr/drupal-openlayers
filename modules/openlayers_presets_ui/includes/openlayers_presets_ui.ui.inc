@@ -30,7 +30,7 @@ function openlayers_presets_ui_presets_manage_list() {
     $links = array();
     $row[] = $preset['preset_title'];
     $row[] = $preset['preset_description'];
-    // Only add edit and delete actions if not coded presets
+    // Check preset type and create links accordingly.
     if ($preset['type'] == OPENLAYERS_STORAGE_OVERRIDE) {
       $links[] = l(t('Edit'), 'admin/settings/openlayers/presets/' . $preset['preset_name'] . '/edit');
       $links[] = l(t('Revert'), 'admin/settings/openlayers/presets/' . $preset['preset_name'] .'/delete');
@@ -638,17 +638,15 @@ function openlayers_presets_ui_presets_manage_add_submit($form, &$form_state) {
   
   // Only save if save button is pressed
   if ($form_state['clicked_button']['#id'] == 'edit-openlayers-save') {
-    // Convert values to map array
-    $map = _openlayers_presets_ui_convert_form_to_map($form_state['values']);
-    
     // Merge with original map data to account for data
     // that cannot be accounted for UI
     if (!empty($form_state['values']['default_map'])) {
-      $default_map = $form_state['values']['default_map'];
-      unset($default_map['preset_name']);
-      unset($default_map['preset_title']);
-      unset($default_map['preset_description']);
-      $map = openlayers_merge_maps($form_state['values']['default_map'], $map);
+      // Convert form, but keep empty values, so merging is subtractive
+      $map = _openlayers_presets_ui_convert_form_to_map($form_state['values'], FALSE);
+      $map = _openlayers_presets_ui_merge_maps($map, $form_state['values']['default_map']);
+    }
+    else {
+      $map = _openlayers_presets_ui_convert_form_to_map($form_state['values']);
     }
     
     // Create preset array
@@ -907,10 +905,12 @@ function openlayers_presets_ui_preset_ahah() {
  *
  * @param $values
  *   Array of values to convert
+ * @param $clear_empty
+ *   Boolean of whether empty values should be cleared
  * @return
  *   Array of form items
  */
-function _openlayers_presets_ui_convert_form_to_map($values = array()) {
+function _openlayers_presets_ui_convert_form_to_map($values = array(), $clear_empty = TRUE) {
   // If the form values are empty then we have nothing to return.
   if (empty($values)) {
     return array();
@@ -929,7 +929,7 @@ function _openlayers_presets_ui_convert_form_to_map($values = array()) {
   $processed['layers'] = array_merge($baselayers, $overlays);
   
   // Take out form values that are no good
-  $throw = array('op', 'submit', 'form_build_id', 'form_token', 'form_id', 'projections', 'layers', 'openlayers_save', 'preset_name', 'preset_title', 'preset_description', 'map_preview', 'openlayers_projection_ahah', 'openlayers_cancel');
+  $throw = array('op', 'submit', 'form_build_id', 'form_token', 'form_id', 'projections', 'layers', 'openlayers_save', 'preset_name', 'preset_title', 'preset_description', 'map_preview', 'openlayers_projection_ahah', 'openlayers_cancel', 'default_map');
   foreach ($values as $k => $v) {
     if (!in_array($k, $throw)) {
       $processed[$k] = $v;
@@ -937,7 +937,9 @@ function _openlayers_presets_ui_convert_form_to_map($values = array()) {
   }
   
   // Recursively unset any empty values
-  $processed = _openlayers_presets_ui_unset_empty_values($processed);
+  if ($clear_empty) {
+    $processed = _openlayers_presets_ui_unset_empty_values($processed);
+  }
   return $processed;
 }
 
@@ -1131,6 +1133,9 @@ function _openlayers_presets_ui_form_center_map($defaults = array()) {
  * Get Available Controls
  *
  * Builds an array of available controls for the form.
+ *
+ * @return
+ *   Array of available controls
  */
 function _openlayers_presets_ui_available_controls() {
   $available = array();
@@ -1182,4 +1187,37 @@ function _openlayers_presets_ui_available_controls() {
   );
   
   return $available;
+}
+
+/**
+ * Merge maps from form and original preset
+ *
+ * Takes data from form and data from original map and merges
+ * them together, taking into account any manual changes
+ *
+ * @param $submitted_map
+ *   Map array from form that has been convertted
+ * @param $orig_map
+ *   Map array form the original map
+ * @return
+ *   Merged map array
+ */
+function _openlayers_presets_ui_merge_maps($submitted_map = array(), $orig_map = array()) {
+  $merged_map = array();
+  
+  // Check map arrays
+  if (!is_array($submitted_map) || empty($submitted_map) || !is_array($orig_map) || empty($orig_map)) {
+    return (is_array($submitted_map)) ? $submitted_map : array();
+  }
+  
+  // Unset values in original map that can be altered by preset form
+  unset($orig_map['preset_name']);
+  unset($orig_map['preset_title']);
+  unset($orig_map['preset_description']);
+  
+  // Merge maps.  The passed in submitted map has not had empty values removed.
+  // This ensures that there is a subtractive merge
+  $merged_map = openlayers_merge_maps($orig_map, $submitted_map);
+  $merged_map = _openlayers_presets_ui_unset_empty_values($merged_map);
+  return $merged_map;
 }

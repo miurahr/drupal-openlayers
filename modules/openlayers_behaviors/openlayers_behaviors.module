@@ -10,7 +10,7 @@
  */
 
 /**
- * Implementation of hook_help
+ * Implementation of hook_help().
  */
 function openlayers_behaviors_help($path, $arg) {
   switch ($path) {
@@ -21,7 +21,22 @@ function openlayers_behaviors_help($path, $arg) {
 }
 
 /**
- * Implementation of hook_openlayers_behaviors_info
+ * Implementation of hook_theme().
+ */
+function openlayers_behaviors_theme($existing, $type, $theme, $path) {
+  return array(
+    'openlayers_behaviors_tooltip_container' => array(
+      'arguments' => array(
+        'behavior' => array(),
+        'map' => array(),
+      ),
+      'file' => 'includes/openlayers_behaviors.theme.inc',
+    ),
+  );
+}
+
+/**
+ * Implementation of hook_openlayers_behaviors_info().
  */
 function openlayers_behaviors_openlayers_behaviors_info() {
   $file = drupal_get_path('module', 'openlayers_behaviors') .'/includes/openlayers_behaviors.behaviors.inc';

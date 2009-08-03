@@ -28,11 +28,12 @@ OL.Behaviors.popup = function(event) {
   var layers = Array();
   
   // Set up the hover triggers
-  for(layer in OL.maps[mapid].map.layers) {
-    if(OL.maps[mapid].map.layers[layer].drupalData.type == 'Vector') {
+  for (layer in OL.maps[mapid].map.layers) {
+    if (OL.maps[mapid].map.layers[layer].drupalData.type == 'Vector') {
 	    OL.maps[mapid].map.layers[layer].drupalData.popupAttribute = behavior.attribute;
-        OL.maps[mapid].map.layers[layer].drupalData.popupId = behavior.id;
-        layers.push(OL.maps[mapid].map.layers[layer]); // have to use push so it stores the reference instead of value
+      OL.maps[mapid].map.layers[layer].drupalData.popupId = behavior.id;
+      // have to use push so it stores the reference instead of value
+      layers.push(OL.maps[mapid].map.layers[layer]);
     }
   }
 
@@ -54,7 +55,7 @@ OL.Behaviors.popup = function(event) {
  *   Feature Object
  */
 OL.Behaviors.popupFeatureSelected = function(feature) {
-  popup = new OpenLayers.Popup.FramedCloud("popup", 
+  popup = new OpenLayers.Popup.FramedCloud('popup', 
     feature.geometry.getBounds().getCenterLonLat(),
     null,
     "<div class='openlayers-popup'>"+ feature.attributes[feature.layer.drupalData.popupAttribute] +"</div>",
@@ -98,21 +99,21 @@ OL.Behaviors.tooltip = function(event) {
   var options = {
     hover: true, 
     highlightOnly: true, 
-    renderIntent: "temporary", 
+    renderIntent: 'temporary', 
     eventListeners: {
       featurehighlighted: OL.Behaviors.tooltipOver, 
       featureunhighlighted: OL.Behaviors.tooltipOut
     }
   };
-  layer.drupalData.tooltipAttribute = behavior.attribute;
+  layer.drupalData.tooltipData = behavior;
   OL.maps[mapid].controls[behavior.id] = new OpenLayers.Control.SelectFeature(layer, options);
+  
   // Add control
   map.addControl(OL.maps[mapid].controls[behavior.id]);
   OL.maps[mapid].controls[behavior.id].activate();
   
-  // Set up the HTML div
-  // @TODO: Put into Drupal.theme
-  $("#" + mapid).after('<div id="'+ mapid +'-tooltip" class="openlayers-behaviors-tooltip"><img class="openlayers-behaviors-pointy" src="'+ Drupal.settings.basePath + behavior.pointy_path +'" alt="pointy" /><span id="'+ mapid +'-tooltip-text"></span></div>');
+  // Set up the HTML div from themed container
+  $("#" + mapid).after(behavior.container);
 }
 
 /**
@@ -121,26 +122,33 @@ OL.Behaviors.tooltip = function(event) {
  * @param event
  *   Event Object
  */
-OL.Behaviors.tooltipOver = function(event) { 
+OL.Behaviors.tooltipOver = function(event) {
   var feature = event.feature;
-  var tooltipText = feature.attributes[feature.layer.drupalData.tooltipAttribute];
-  $('#'+ feature.layer.map.mapid + "-tooltip-text").html(tooltipText);
+  var behavior = feature.layer.drupalData.tooltipData;
+  var tooltipText = feature.attributes[behavior.attribute];
+  var $textContainer = $('#' + behavior.attribute_id);
+  
+  // Put text into tooltip
+  $textContainer.html(tooltipText);
   
   // Set the tooltip location
+  // @@TODO: dynamically set offset based on height of tooltip...
+  var $tooltipContainer = $('#' + behavior.container_id);
   var centroid = OL.Behaviors.tooltipGetCentroid(feature.geometry.clone());
   var centroidPixel = feature.layer.map.getPixelFromLonLat(centroid);
-  var mapDivOffset = $('#'+feature.layer.map.mapid).offset();
+  var mapDivOffset = $('#' + feature.layer.map.mapid).offset();
   var scrollTop = $(window).scrollTop();
   var scrollLeft = $(window).scrollLeft();
+  var containerHeight = $textContainer.height();
+  var containterWidth = $textContainer.width();
+  var absoluteTop = centroidPixel.y + mapDivOffset.top - scrollTop - behavior.offset_top;
+  var absoluteLeft = centroidPixel.x + mapDivOffset.left - scrollLeft - behavior.offset_left;
   
-  // @@TODO: Can this -12 and -30 put in openlayers_behavior.css and then be 
-  // read out and into this script? This would allow easier styling
-  var absoluteTop = centroidPixel.y + mapDivOffset.top - scrollTop - 30;
-  var absoluteLeft = centroidPixel.x + mapDivOffset.left - scrollLeft - 12;
-  $('#'+ feature.layer.map.mapid + "-tooltip")
+  // Create offset
+  $tooltipContainer
     .css('top', absoluteTop)
     .css('left', absoluteLeft)
-    .css('display','block');
+    .css('display', 'block');
 }
 
 /**
@@ -150,7 +158,7 @@ OL.Behaviors.tooltipOver = function(event) {
  *   Event Object
  */
 OL.Behaviors.tooltipOut = function(event) {
-  $('#'+ event.feature.layer.map.mapid + "-tooltip").css('display','none');
+  $('#' + event.feature.layer.map.mapid + "-tooltip").css('display','none');
 }
 
 /**
@@ -167,8 +175,10 @@ OL.Behaviors.tooltipGetCentroid = function(geometry) {
     if (geometry.containsPoint(firstCentroid)) {
       // The polygon contains it's centroid, easy!
       var baseCentroid = firstCentroid;
-    }else{    
-      // The polygon is a funny shape and does not contain it's own centroid. Find the closest vertex to the centroid.
+    }
+    else {    
+      // The polygon is a funny shape and does not contain 
+      // it's own centroid. Find the closest vertex to the centroid.
       var vertices = geometry.getVertices();
       var minDistance;
       for (var v in vertices){
@@ -178,18 +188,17 @@ OL.Behaviors.tooltipGetCentroid = function(geometry) {
           var closestVertices = vertices[v];
         }
       }
-     var baseCentroid = closestVertices;
+      var baseCentroid = closestVertices;
     }
-
   }
-  else if (geometry.CLASS_NAME == 'OpenLayers.Geometry.LineString'){
+  else if (geometry.CLASS_NAME == 'OpenLayers.Geometry.LineString') {
     // Simply use the middle vertices as the centroid. One day 
     // we may want to take into account the lengths of the different segments
     var vertices = geometry.getVertices();
     var midVerticesIndex = Math.round((vertices.length -1) / 2);
     var baseCentroid = vertices[midVerticesIndex];
   }
-  else if (geometry.CLASS_NAME == 'OpenLayers.Geometry.Point'){
+  else if (geometry.CLASS_NAME == 'OpenLayers.Geometry.Point') {
     var baseCentroid = geometry.getCentroid();
   }
   return new OpenLayers.LonLat(baseCentroid.x, baseCentroid.y);

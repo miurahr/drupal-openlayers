@@ -39,13 +39,17 @@ function openlayers_behaviors_process_zoom_to_layer($behavior, &$map) {
 function openlayers_behaviors_process_tooltip($behavior, &$map) {
   // Check to make sure the layer attribute is properly set.
   if ($behavior['layer'] && $map['layers'][$behavior['layer']]) {
-    drupal_add_css(drupal_get_path('module', 'openlayers_behaviors') .'/openlayers_behaviors.css', 'module');
-    $behavior['pointy_path'] = drupal_get_path('module', 'openlayers_behaviors') .'/images/pointy.png';
+    drupal_add_css(drupal_get_path('module', 'openlayers_behaviors') . '/openlayers_behaviors.css', 'module');
     
-    // Assume we want to display the name attribute if no attribute is specified
-    if (!$behavior['attribute']) {
-      $behavior['attribute'] = 'name';
-    }
+    // Designate some default values
+    $behavior['attribute'] = (!empty($behavior['attribute'])) ? $behavior['attribute'] : 'name';
+    $behavior['attribute_id'] = (!empty($behavior['attribute_id'])) ? $behavior['attribute_id'] : $map['id'] . '-tooltip-text';
+    $behavior['container_id'] = (!empty($behavior['container_id'])) ? $behavior['container_id'] : $map['id'] . '-tooltip';
+    $behavior['offset_top'] = (!empty($behavior['offset_top'])) ? $behavior['offset_top'] : 30;
+    $behavior['offset_left'] = (!empty($behavior['offset_left'])) ? $behavior['offset_left'] : 12;
+    
+    // Create container
+    $behavior['container'] = theme('openlayers_behaviors_tooltip_container', $behavior, $map);
     
     return $behavior;
   }

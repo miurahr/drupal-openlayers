@@ -11,17 +11,17 @@
  * Tooltip
  */
 .openlayers-behaviors-tooltip {
-  display:none;
-  position:fixed;
-  top:0px;
-  left:0px;
+  display: none;
+  position: fixed;
+  top: 0px;
+  left: 0px;
   border: 1px solid #006699;
   background-color: white;
-  z-index:1001;
-  padding:2px 3px 2px 3px;
+  z-index: 1001;
+  padding: 2px 3px 2px 3px;
 }
 
-img.openlayers-behaviors-pointy {
+img.openlayers-tooltip-point {
   position: absolute;
   bottom: -7px;
   left: 5px;

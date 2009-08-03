@@ -158,7 +158,8 @@ OL.Behaviors.tooltipOver = function(event) {
  *   Event Object
  */
 OL.Behaviors.tooltipOut = function(event) {
-  $('#' + event.feature.layer.map.mapid + "-tooltip").css('display','none');
+  var behavior = event.feature.layer.drupalData.tooltipData;
+  $('#' + behavior.container_id).css('display','none');
 }
 
 /**

@@ -1169,7 +1169,7 @@ function _openlayers_presets_ui_available_controls() {
     'title'=> t('Pan Zoom Bar'),
     'description' => t('Gives user ability to pan and zoom in the map interface.'),
   );
-  $available['PermaLink'] = array(
+  $available['Permalink'] = array(
     'title'=> t('Permanent Link'),
     'description' => t('Prvides a URL that will link to a specific map position.'),
   );

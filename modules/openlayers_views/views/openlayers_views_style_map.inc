@@ -283,8 +283,10 @@ class openlayers_views_style_map extends views_plugin_style {
     // Build feature. We create one feature per field per row.
     foreach ($records as $id => $record) {
       $feature = array();
-      // In order for any kind of substitution/replacement token/convert to link/trim/etc. functionality to work, we
-      // have to call advanced_render on each field in the record in order and use its output to generate the attributes
+      // In order for any kind of substitution/replacement 
+      // token/convert to link/trim/etc. functionality to work, we
+      // have to call advanced_render on each field in the record 
+      // in order and use its output to generate the attributes
       // for features. 
       $rendered_record = array();
       foreach ($handlers as $hid => $handler) {
@@ -322,10 +324,10 @@ class openlayers_views_style_map extends views_plugin_style {
             break;
             
           case 'other_latlon':
-            $lat_field = $fields[$data_source['other_lon']]['field_alias'];
-            $lon_field = $fields[$data_source['other_lat']]['field_alias'];
-            $lon = $record->$lat_field;
-            $lat = $record->$lon_field;
+            $lat_field = $fields[$data_source['other_lat']]['field_alias'];
+            $lon_field = $fields[$data_source['other_lon']]['field_alias'];
+            $lon = $record->$lon_field;
+            $lat = $record->$lat_field;
             
             if (!empty($lat) && !empty($lon)) {
               $feature['wkt'] = 'POINT(' . $lon . ' ' . $lat . ')';
@@ -393,7 +395,7 @@ class openlayers_views_style_map extends views_plugin_style {
           $feature['style'] = $feature_style;
         }
       }
-      
+
       // Only add features with WKT data
       if (!empty($feature['wkt'])) {
         $features[] = $feature;
@@ -527,26 +529,25 @@ class openlayers_views_style_map extends views_plugin_style {
           'attribute' => 'openlayers_popup',
         );
       
+        // Zoom to layer., assuming last layer
+        // @@TODO: Use better logic or use options
+        if ($this->options['behaviors']['zoom_to_layer']) {
+          $map['behaviors']['openlayers_views_zoom_to_layer'] = array(
+            'id' => 'openlayers_views_zoom_to_layer',
+            'type' => 'openlayers_behaviors_zoom_to_layer',
+            'layer' => 'openlayers_views_layer_'. $this->view->name,
+          );
+        }
+        // Full screen
+        if ($this->options['behaviors']['fullscreen']) {
+          $map['behaviors']['openlayers_views_fullscreen'] = array(
+            'id' => 'openlayers_views_fullscreen',
+            'type' => 'openlayers_behaviors_fullscreen'
+          );
+        }
+      }
+    }
 
-      // Zoom to layer., assuming last layer
-      // @@TODO: Use better logic or use options
-      if ($this->options['behaviors']['zoom_to_layer']) {
-        $map['behaviors']['openlayers_views_zoom_to_layer'] = array(
-          'id' => 'openlayers_views_zoom_to_layer',
-          'type' => 'openlayers_behaviors_zoom_to_layer',
-          'layer' => 'openlayers_views_layer_'. $this->view->name,
-        );
-      }
-      // Full screen
-      if ($this->options['behaviors']['fullscreen']) {
-        $map['behaviors']['openlayers_views_fullscreen'] = array(
-          'id' => 'openlayers_views_fullscreen',
-          'type' => 'openlayers_behaviors_fullscreen'
-        );
-      }
-    }
-    }
-    
     // Render map
     $map = openlayers_render_map($map);
       

@@ -2,24 +2,39 @@ $Id$
 
  Description
 =====================================
-The OpenLayers module creates an API to use in Drupal.  (needs more)
+OpenLayers is a suite of module to help integrate the
+OpenLayers JS library within Drupal.  At it's core, it
+provides a simple API to create maps with PHP arrays
+and display them where you like.
+
+There are a number of modules that add on more functionality.
+  * Preset UI - Creates a user interface to make map
+    arrays which can be used in various places
+  * Layers - Adds multiple layer types and layers
+    that can be used in maps
+  * Behaviors - Adds extra functionality to maps
+    like Popups and Tooltips
+  * CCK - Allows integration with CCK so that geo data
+    can be inputted via a map
+  * Views - Allows data to be displayed on a map
+    via Views
+  * Filters - Creates a filter to replace
+    [openlayers preset_name] with a map.
 
 
  Installation
 =====================================
-1) Normal Drupal module installation
-2) Set OpenLayers Source at: admin/settings/openlayers
-   It is suggested to download the library and use it locally for performance.
-   For OpenLayers 2.8 Library, set to: http://openlayers.org/dev/OpenLayers.js
-3) You can set defaults at: admin/settings/openlayers/defaults
+ 1) Normal Drupal module installation
+ 
+ 2) Set OpenLayers Source at: admin/settings/openlayers
+    It is suggested to download the library and use it locally for performance.
+   
+ 3) You can set defaults at: admin/settings/openlayers/defaults
 
 
  Documentation
 =====================================
-* API:
-  docs/API.txt
-  docs/THEMING.txt
-  docs/HOOKS.txt
+* See docs/ directory.
 
   
  Authors/Credits

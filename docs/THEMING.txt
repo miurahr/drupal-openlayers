@@ -1,14 +1,48 @@
-This file describes the theming functions available for the OpenLayers module and sub modules.
+This file describes the theming functions
+available for the OpenLayers module and sub modules.
+Most theming is done through functions, as
+opposed to template files.
 
 
- Main Map Output
+ Theming Functions
 =====================================
-/**
- * Theme function for openlayers_map
- */
-function theme_openlayers_map($map = array()) {
-  $output = '
-    <div id="'. $map['id'] .'" class="openlayers-map"></div>
-  ';
-  return $output;
-}
+Please note that most of these functions
+are well documented with inline code, and
+up-to-date information and documentation
+can be found on the project page.
+
+
+  * theme_openlayers_map($map = array())
+    --
+    The basic display for the map to render in.
+
+
+  * theme_openlayers_vector_styles($styles = array(), $map = array())
+    --
+    Does not change HTML, this is used to
+    alter the main default style array.
+
+
+  * theme_openlayers_behaviors_tooltip_container($behavior = array(), $map = array())
+    --
+    Output for tooltip containers
+
+
+  * theme_openlayers_presets_ui_form_layer_description($layer_title = '', $layer_description = '')
+    --
+    Output for listing of layer descriptions
+    in Preset UI.
+
+
+  * theme_openlayers_presets_ui_form_projection_description($projection_title = '', $available_layers = array(), $layers = array())
+    --
+    Output for listing of projections in
+    Preset UI.
+
+
+  * theme_openlayers_views_feature_style($view = NULL, $row = NULL, $group = NULL)
+    --
+    This allow you to override the styles
+    for each feature that is rendered in a view.
+    Again, this does not change the output of
+    HTML.

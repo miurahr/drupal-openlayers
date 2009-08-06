@@ -8,7 +8,7 @@
  *
  * @ingroup openlayers
  */
- 
+
 /**
  * Implementation of hook_enable().
  */
@@ -17,7 +17,7 @@ function openlayers_cck_enable() {
   drupal_load('module', 'content');
   content_notify('enable', 'openlayers_cck');
 }
- 
+
 /**
  * Implementation of hook_disable().
  */
@@ -26,7 +26,7 @@ function openlayers_cck_disable() {
   drupal_load('module', 'content');
   content_notify('disable', 'openlayers_cck');
 }
- 
+
 /**
  * Implementation of hook_install().
  */
@@ -35,7 +35,7 @@ function openlayers_cck_install() {
   drupal_load('module', 'content');
   content_notify('install', 'openlayers_cck');
 }
- 
+
 /**
  * Implementation of hook_uninstall().
  */
@@ -43,7 +43,7 @@ function openlayers_cck_uninstall() {
   // Let content/cck know about our actions
   drupal_load('module', 'content');
   content_notify('uninstall', 'openlayers_cck');
-  
+
   // Get module variables
   $results = db_query("SELECT v.name FROM {variable} AS v WHERE v.name LIKE '%s%%'", 'openlayers_cck_');
   // Remove variables

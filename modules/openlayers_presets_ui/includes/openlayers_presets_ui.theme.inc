@@ -13,7 +13,7 @@
  */
 function theme_openlayers_presets_ui_form_layer_description($layer_title = '', $layer_description = '') {
   if ($layer_description) {
-    $output = $layer_title .' - <span class="openlayers-form-layer-description">'. $layer_description .'</span>';
+    $output = $layer_title . ' - <span class="openlayers-form-layer-description">' . $layer_description . '</span>';
   }
   else {
     $output = $layer_title;
@@ -30,13 +30,13 @@ function theme_openlayers_presets_ui_form_projection_description($projection_tit
   foreach ($available_layers as $k => $val) {
     $names[] = $layers[$val]['name'];
   }
-  
+
   if ($names) {
     $output = '
-      '. $projection_title .' - 
+      ' . $projection_title . ' -
       <span class="openlayers-form-projection-description">
-        '. t('Available Layers') .': 
-        '. implode(', ', $names) .'
+        ' . t('Available Layers') . ':
+        ' . implode(', ', $names) . '
       </span>
     ';
   }

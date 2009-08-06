@@ -1,7 +1,10 @@
 <?php
+// $Id$
+
 /**
  * @file
  * OpenLayers Features Support
+ *
  * Provides a programmatic API to the exportable presets
  * that the OpenLayers module uses for map settings.
  */
@@ -55,7 +58,6 @@ function openlayers_features_export_render($module_name, $data) {
   return array('openlayers_presets' => $code);
 }
 
-
 /**
  * Implementation of hook_features_export_options().
  * @return array of preset names we can export
@@ -76,7 +78,7 @@ function openlayers_features_export_options() {
  */
 function openlayers_delete_preset($preset) {
   $preset = openlayers_get_preset($preset, TRUE);
-  
+
   if ($preset['type'] == OPENLAYERS_STORAGE_DEFAULT) {
     drupal_set_message(t('Cannot delete %name because it is provided by a module.', array('%name' => $preset['preset_name'])));
   }
@@ -84,7 +86,7 @@ function openlayers_delete_preset($preset) {
     // Create query
     $query = "DELETE FROM {openlayers_map_presets} WHERE preset_id = %d";
     $result = db_query($query, $preset['preset_id']);
-  
+
     // Check query results
     if ($result) {
       drupal_set_message(t('Preset %name was deleted.', array('%name' => $preset['preset_name'])));
@@ -94,8 +96,6 @@ function openlayers_delete_preset($preset) {
     }
   }
 }
-    
-
 
 /**
  * Implementation of hook_features_revert().

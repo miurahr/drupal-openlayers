@@ -23,7 +23,7 @@ function openlayers_install() {
 function openlayers_uninstall() {
   // Remove tables
   drupal_uninstall_schema('openlayers');
-  
+
   // Get module variables
   $results = db_query("SELECT v.name FROM {variable} AS v WHERE v.name LIKE '%s%%'", 'openlayers_');
   // Remove variables
@@ -33,7 +33,7 @@ function openlayers_uninstall() {
 }
 
 /**
- * Implementation of hook_schema.
+ * Implementation of hook_schema().
  */
 function openlayers_schema() {
   $schema['openlayers_map_presets'] = array(
@@ -70,6 +70,6 @@ function openlayers_schema() {
     'primary key' => array('preset_id'),
     'unique key' => array('preset_name'),
   );
-  
+
   return $schema;
 }

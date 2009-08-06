@@ -3,26 +3,26 @@
 
 /**
  * @file
- * This file holds the main Drupal hook functions 
+ * This file holds the main Drupal hook functions
  * and private functions for the openlayers_filters module.
  *
  * @ingroup openlayers
  */
 
 /**
- * Implementation of hook_help
+ * Implementation of hook_help().
  */
 function openlayers_filters_help($path, $arg) {
   switch ($path) {
     case 'admin/help#openlayers_filters':
       $output = '<p>'. t('The OpenLayers Filters module provides input filters to allow for inline maps.') .'</p>';
   }
-  
+
   return $output;
 }
 
 /**
- * Implementation of hook_filter
+ * Implementation of hook_filter().
  */
 function openlayers_filters_filter($op, $delta = 0, $format = -1, $text = '', $cache_id = 0) {
   // Check op for list
@@ -49,7 +49,7 @@ function openlayers_filters_filter($op, $delta = 0, $format = -1, $text = '', $c
         case 'process':
           $matches = array();
           preg_match_all('/\[(openlayers[^\]]*)\]/', $text, $matches);
-          
+
           // Check for found
           if (is_array($matches[1]) && count($matches[1]) > 0) {
             foreach ($matches[1] as $i => $match) {
@@ -63,29 +63,29 @@ function openlayers_filters_filter($op, $delta = 0, $format = -1, $text = '', $c
                 else {
                   $map = openlayers_get_default_map();
                 }
-                
+
                 // Check map
                 if (!empty($map)) {
                   // Render map
                   $rendered = openlayers_render_map($map);
-                  
+
                   // Replace text
                   $text = str_replace($matches[0][$i], $rendered['themed'], $text);
                 }
               }
             }
           }
-          
+
           return $text;
 
       }
       break;
-      
+
   }
 }
 
 /**
- * Implementation of hook_filter
+ * Implementation of hook_filter_tips().
  */
 function openlayers_filters_filter_tips($delta, $format, $long = FALSE) {
   switch ($delta) {

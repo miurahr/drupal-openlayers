@@ -24,7 +24,7 @@ function theme_openlayers_behaviors_tooltip_container($behavior = array(), $map 
     'class' => 'openlayers-tooltip-point',
   );
   $point_image = theme('image', $path_point_image, t('Tooltip point'), '', $attr, FALSE);
-  
+
   // Create output
   $output = '
     <div id="' . $behavior['container_id'] . '" class="openlayers-behaviors-tooltip">

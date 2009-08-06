@@ -3,7 +3,7 @@
 
 /**
  * @file
- * This file holds the main Drupal hook functions 
+ * This file holds the main Drupal hook functions
  * and private functions for the openlayers_behaviors module.
  *
  * @ingroup openlayers
@@ -42,7 +42,7 @@ function openlayers_behaviors_openlayers_behaviors_info() {
   $file = drupal_get_path('module', 'openlayers_behaviors') .'/includes/openlayers_behaviors.behaviors.inc';
   $js_file = drupal_get_path('module', 'openlayers_behaviors') .'/js/openlayers_behaviors.behaviors.js';
   $info = array();
-  
+
   // Define info array
   $info['openlayers_behaviors_zoom_to_layer'] = array(
     'name' => t('Zoom to Layer'),
@@ -92,6 +92,6 @@ function openlayers_behaviors_openlayers_behaviors_info() {
     'js_file' => $js_file,
     'js_callback' => 'popup',
   );
-  
+
   return $info;
 }

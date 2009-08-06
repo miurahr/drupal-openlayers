@@ -3,12 +3,12 @@
 
 /**
  * @file
- * This file holds the main Drupal hook functions 
+ * This file holds the main Drupal hook functions
  * and private functions for the openlayers module.
  *
  * @ingroup openlayers
  */
- 
+
 /**
  * Process Layers
  *
@@ -24,15 +24,15 @@
  */
 function openlayers_layers_process_layers($layer = NULL) {
   $layer_data = array();
-  
+
   // Make sure layer is a string
   if (!is_string($layer)) {
     return FALSE;
   }
-  
+
   // Get info array to reference title
   $layer_info = openlayers_layers_openlayers_layers_info();
-  
+
   // Determine what data to send back
   switch ($layer) {
     case 'openlayers_layers_nasa_global_mosaic':
@@ -50,7 +50,7 @@ function openlayers_layers_process_layers($layer = NULL) {
         'events' => array(),
       );
       break;
-      
+
     case 'openlayers_layers_nasa_daily_planet':
       $layer_data = array(
         'id' => $layer,
@@ -67,7 +67,7 @@ function openlayers_layers_process_layers($layer = NULL) {
         'events' => array(),
       );
       break;
-    
+
     case 'openlayers_layers_nasa_blue_marble':
       $layer_data = array(
         'id' => $layer,
@@ -84,7 +84,7 @@ function openlayers_layers_process_layers($layer = NULL) {
         'events' => array(),
       );
       break;
-    
+
     case 'openlayers_layers_open_aerial':
       $layer_data = array(
         'id' => $layer,
@@ -99,7 +99,7 @@ function openlayers_layers_process_layers($layer = NULL) {
         'events' => array(),
       );
       break;
-    
+
     case 'openlayers_layers_google_street':
       _openlayers_layers_include_map_api('google');
       $layer_data = array(
@@ -113,7 +113,7 @@ function openlayers_layers_process_layers($layer = NULL) {
         ),
       );
       break;
-    
+
     case 'openlayers_layers_google_satellite':
       _openlayers_layers_include_map_api('google');
       $layer_data = array(
@@ -127,7 +127,7 @@ function openlayers_layers_process_layers($layer = NULL) {
         ),
       );
       break;
-    
+
     case 'openlayers_layers_google_hybrid':
       _openlayers_layers_include_map_api('google');
       $layer_data = array(
@@ -141,7 +141,7 @@ function openlayers_layers_process_layers($layer = NULL) {
         ),
       );
       break;
-    
+
     case 'openlayers_layers_google_physical':
       _openlayers_layers_include_map_api('google');
       $layer_data = array(
@@ -155,7 +155,7 @@ function openlayers_layers_process_layers($layer = NULL) {
         ),
       );
       break;
-    
+
     case 'openlayers_layers_yahoo_street':
       _openlayers_layers_include_map_api('yahoo');
       $layer_data = array(
@@ -169,7 +169,7 @@ function openlayers_layers_process_layers($layer = NULL) {
         ),
       );
       break;
-    
+
     case 'openlayers_layers_yahoo_satellite':
       _openlayers_layers_include_map_api('yahoo');
       $layer_data = array(
@@ -183,7 +183,7 @@ function openlayers_layers_process_layers($layer = NULL) {
         ),
       );
       break;
-    
+
     case 'openlayers_layers_yahoo_hybrid':
       _openlayers_layers_include_map_api('yahoo');
       $layer_data = array(
@@ -197,7 +197,7 @@ function openlayers_layers_process_layers($layer = NULL) {
         ),
       );
       break;
-    
+
     case 'openlayers_layers_virtual_earth_street':
       _openlayers_layers_include_map_api('virtual_earth');
       $layer_data = array(
@@ -211,7 +211,7 @@ function openlayers_layers_process_layers($layer = NULL) {
         ),
       );
       break;
-    
+
     case 'openlayers_layers_virtual_earth_satellite':
       _openlayers_layers_include_map_api('virtual_earth');
       $layer_data = array(
@@ -225,7 +225,7 @@ function openlayers_layers_process_layers($layer = NULL) {
         ),
       );
       break;
-    
+
     case 'openlayers_layers_virtual_earth_hybrid':
       _openlayers_layers_include_map_api('virtual_earth');
       $layer_data = array(
@@ -239,7 +239,7 @@ function openlayers_layers_process_layers($layer = NULL) {
         ),
       );
       break;
-    
+
     case 'openlayers_layers_osm_mapnik':
       $layer_data = array(
         'id' => $layer,
@@ -250,7 +250,7 @@ function openlayers_layers_process_layers($layer = NULL) {
         'url' => 'http://tile.openstreetmap.org/${z}/${x}/${y}.png',
       );
       break;
-    
+
     case 'openlayers_layers_osm_tah':
       $layer_data = array(
         'id' => $layer,
@@ -261,7 +261,7 @@ function openlayers_layers_process_layers($layer = NULL) {
         'url' => 'http://tah.openstreetmap.org/Tiles/tile/${z}/${x}/${y}.png',
       );
       break;
-    
+
     case 'openlayers_layers_osm_cycle':
       $layer_data = array(
         'id' => $layer,
@@ -285,12 +285,12 @@ function openlayers_layers_process_layers($layer = NULL) {
           'layers' => 'osm-4326-hybrid',
         ),
         'options' => array(
-          'isBaseLayer' => false,
+          'isBaseLayer' => FALSE,
           'buffer' => 1,
         ),
       );
       break;
-      
+
     case 'openlayers_layers_cloudmade':
       $layer_data = array(
         'id' => $layer,
@@ -303,12 +303,12 @@ function openlayers_layers_process_layers($layer = NULL) {
           'styleId' => variable_get('openlayers_layers_cloudmade_style', ''),
         ),
       );
-      
+
       // Include JS
-      drupal_add_js(variable_get('openlayers_layers_cloudmade_js',''));
+      drupal_add_js(variable_get('openlayers_layers_cloudmade_js', ''));
       break;
-   
-   case 'openlayers_layers_local_kml':
+
+    case 'openlayers_layers_local_kml':
       $layer_data = array(
         'id' => $layer,
         'type' => 'KML',
@@ -316,11 +316,11 @@ function openlayers_layers_process_layers($layer = NULL) {
         'url' => url('kml/node'),
       );
       break;
-     
+
     default:
       break;
   }
-  
+
   return $layer_data;
 }
 
@@ -339,10 +339,10 @@ function openlayers_layers_process_geo_data_layers($layer = NULL) {
   // Get table description
   $table_desc = geo('table_desc', $layer);
   $attribute_cols = array();
-  
+
   // Go through columns
-  foreach ($table_desc as $cname => $cinfo){
-    if ($cinfo['type'] == 'geometry'){
+  foreach ($table_desc as $cname => $cinfo) {
+    if ($cinfo['type'] == 'geometry') {
       $geometry_col = $cname;
       $srid = $cinfo['srid'];
     }
@@ -350,19 +350,19 @@ function openlayers_layers_process_geo_data_layers($layer = NULL) {
       $attribute_cols[] = db_escape_table($cname);
     }
   }
-  
+
   // Make values safe since not enritely sure how its getting there.
   $geometry_col = db_escape_table($geometry_col);
-  
+
   // Get geometry text
   $query = "SELECT asText(%s) as %s, ". implode(',', $attribute_cols) ." from {%s}";
   $res = db_query($query, $geometry_col, $geometry_col, $layer);
   $features = array();
-  
+
   // Go through results
-  while ($row = db_fetch_array($res)){
+  while ($row = db_fetch_array($res)) {
     $attributes = array();
-    foreach ($attribute_cols as $attr_name){
+    foreach ($attribute_cols as $attr_name) {
       $attr_val = $row[$attr_name];
       $attributes[$attr_name] = $attr_val;
     }
@@ -373,7 +373,7 @@ function openlayers_layers_process_geo_data_layers($layer = NULL) {
       'projection' => $srid,
     );
   }
-  
+
   // Create layer data array
   $layer_data = array(
     'id' => $layer,
@@ -394,23 +394,23 @@ function openlayers_layers_process_geo_data_layers($layer = NULL) {
  */
 function _openlayers_layers_include_map_api($type = '') {
   static $included = array();
-  
+
   // Check if already included
   if (!$included[$type] && $type) {
     switch ($type) {
       case 'google':
         // Include Google Map API JS (maybe getting key from GMap)
-        drupal_set_html_head('<script src="'. check_url("http://maps.google.com/maps?file=api&v=2&sensor=false&key=". variable_get('openlayers_layers_google_api', variable_get('googlemap_api_key', ''))) .'" type="text/javascript"></script>');
+        drupal_set_html_head('<script src="'. check_url("http://maps.google.com/maps?file=api&v=2&sensor=false&key=" . variable_get('openlayers_layers_google_api', variable_get('googlemap_api_key', ''))) . '" type="text/javascript"></script>');
         break;
-        
+
       case 'yahoo':
-        drupal_set_html_head('<script src="'. check_url("http://api.maps.yahoo.com/ajaxymap?v=3.0&appid=".variable_get('openlayers_layers_yahoo_api','')) .'" type="text/javascript"></script>');
+        drupal_set_html_head('<script src="' . check_url("http://api.maps.yahoo.com/ajaxymap?v=3.0&appid=" . variable_get('openlayers_layers_yahoo_api', '')) . '" type="text/javascript"></script>');
         break;
-        
+
       case 'virtual_earth':
-        drupal_set_html_head('<script src="'. check_url("http://dev.virtualearth.net/mapcontrol/mapcontrol.ashx?v=6.1") .'" type="text/javascript"></script>');
+        drupal_set_html_head('<script src="' . check_url("http://dev.virtualearth.net/mapcontrol/mapcontrol.ashx?v=6.1") . '" type="text/javascript"></script>');
         break;
-      
+
     }
     $included[$type] = TRUE;
   }

@@ -44,7 +44,7 @@ function openlayers_admin_settings() {
     '#options' => openlayers_get_presets(),
     '#default_value' => variable_get('openlayers_default_preset', 'default'),
   );
-  
+
   // Make a system setting form and return
   return system_settings_form($form);
 }

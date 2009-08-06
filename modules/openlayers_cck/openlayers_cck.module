@@ -3,7 +3,7 @@
 
 /**
  * @file
- * This file holds the main Drupal hook functions 
+ * This file holds the main Drupal hook functions
  * and private functions for the openlayers_cck module.
  *
  * @ingroup openlayers
@@ -15,14 +15,14 @@
 define('OPENLAYERS_CCK_MAP_ID_PREFIX', 'openlayers-cck-map-auto-id');
 
 /**
- * Implementation of hook_help
+ * Implementation of hook_help().
  */
 function openlayers_cck_help($path, $arg) {
   switch ($path) {
     case 'admin/help#openlayers_cck':
       $output = '<p>'. t('The openlayers_cck module provides fields and widgets that interface with OpenLayers.') .'</p>';
   }
-  
+
   return $output;
 }
 
@@ -51,7 +51,7 @@ function openlayers_cck_theme() {
       'arguments' => array('element' => NULL),
     ),
   );
-    
+
   // Create formatter theme functions
   foreach (openlayers_get_presets() as $name => $title) {
     $themes['openlayers_cck_formatter_' . $name] = array(
@@ -59,7 +59,7 @@ function openlayers_cck_theme() {
       'function' => 'theme_openlayers_cck_formatter_map',
     );
   }
-  
+
   return $themes;
 }
 
@@ -103,12 +103,12 @@ function openlayers_cck_field_info() {
 }
 
 /**
- * Implementation of hook_field_settings
+ * Implementation of hook_field_settings().
  */
 function openlayers_cck_field_settings($op, $field) {
   switch ($op) {
     case 'form':
-      $form = array();      
+      $form = array();
       return $form;
 
     case 'validate':
@@ -121,38 +121,39 @@ function openlayers_cck_field_settings($op, $field) {
       $columns = array(
         'openlayers_wkt' => array(
           'type' => 'text',
-          'not null' => FALSE, 
+          'not null' => FALSE,
           'sortable' => TRUE,
           'views' => TRUE,
         ),
       );
       return $columns;
-   
-   case 'views data':
+
+    case 'views data':
       $data = content_views_field_views_data($field);
       $db_info = content_database_info($field);
       $table_alias = content_views_tablename($field);
       return $data;
+
   }
 }
 
 /**
- * Implementation of hook_field
+ * Implementation of hook_field().
  */
 function openlayers_cck_field($op, &$node, $field, &$items, $teaser, $page) {
   switch ($op) {
     case 'validate':
       // Check if field is valid WKT format
-      foreach($items as $delta => $value) {
+      foreach ($items as $delta => $value) {
         // @@TODO: validate WKT
       }
       break;
-      
+
   }
 }
 
 /**
- * Implementation of hook_content_is_empty
+ * Implementation of hook_content_is_empty().
  */
 function openlayers_cck_content_is_empty($item, $field) {
   if (empty($item['openlayers_wkt'])) {
@@ -162,7 +163,7 @@ function openlayers_cck_content_is_empty($item, $field) {
 }
 
 /**
- * Implementation of hook_widget_info
+ * Implementation of hook_widget_info().
  */
 function openlayers_cck_widget_info() {
   return array(
@@ -178,7 +179,7 @@ function openlayers_cck_widget_info() {
 }
 
 /**
- * Implementation of hook_widget_settings
+ * Implementation of hook_widget_settings().
  */
 function openlayers_cck_widget_settings($op, $widget) {
   switch ($op) {
@@ -191,7 +192,7 @@ function openlayers_cck_widget_settings($op, $widget) {
         'path' => t('Path'),
         'polygon' => t('Polygon'),
       );
-      
+
       // Define form elements
       $form['openlayers_cck_preset_map'] = array(
         '#type' => 'select',
@@ -218,7 +219,7 @@ function openlayers_cck_widget_settings($op, $widget) {
 }
 
 /**
- * Implementation of hook_widget
+ * Implementation of hook_widget().
  */
 function openlayers_cck_widget(&$form, &$form_state, $field, $items, $delta = 0) {
   switch ($field['widget']['type']) {
@@ -262,14 +263,14 @@ function openlayers_cck_wkt_element_process($element, $edit, &$form_state, &$for
   $widget = $field['widget'];
   $field_label = $widget['label'];
   $field_key = $element['#columns'][0];
-  
+
   // Make map for input
   $rendered_map = _openlayers_cck_render_element_map($field_name, $field_label, $element['#value'], $field);
   // Create map element
   $element['map'] = array(
     '#value' => theme('openlayers_cck_map', $field, $rendered_map),
   );
-  
+
   // Create storage element
   $element['openlayers_wkt'] = array(
     '#type' => 'textarea',
@@ -285,7 +286,7 @@ function openlayers_cck_wkt_element_process($element, $edit, &$form_state, &$for
     '#delta' => $element['#delta'],
     '#columns' => $element['#columns'],
   );
-  
+
   // Make default value.  It will be stored in hidden field
   $default_value = '';
   if (is_array($element['#value'])  && count($element['#value']) > 0) {
@@ -299,14 +300,14 @@ function openlayers_cck_wkt_element_process($element, $edit, &$form_state, &$for
       $default_value = implode('||', $values);
     }
   }
-  
+
   // Hidden element.  This is used to store a more distinctly
   // delimited dataset
   $element['openlayers_wkt_hidden'] = array(
     '#type' => 'hidden',
     '#default_value' => $default_value,
   );
-  
+
   // Set #element_validate in a way that it will not wipe out other
   // validation functions already set by other modules.
   if (empty($element['#element_validate'])) {
@@ -328,7 +329,7 @@ function openlayers_cck_validate($element, &$form_state) {
   // turning multiple selected options into multiple parent elements.
   // Immediate parent is the delta, need to get back to parent's parent
   // to create multiple elements.
-  
+
   // Get field array
   $field = $form_state['#field_info'][$element['#field_name']];
   // Convert data to array of values
@@ -365,14 +366,14 @@ function _openlayers_cck_convert_form_data($element, $field) {
  */
 function openlayers_cck_field_formatter_info() {
   $formatters = array();
-  
-  // Default formatter  
+
+  // Default formatter
   $formatters['wkt_default'] = array(
     'label' => t('Default WKT Value'),
     'field types' => array('geo', 'openlayers_wkt'),
     'multiple values' => CONTENT_HANDLE_MODULE,
   );
-    
+
   // Map preset formatter
   foreach (openlayers_get_presets() as $name => $title) {
     $formatters[$name] = array(
@@ -409,10 +410,10 @@ function theme_openlayers_cck_formatter_wkt_default($element) {  $features = arr
   foreach (element_children($element) as $delta) {
     $features[$delta] = $element[$delta]['#item']['openlayers_wkt'];
   }
-  
+
   // Check count and build geomtry collection
   if (count($features) > 0) {
-    if (count($features) > 1){
+    if (count($features) > 1) {
       $output = 'GEOMETRYCOLLECTION(' . implode(',', $features) . ')';
     }
     else {
@@ -440,10 +441,10 @@ function theme_openlayers_cck_formatter_map($element) {
 
   // Get preset name from formatter
   $preset_name = str_replace('openlayers_cck_formatter_', '', $element['#formatter']);
-  
+
   // Get map preset
   $map = openlayers_get_map($preset_name);
-  
+
   // Add features and vector layer
   if (count($features) > 0) {
     $map['layers']['openlayers_cck_vector'] = array(
@@ -451,11 +452,11 @@ function theme_openlayers_cck_formatter_map($element) {
       'name' => $field['widget']['label'],
       'type' => 'Vector',
       'options' => array(),
-      'features' => $features,  
+      'features' => $features,
     );
     $map['options']['displayProjection'] = ($field['srid'] != 0) ? $field['srid'] : '4326';
   }
-  
+
   // Render map
   $rendered = openlayers_render_map($map);
 
@@ -475,22 +476,24 @@ function theme_openlayers_cck_map($field = array(), $map = array()) {
   $title = check_plain(t($field['widget']['label']));
   $description = content_filter_xss(t($field['widget']['description']));
   $output = '';
-  
+
   // Check for errors
   if (!empty($map['errors'])) {
     return $output;
   }
-  
+
   $output = '
     <div id="openlayers-cck-map-container-' . $map['id'] . '" class="form-item openlayers-cck-map-container">
       <label for="openlayers-cck-map-' . $map['id'] . '">' . $title . ':</label>
       ' . $map['themed'] . '
-      <div class="description openlayers-cck-map-instructions">'.t('Click the tools in the upper right-hand corner of the map to switch between draw mode and zoom/pan mode. Draw your shape, double-clicking to finish. You may edit your shape using the control points. To delete a shape, select it and press the delete key. To delete a vertex hover over it and press the d key.').'</div>
+      <div class="description openlayers-cck-map-instructions">
+        ' . t('Click the tools in the upper right-hand corner of the map to switch between draw mode and zoom/pan mode. Draw your shape, double-clicking to finish. You may edit your shape using the control points. To delete a shape, select it and press the delete key. To delete a vertex hover over it and press the d key.') . '
+      </div>
       <div class="description openlayers-cck-map-description">
         ' . $description . '
       </div>
       <div class="openlayers-cck-actions">
-        <a href="#" id="' . $map['id'] . '-wkt-switcher" rel="' . $map['id'] . '">'. t('Show/Hide WKT Fields') .'</a>
+        <a href="#" id="' . $map['id'] . '-wkt-switcher" rel="' . $map['id'] . '">' . t('Show/Hide WKT Fields') . '</a>
       </div>
     </div>
   ';
@@ -526,16 +529,16 @@ function _openlayers_cck_render_element_map($field_name = '', $field_label = '',
   else {
     $map = openlayers_get_default_map();
   }
-  
+
   // Put together map
   $map['id'] = $map_id;
 
   // Add main event for CCK processing
   $map['events']['beforeBehaviors'] = array('CCKProcess');
-  
+
   // Make sure that our display projection matches the database projection
   $map['options']['displayProjection'] = ($field['srid'] != 0) ? $field['srid'] : '4326';
-  
+
   // Define a vector layer for our features
   $map['layers']['openlayers_cck_vector'] = array(
     'id' => 'openlayers_cck_vector',
@@ -547,7 +550,7 @@ function _openlayers_cck_render_element_map($field_name = '', $field_label = '',
       'featureunselected' => array('CCKFeaturesUnselected'),
     ),
   );
-  
+
   // Create base behavior array
   $behavior_base = array(
     'type' => 'openlayers_behaviors_draw_features',
@@ -556,34 +559,35 @@ function _openlayers_cck_render_element_map($field_name = '', $field_label = '',
     'featuremodified_handler' => array('OL.CCK.featureModified'),
     'featureremoved_handler' => array('OL.CCK.featureRemoved'),
   );
-  
+
   // Look for geo type
   if ($type == 'geo' && isset($field['geo_type'])) {
     // Add id to geo type and add base behavoir to map
     $behavior_base['id'] = 'openlayers_cck_edit_' . $field['geo_type'];
     $map['behaviors']['openlayers_cck_edit_' . $field['geo_type']] = $behavior_base;
-    
+
     // Determine type from geo type
     switch ($field['geo_type']) {
       case 'point':
         $map['behaviors']['openlayers_cck_edit_' . $field['geo_type']]['feature_type'] = 'point';
         break;
-      
+
       case 'linestring':
         $map['behaviors']['openlayers_cck_edit_' . $field['geo_type']]['feature_type'] = 'path';
         break;
-        
+
       case 'polygon':
         $map['behaviors']['openlayers_cck_edit_' . $field['geo_type']]['feature_type'] = 'polygon';
         break;
+
     }
   }
   else {
     // Check which feature types are available
-    if ($widget['openlayers_cck_feature_types']){
+    if ($widget['openlayers_cck_feature_types']) {
       foreach ($widget['openlayers_cck_feature_types'] as $type) {
         if (!empty($type)) {
-          $map['behaviors']['openlayers_cck_edit_' . $type] = $behavior_base + 
+          $map['behaviors']['openlayers_cck_edit_' . $type] = $behavior_base +
             array(
               'id' => 'openlayers_cck_edit_' . $type,
               'feature_type' => $type,
@@ -591,21 +595,23 @@ function _openlayers_cck_render_element_map($field_name = '', $field_label = '',
         }
       }
     }
-    // @@TODO: Allow default values using a map
-    // We are in the widget settings screen and it wants default values
-    else return false;
+    else {
+      // @@TODO: Allow default values using a map
+      // We are in the widget settings screen and it wants default values
+      return FALSE;
+    }
   }
-  
+
   // Render Map
   $rendered_map = openlayers_render_map($map);
-  
+
   // Check errors
   if (!$rendered_map['errors']) {
     // Add JS
     drupal_add_js(drupal_get_path('module', 'openlayers_cck') .'/js/openlayers_cck.js');
     //Add CSS
     drupal_add_css(drupal_get_path('module', 'openlayers_cck') .'/openlayers_cck.css', 'module');
-    
+
     // Put together array for JS
     $openlayers_cck = array(
       'openlayers_cck' => array(

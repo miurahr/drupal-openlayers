@@ -23,12 +23,12 @@
  */
 function openlayers_process_styles($style = NULL, $map = array()) {
   $style_data = array();
-  
+
   // Make sure layer is a string
   if (!is_string($style)) {
     return FALSE;
   }
-      
+
   // Determine what data to send back
   switch ($style) {
     case 'default':
@@ -40,7 +40,7 @@ function openlayers_process_styles($style = NULL, $map = array()) {
         'fillOpacity' => 0.5
       );
       break;
-      
+
     case 'default_select':
       $style_data = array(
         'pointRadius' => 5,
@@ -50,8 +50,8 @@ function openlayers_process_styles($style = NULL, $map = array()) {
         'fillOpacity' => 0.5
       );
       break;
-      
+
   }
-  
+
   return $style_data;
 }

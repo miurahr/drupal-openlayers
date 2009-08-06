@@ -17,6 +17,6 @@ function theme_openlayers_views_map($view, $options = array(), $map = array()) {
       ' . $map['themed'] . '
     </div>
   ';
-  
+
   return $output;
 }

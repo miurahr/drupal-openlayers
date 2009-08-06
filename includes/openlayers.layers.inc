@@ -21,15 +21,15 @@
  */
 function openlayers_process_layers($layer = NULL) {
   $layer_data = array();
-  
+
   // Make sure layer is a string
   if (!is_string($layer)) {
     return FALSE;
   }
-  
+
   // Get info array to reference title
   $layer_info = openlayers_openlayers_layers_info();
-  
+
   // Determine what data to send back
   switch ($layer) {
     case 'openlayers_default_wms':
@@ -48,8 +48,8 @@ function openlayers_process_layers($layer = NULL) {
         'events' => array(),
       );
       break;
-      
+
   }
-  
+
   return $layer_data;
 }

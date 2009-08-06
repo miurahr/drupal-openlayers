@@ -28,7 +28,7 @@ function _openlayers_layers_process($layers = array(), &$map = array()) {
     $map = array();
   }
   $processed = array();
-  
+
   // Get layer info array
   $layer_info = openlayers_layers_get_info();
 
@@ -36,7 +36,7 @@ function _openlayers_layers_process($layers = array(), &$map = array()) {
   if (!array_key_exists($map['default_layer'], $layers) && ($map['default_layer'])) {
     $layers[$map['default_layer']] = $map['default_layer'];
   }
-  
+
   // Go through layers
   foreach ($layers as $k => $layer) {
     // Check if array, if array, just pass on
@@ -76,7 +76,7 @@ function _openlayers_layers_process($layers = array(), &$map = array()) {
       }
     }
   }
-  
+
   // Return processed
   return $processed;
 }
@@ -101,12 +101,12 @@ function _openlayers_behaviors_process($behaviors = array(), &$map = array()) {
   if (!is_array($map)) {
     $map = array();
   }
-  
+
   // Initialized variables
   $processed = array();
   // Get behavior info array
   $behavior_info = openlayers_behaviors_get_info();
-  
+
   // Go through behaviors
   foreach ($behaviors as $k => $behavior) {
     // Check if array, if array, just pass on
@@ -120,11 +120,11 @@ function _openlayers_behaviors_process($behaviors = array(), &$map = array()) {
       );
     }
   }
-  
+
   // Go through processed
   foreach ($processed as $bkey => $behavior) {
     $info = $behavior_info[$behavior['type']];
-    
+
     if (is_file($info['file'])) {
       require_once $info['file'];
       // Check for function
@@ -139,7 +139,7 @@ function _openlayers_behaviors_process($behaviors = array(), &$map = array()) {
         }
       }
       // Include JavaScript
-      if ($info['js_file']){
+      if ($info['js_file']) {
         drupal_add_js($info['js_file'], 'module');
       }
     }
@@ -169,7 +169,7 @@ function _openlayers_styles_process($styles = array(), &$map = array()) {
   if (!is_array($map)) {
     $map = array();
   }
-  
+
   // Initialized variables
   $processed = array();
   // Get behavior info array
@@ -184,7 +184,7 @@ function _openlayers_styles_process($styles = array(), &$map = array()) {
       // If not array, we want to include the file and call the function
       if (($info = $styles_info[$style]) && is_array($styles_info[$style])) {
         // Check if file exists
-        if (is_file('./'. $info['file'])) {          
+        if (is_file('./'. $info['file'])) {
           require_once './'. $info['file'];
           // Check for function
           if (function_exists($info['callback'])) {
@@ -200,9 +200,9 @@ function _openlayers_styles_process($styles = array(), &$map = array()) {
     }
   }
 
-  // Run through theme function  
+  // Run through theme function
   $processed = theme('openlayers_vector_styles', $processed, $map);
-  
+
   // Return processed
   return $processed;
 }

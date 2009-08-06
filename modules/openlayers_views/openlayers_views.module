@@ -3,7 +3,7 @@
 
 /**
  * @file
- * This file holds the main Drupal hook functions 
+ * This file holds the main Drupal hook functions
  * and private functions for the openlayers_views module.
  *
  * @ingroup openlayers
@@ -15,19 +15,19 @@
 define('OPENLAYERS_VIEWS_MAP_ID_PREFIX', 'openlayers-views-map-auto-id');
 
 /**
- * Implementation of hook_help
+ * Implementation of hook_help().
  */
 function openlayers_views_help($path, $arg) {
   switch ($path) {
     case 'admin/help#openlayers_views':
       $output = '<p>'. t('The OpenLayers Views module provides a set of plugins for Views.') .'</p>';
   }
-  
+
   return $output;
 }
 
 /**
- * Implementation of hook_theme
+ * Implementation of hook_theme().
  */
 function openlayers_views_theme($existing, $type, $theme, $path) {
   return array(
@@ -43,7 +43,7 @@ function openlayers_views_theme($existing, $type, $theme, $path) {
 }
 
 /**
- * Implementation of hook_views_api
+ * Implementation of hook_views_api().
  */
 function openlayers_views_views_api() {
   return array(

@@ -31,7 +31,7 @@ function openlayers_layers_admin_settings() {
       array('!google_url' => 'http://www.google.com/apis/maps/')),
     '#default_value' => variable_get('openlayers_layers_google_api', variable_get('googlemap_api_key', '')),
   );
-  
+
   // Yahoo Map API Key
   $form['openlayers_yahoo'] = array(
     '#type' => 'fieldset',
@@ -47,7 +47,7 @@ function openlayers_layers_admin_settings() {
       array('!yahoo_url' => 'http://developer.yahoo.com/maps/')),
     '#default_value' => variable_get('openlayers_layers_yahoo_api', ''),
   );
-  
+
   // Cloud Made Settings
   $form['openlayers_cloudmade'] = array(
     '#type' => 'fieldset',
@@ -76,10 +76,10 @@ function openlayers_layers_admin_settings() {
     '#title' => t('CloudMade OpenLayers JS Library Path'),
     '#description' => t('Enter the Drupal path to where the CloudMade OpenLayers JS library is located.  You down load it from the <a href="!cloudmade_js_url">CloudMade OpenLayers Page</a>.',
       array('!cloudmade_js_url' => 'http://developers.cloudmade.com/wiki/openlayers-api/CloudMade_Tiles')),
-    '#default_value' => variable_get('openlayers_layers_cloudmade_js',''),
+    '#default_value' => variable_get('openlayers_layers_cloudmade_js', ''),
   );
-  
-  
-  
+
+
+
   return system_settings_form($form);
 }

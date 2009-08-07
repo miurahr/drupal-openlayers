@@ -15,7 +15,7 @@
  */
 function openlayers_admin_settings() {
   // Initialize
-  openlayers_intialize();
+  openlayers_initialize();
 
   // Source description
   $source_description = t('The source for the OpenLayers library can be one of two things:')

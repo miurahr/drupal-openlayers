@@ -47,16 +47,18 @@ function openlayers_cck_theme() {
         'map' => NULL,
       ),
     ),
-    'openlayers_cck_formatter_wkt_default' => array(
+    'openlayers_cck_formatter_openlayers_wkt' => array(
       'arguments' => array('element' => NULL),
+      'gis input' => 'wkt',
     ),
   );
 
   // Create formatter theme functions
   foreach (openlayers_get_presets() as $name => $title) {
-    $themes['openlayers_cck_formatter_' . $name] = array(
+    $themes['openlayers_cck_formatter_openlayers_map_' . $name] = array(
       'arguments' => array('element' => NULL),
       'function' => 'theme_openlayers_cck_formatter_map',
+      'gis input' => 'wkt',
     );
   }
 
@@ -368,18 +370,22 @@ function openlayers_cck_field_formatter_info() {
   $formatters = array();
 
   // Default formatter
-  $formatters['wkt_default'] = array(
-    'label' => t('Default WKT Value'),
+  $formatters['openlayers_wkt'] = array(
+    'label' => t('WKT Value'),
     'field types' => array('geo', 'openlayers_wkt'),
     'multiple values' => CONTENT_HANDLE_MODULE,
+    'gis types' => array('point', 'linestring', 'polygon'),
+    'gis input' => 'wkt',
   );
 
   // Map preset formatter
   foreach (openlayers_get_presets() as $name => $title) {
-    $formatters[$name] = array(
+    $formatters['openlayers_map_' . $name] = array(
       'label' => t('OpenLayers Map: @preset', array('@preset' => check_plain($title))),
       'field types' => array('geo', 'openlayers_wkt'),
       'multiple values' => CONTENT_HANDLE_MODULE,
+      'gis types' => array('point', 'linestring', 'polygon'),
+      'gis input' => 'wkt',
     );
   }
   return $formatters;
@@ -402,13 +408,14 @@ function theme_openlayers_wkt_widget($element) {
 /**
  * Theme function for openlayers cck default formatters
  */
-function theme_openlayers_cck_formatter_wkt_default($element) {  $features = array();
+function theme_openlayers_cck_formatter_openlayers_wkt($element) {
   $features = array();
   $output = '';
 
   // Create array of $features
   foreach (element_children($element) as $delta) {
-    $features[$delta] = $element[$delta]['#item']['openlayers_wkt'];
+    // First look in the 'wkt' key (where geo stores it), then look in 'openlayers_wkt' key (where the non-spatial openlayers wkt field stores it).
+    $features[$delta] = $element[$delta]['#item']['wkt'] ? $element[$delta]['#item']['wkt'] : $element[$delta]['#item']['openlayers_wkt'];
   }
 
   // Check count and build geomtry collection
@@ -430,21 +437,23 @@ function theme_openlayers_cck_formatter_wkt_default($element) {  $features = arr
 function theme_openlayers_cck_formatter_map($element) {
   $features = array();
   $field = content_fields($element['#field_name'], $element['#type_name']);
-
+  
   // Create array of $features
   foreach (element_children($element) as $delta) {
     $features['openlayers_cck_vector_feature_' . $delta] = array(
-      'wkt' => $element[$delta]['#item']['openlayers_wkt'],
-      'projection' => '4326',
+      // First look for geo_field data, then for openlayers wkt data
+      'wkt' => $element[$delta]['#item']['wkt'] ? $element[$delta]['#item']['wkt'] : $element[$delta]['#item']['openlayers_wkt'],
+      'projection' => $element[$delta]['#item']['srid'] ? $element[$delta]['#item']['srid'] : '4326',
     );
   }
-
-  // Get preset name from formatter
-  $preset_name = str_replace('openlayers_cck_formatter_', '', $element['#formatter']);
-
+    
+  // Get preset name from formatter. Strip off 'openlayers_cck_formatter_' and 'openlayers_map_' from the begginging.
+  if (substr($element['#formatter'],25) == 'openlayers_cck_formatter_') $preset_name = substr($element['#formatter'],25);
+  if (substr($element['#formatter'],0,15) == 'openlayers_map_') $preset_name = substr($element['#formatter'],15);
+  
   // Get map preset
   $map = openlayers_get_map($preset_name);
-
+  
   // Add features and vector layer
   if (count($features) > 0) {
     $map['layers']['openlayers_cck_vector'] = array(
@@ -456,10 +465,10 @@ function theme_openlayers_cck_formatter_map($element) {
     );
     $map['options']['displayProjection'] = ($field['srid'] != 0) ? $field['srid'] : '4326';
   }
-
+  
   // Render map
   $rendered = openlayers_render_map($map);
-
+  
   // Check for output
   if (!$map['errors'] && !empty($map['width'])) {
     return $rendered['themed'];

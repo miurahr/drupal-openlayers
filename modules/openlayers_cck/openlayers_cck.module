@@ -42,7 +42,7 @@ function openlayers_cck_theme() {
         'map' => NULL,
       ),
     ),
-    'openlayers_cck_formatter_openlayers_wkt' => array(
+    'openlayers_cck_formatter_default' => array(
       'arguments' => array('element' => NULL),
       'gis input' => 'wkt',
     ),
@@ -378,7 +378,7 @@ function openlayers_cck_field_formatter_info() {
   $formatters = array();
 
   // Default formatter
-  $formatters['openlayers_wkt'] = array(
+  $formatters['default'] = array(
     'label' => t('WKT Value'),
     'field types' => array('openlayers_wkt'),
     'multiple values' => CONTENT_HANDLE_MODULE,
@@ -409,7 +409,7 @@ function theme_openlayers_wkt_widget($element) {
 /**
  * Theme function for openlayers cck default formatters
  */
-function theme_openlayers_cck_formatter_openlayers_wkt($element) {
+function theme_openlayers_cck_formatter_default($element) {
   $features = array();
   $output = '';
 

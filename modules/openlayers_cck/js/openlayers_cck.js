@@ -69,6 +69,11 @@ OL.CCK.populateMap = function(mapid) {
     // Get array collection and go through
     collection = collectionString.split('||');
     for (var wkt in collection) {
+      // Check to make sure the wkt is not empty
+      if (collection[wkt] == ''){
+        delete collection[wkt];
+        continue;
+      }
       // Update id for collection item
       OL.CCK.maps[mapid].featureID = OL.CCK.maps[mapid].featureID + 1;
       var featureID = 'feature_id_' + OL.CCK.maps[mapid].featureID.toString();
@@ -266,9 +271,31 @@ OL.CCK.updateCollection = function(mapid, action, featureID, wkt) {
   // Make geomotry collection
   if (collection.length > 0) {
     if (collection.length > 1) {
-      output = 'GEOMETRYCOLLECTION(' + collection.join(',') + ')';
+      // There are multiple features, so output either a multipart feature or a geometrycollection.
+      // Check to see if all the feature types are the same.
+      var samefeaturetype = true;
+      for (i in collection) {
+        for (j in collection) {
+          if (collection[i].substr(0, 5) != collection[j].substr(0, 5)) {
+            samefeaturetype = false;
+            break;
+          }
+        }
+      }
+      if (samefeaturetype == true) {
+        // All the same feature types, output a multipart feature.
+        output = 'test';
+        if (collection[0].substr(0, 5) == 'POINT')        output = 'MULTIPOINT(' + collection.join(',').replace(/POINT/g,'') + ')';
+        if (collection[0].substr(0, 10) == 'LINESTRING')  output = 'MULTILINESTRING(' + collection.join(',').replace(/LINESTRING/g,'') + ')';
+        if (collection[0].substr(0, 7) == 'POLYGON')      output = 'MULTIPOLYGON(' + collection.join(',').replace(/POLYGON/g,'') + ')';
+      }
+      else {
+        // Different feature types, output a geometrycollection.
+        output = 'GEOMETRYCOLLECTION(' + collection.join(',') + ')';
+      }   
     }
     else {
+      // It's just a single feature
       output = collection[0];
     }
   }

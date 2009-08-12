@@ -418,13 +418,37 @@ function theme_openlayers_cck_formatter_default($element) {
     // First look in the 'wkt' key (where geo stores it), then look in 'openlayers_wkt' key (where the non-spatial openlayers wkt field stores it).
     $features[$delta] = $element[$delta]['#item']['wkt'] ? $element[$delta]['#item']['wkt'] : $element[$delta]['#item']['openlayers_wkt'];
   }
-
+  
+  // Clean features array of empty and null values
+  $features = array_filter($features);
+  
   // Check count and build geomtry collection
   if (count($features) > 0) {
     if (count($features) > 1) {
-      $output = 'GEOMETRYCOLLECTION(' . implode(',', $features) . ')';
+      // There are multiple features, so output either a multipart feature or a geometrycollection.
+      // Check to see if all the feature types are the same.
+      $samefeaturetype = TRUE;
+      foreach ($features as $feature) {
+        foreach ($features as $checkfeature) {
+          if (substr($feature, 0, 5) != substr($checkfeature, 0, 5)) {
+            $samefeaturetype = FALSE;
+            break 2;
+          }
+        }
+      }
+      if ($samefeaturetype) {
+        // All the same feature types, output a multipart feature.
+        if (substr($features[0], 0, 5) == 'POINT')        $output = 'MULTIPOINT(' . str_replace('POINT', '', implode(',', $features)) . ')';
+        if (substr($features[0], 0, 10) == 'LINESTRING')  $output = 'MULTILINESTRING(' . str_replace('LINESTRING', '', implode(',', $features)) . ')';
+        if (substr($features[0], 0, 7) == 'POLYGON')      $output = 'MULTIPOLYGON(' . str_replace('POLYGON', '', implode(',', $features)) . ')';        
+      }
+      else {
+        // Different feature types, output a geometrycollection.
+        $output = 'GEOMETRYCOLLECTION(' . implode(',', $features) . ')';
+      }
     }
     else {
+      // Only one feature.
       $output = $features[0];
     }
   }

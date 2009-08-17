@@ -231,6 +231,45 @@ class openlayers_views_style_map extends views_plugin_style {
         '#process' => array('views_process_dependency'),
         '#dependency' => array('edit-style-options-behaviors-declutter' => array('1')),
       );
+      $form['behaviors']['cluster'] = array(
+        '#type' => 'checkbox',
+        '#title' => t('Cluster'),
+        '#description' => t('Cluster nodes that are close together into a single node.'),
+        '#default_value' => $this->options['behaviors']['cluster'],
+      );
+      $form['behaviors']['cluster_distance'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Cluster distance'),
+        '#description' => t('Pixel distance between features that should be considered a single cluster.  Default is 20 pixels.'),
+        '#default_value' => $this->options['behaviors']['cluster_distance'],
+        '#process' => array('views_process_dependency'),
+        '#dependency' => array('edit-style-options-behaviors-cluster' => array('1')),
+      );
+      $form['behaviors']['cluster_threshold'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Cluster threshold'),
+        '#description' => t('Optional threshold below which original features will be added to the layer instead of clusters.  For example, a threshold of 3 would mean that any time there are 2 or fewer features in a cluster, those features will be added directly to the layer instead of a cluster representing those features.  Default is null (which is equivalent to 1 - meaning that clusters may contain just one feature).'),
+        '#default_value' => $this->options['behaviors']['cluster_threshold'],
+        '#process' => array('views_process_dependency'),
+        '#dependency' => array('edit-style-options-behaviors-cluster' => array('1')),
+      );
+      $form['behaviors']['cluster_popup'] = array(
+        '#type' => 'checkbox',
+        '#title' => t('Popups on clusters'),
+        '#description' => t('Should clustered features permit popups?'),
+        '#default_value' => $this->options['behaviors']['cluster'],
+        '#process' => array('views_process_dependency'),
+        '#dependency' => array('edit-style-options-behaviors-cluster' => array('1')),
+      );
+      $form['behaviors']['cluster_popup_callback'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Callback for popup contents when clustering'),
+        '#description' => t('Enter the name of a JavaScript callback that returns the contents of popups (a string) attached to clustered features.  The callback takes one argument: \'feature\'.  <em>feature.cluster</em> contains the features being clustered together.'),
+        '#default_value' => $this->options['behaviors']['cluster_popup_callback'],
+        '#process' => array('views_process_dependency'),
+        '#dependency_count' => 2,
+        '#dependency' => array('edit-style-options-behaviors-cluster' => array('1'), 'edit-style-options-behaviors-cluster-popup' => array('1')),
+      );
     }
 
     // Grouping
@@ -256,6 +295,12 @@ class openlayers_views_style_map extends views_plugin_style {
         '#description' => t('For advanced users only'),
         '#collapsible' => TRUE,
         '#collapsed' => TRUE,
+    );
+    $form['style']['style_context_callback'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Style-context callback'),
+        '#description' => t('If you want to be able to theme features on the fly with JavaScript, write a JS function that returns an associative array of functions and variables (a style context) and enter its name here.  You can then use these callbacks anywhere you define a style array (for example, in theme_openlayers_vector_styles) with "${func_name}".  For example: "pointRadius" => "${get_cluster_size}".  This is particularly useful when you have clustering enabled, as the clustering algorithm creates new features on the fly and it\'s difficult to theme them before runtime.  One caveat: if you define a style context, you cannot access feature.attributes with the ${} notation (although you can access feature.attributes directly from within your context\'s functions).<br>The function takes the parameters func(map_id, layer_id, render_intent) and so can return different contexts based on the map, layer, and render intent.'),
+        '#default_value' => $this->options['style']['style_context_callback'],
     );
     $form['style']['snippet'] = array(
       '#type' => 'textarea',
@@ -440,7 +485,7 @@ class openlayers_views_style_map extends views_plugin_style {
 
     // Check row plugin if using it.
     if (empty($this->row_plugin)) {
-      drupal_set_message(t('Mising Row Plug-in'), 'error');
+      drupal_set_message(t('Missing Row Plug-in'), 'error');
       vpr('views_plugin_style_default: Missing row plugin');
       return;
     }
@@ -452,6 +497,10 @@ class openlayers_views_style_map extends views_plugin_style {
 
     // Define ID
     $map['id'] = OPENLAYERS_VIEWS_MAP_ID_PREFIX . '-' . $this->view->name;
+
+    // Get the name of the JS callback that generates style contexts
+    if($this->options['style']['style_context_callback'])
+        $map['styleContextCallback'] = $this->options['style']['style_context_callback'];
 
     // Group the rows according to the grouping field, if specified.
     $sets = $this->render_grouping($this->view->result, $this->options['grouping_set']['grouping']);
@@ -511,6 +560,25 @@ class openlayers_views_style_map extends views_plugin_style {
             $map['behaviors']['openlayers_views_declutter_' . $layer_id]['adjustment'] = intval($this->options['behaviors']['declutter_adjustment']);
           }
         }
+
+        // Set up clustering behaviors
+        if ($this->options['behaviors']['cluster']) {
+          $map['behaviors'] = is_array($map['behaviors']) ? $map['behaviors'] : array();
+          $map['behaviors']['openlayers_views_cluster_' . $layer_id] = array(
+            'id' => 'openlayers_views_cluster_' . $layer_id,
+            'type' => 'openlayers_behaviors_cluster',
+            'layer' => $layer_id,
+          );
+
+          if($this->options['behaviors']['cluster_distance'])
+            $map['behaviors']['openlayers_views_cluster_' . $layer_id]['cluster_distance'] = $this->options['behaviors']['cluster_distance'];
+          if($this->options['behaviors']['cluster_threshold'])
+            $map['behaviors']['openlayers_views_cluster_' . $layer_id]['cluster_threshold'] = $this->options['behaviors']['cluster_threshold'];
+          if($this->options['behaviors']['cluster_popup'])
+            $map['behaviors']['openlayers_views_cluster_' . $layer_id]['cluster_popup'] = $this->options['behaviors']['cluster_popup'];
+          if($this->options['behaviors']['cluster_popup_callback'])
+            $map['behaviors']['openlayers_views_cluster_' . $layer_id]['cluster_popup_callback'] = $this->options['behaviors']['cluster_popup_callback'];
+        }
       }
     } // end foreach views-group/layer
 
@@ -523,30 +591,31 @@ class openlayers_views_style_map extends views_plugin_style {
 
       // Popups, which apply to all Vector layers when activated
       // @@TODO: Put checkboxes in the style plugin interface to choose layers to use popups with?
-      if (!empty($this->options['behaviors']['popup'])) {
+      if($this->options['behaviors']['popup']) {
         $map['behaviors'] = is_array($map['behaviors']) ? $map['behaviors'] : array();
         $map['behaviors']['openlayers_views_popup'] = array(
           'id' => 'openlayers_views_popup',
           'type' => 'openlayers_behaviors_popup',
           'attribute' => 'openlayers_popup',
         );
+      }
 
-        // Zoom to layer., assuming last layer
-        // @@TODO: Use better logic or use options
-        if ($this->options['behaviors']['zoom_to_layer']) {
-          $map['behaviors']['openlayers_views_zoom_to_layer'] = array(
-            'id' => 'openlayers_views_zoom_to_layer',
-            'type' => 'openlayers_behaviors_zoom_to_layer',
-            'layer' => 'openlayers_views_layer_'. $this->view->name,
-          );
-        }
-        // Full screen
-        if ($this->options['behaviors']['fullscreen']) {
-          $map['behaviors']['openlayers_views_fullscreen'] = array(
-            'id' => 'openlayers_views_fullscreen',
-            'type' => 'openlayers_behaviors_fullscreen'
-          );
-        }
+      // Zoom to layer, assuming last layer
+      // @@TODO: Use better logic or use options
+      if ($this->options['behaviors']['zoom_to_layer']) {
+        $map['behaviors']['openlayers_views_zoom_to_layer'] = array(
+          'id' => 'openlayers_views_zoom_to_layer',
+          'type' => 'openlayers_behaviors_zoom_to_layer',
+          'layer' => 'openlayers_views_layer_'. $this->view->name,
+        );
+      }
+
+      // Full screen
+      if ($this->options['behaviors']['fullscreen']) {
+        $map['behaviors']['openlayers_views_fullscreen'] = array(
+          'id' => 'openlayers_views_fullscreen',
+          'type' => 'openlayers_behaviors_fullscreen'
+        );
       }
     }
 

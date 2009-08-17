@@ -15,6 +15,19 @@ OL.Behaviors = OL.Behaviors || {};
 
 
 /**
+ * OL Cluster Behavior
+ *
+ * @param event
+ *   Event Object
+ */
+
+OL.Behaviors.cluster = function(event) {
+
+  // This is just a placeholder for now.  Cluster requires no at-map-ready processing as it stands.
+
+}
+
+/**
  * OL Popup Behavior
  *
  * @param event
@@ -30,7 +43,7 @@ OL.Behaviors.popup = function(event) {
   // Set up the hover triggers
   for (layer in OL.maps[mapid].map.layers) {
     if (OL.maps[mapid].map.layers[layer].drupalData.type == 'Vector') {
-	    OL.maps[mapid].map.layers[layer].drupalData.popupAttribute = behavior.attribute;
+      OL.maps[mapid].map.layers[layer].drupalData.popupAttribute = behavior.attribute;
       OL.maps[mapid].map.layers[layer].drupalData.popupId = behavior.id;
       // have to use push so it stores the reference instead of value
       layers.push(OL.maps[mapid].map.layers[layer]);
@@ -55,16 +68,32 @@ OL.Behaviors.popup = function(event) {
  *   Feature Object
  */
 OL.Behaviors.popupFeatureSelected = function(feature) {
+  popupText = '';
+  var mapid = feature.layer.map.mapid;
+
+  if(feature.cluster) {
+    // If popups aren't enabled for clusters, do nothing
+    if(!OL.mapDefs[mapid].behaviors['openlayers_views_cluster_'+feature.layer.drupalId].cluster_popup) return;
+    
+    var mapid = feature.layer.map.mapid;
+
+    // If we have a callback defined (in the style plugin interface) to generate cluster popups, use it
+    if(OL.mapDefs[mapid].behaviors['openlayers_views_cluster_'+feature.layer.drupalId].cluster_popup_callback)
+      popupText = eval(OL.mapDefs[mapid].behaviors['openlayers_views_cluster_'+feature.layer.drupalId].cluster_popup_callback)(feature);
+    else return; // Otherwise, act as though popups aren't enabled
+  }
+  else popupText = feature.attributes[feature.layer.drupalData.popupAttribute];
+
   popup = new OpenLayers.Popup.FramedCloud('popup', 
     feature.geometry.getBounds().getCenterLonLat(),
     null,
-    "<div class='openlayers-popup'>"+ feature.attributes[feature.layer.drupalData.popupAttribute] +"</div>",
+    "<div class='openlayers-popup'>"+ popupText +"</div>",
     null, true,
-	  function () {
-	    var mapid = feature.layer.map.mapid;
-		  OL.maps[mapid].controls[feature.layer.drupalData.popupId].unselect(feature);
-	  }
-	);
+      function () {
+        var mapid = feature.layer.map.mapid;
+        OL.maps[mapid].controls[feature.layer.drupalData.popupId].unselect(feature);
+      }
+    );
   
   feature.popup = popup;
   feature.layer.map.addPopup(popup);
@@ -721,3 +750,5 @@ OL.EventHandlers.declutterZoomEnd = function(event) {
     }
   }
 }
+
+

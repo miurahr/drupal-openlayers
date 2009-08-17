@@ -12,8 +12,8 @@
 /**
  * Callback for OpenLayers Behaviors (Zoom to Layer)
  *
- * @param $behavoir
- *   Data about behavoir
+ * @param $behavior
+ *   Data about behavior
  * @param $map
  *   Map array
  * @return
@@ -29,8 +29,8 @@ function openlayers_behaviors_process_zoom_to_layer($behavior, &$map) {
 /**
  * Callback for OpenLayers Behaviors (Tooltip)
  *
- * @param $behavoir
- *   Data about behavoir
+ * @param $behavior
+ *   Data about behavior
  * @param $map
  *   Map array
  * @return
@@ -58,8 +58,8 @@ function openlayers_behaviors_process_tooltip($behavior, &$map) {
 /**
  * Callback for OpenLayers Behaviors (Popup)
  *
- * @param $behavoir
- *   Data about behavoir
+ * @param $behavior
+ *   Data about behavior
  * @param $map
  *   Map array
  * @return
@@ -77,8 +77,8 @@ function openlayers_behaviors_process_popup($behavior, &$map) {
 /**
  * Callback for OpenLayers Behaviors (Draw Features)
  *
- * @param $behavoir
- *   Data about behavoir
+ * @param $behavior
+ *   Data about behavior
  * @param $map
  *   Map array
  * @return
@@ -102,8 +102,8 @@ function openlayers_behaviors_process_draw_features($behavior, &$map) {
 /**
  * Callback for OpenLayers Behaviors (Fullscreen)
  *
- * @param $behavoir
- *   Data about behavoir
+ * @param $behavior
+ *   Data about behavior
  * @param $map
  *   Map array
  * @return
@@ -117,8 +117,8 @@ function openlayers_behaviors_process_fullscreen($behavior, &$map) {
 /**
  * Callback for OpenLayers Behaviors (De-clutter)
  *
- * @param $behavoir
- *   Data about behavoir
+ * @param $behavior
+ *   Data about behavior
  * @param $map
  *   Map array
  * @return
@@ -133,6 +133,31 @@ function openlayers_behaviors_process_declutter($behavior, &$map) {
     $map['events']['zoomend'][] = 'declutterZoomEnd';
 
     // @@TODO: Add Events to layer (features added + removed)
+
+    return $behavior;
+  }
+}
+
+
+/**
+ * Callback for OpenLayers Behaviors (Cluster)
+ *
+ * @param $behavior
+ *   Data about behavior
+ * @param $map
+ *   Map array
+ * @return
+ *   Behavior array
+ */
+function openlayers_behaviors_process_cluster($behavior, &$map) {
+  if ($behavior['layer'] && $map['layers'][$behavior['layer']]) {
+
+    // This is just a placeholder for now
+    $map['strategies'] = ($map['strategies']) ? $map['strategies'] : array();
+    $map['strategies']['cluster'] = array(
+      'distance' => $behavior['cluster_distance'],
+      'threshold' => $behavior['cluster_threshold'],
+    );
 
     return $behavior;
   }

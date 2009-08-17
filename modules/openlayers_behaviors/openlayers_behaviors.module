@@ -84,6 +84,14 @@ function openlayers_behaviors_openlayers_behaviors_info() {
     'js_file' => $js_file,
     'js_callback' => 'declutter',
   );
+  $info['openlayers_behaviors_cluster'] = array(
+    'name' => t('Cluster'),
+    'description' => t('When points are overlapping, cluster will combine them into new features.'),
+    'file' => $file,
+    'callback' => 'openlayers_behaviors_process_cluster',
+    'js_file' => $js_file,
+    'js_callback' => 'cluster',
+  );
   $info['openlayers_behaviors_popup'] = array(
     'name' => t('Pop-up'),
     'description' => t('When the user clicks a feature, pop-up some content.'),

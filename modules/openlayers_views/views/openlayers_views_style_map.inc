@@ -353,12 +353,14 @@ class openlayers_views_style_map extends views_plugin_style {
           case 'geo':
             // @@TODO: Geo does not work
             foreach ($data_source['geo_fields'] as $geo_field) {
-              $wkt_field = $geo_field . '_wkt';
-
-              if ($record->$wkt_field) {
-                $feature['wkt'] =
-                $record->$wkt_field;
-                $feature['projection'] ='4326';
+              $wkb_field = 'node_data_' . $geo_field . '_' . $geo_field . '_wkb';
+              $wkb = $record->$wkb_field;
+              $wkt_object = geo_wkb_get_data($wkb, 'wkt');
+              $wkt = $wkt_object['value'];
+              if (!empty($wkt)) {
+                $feature['wkt'] = $wkt;
+                $srid_field = 'node_data_' . $geo_field . '_' . $geo_field . '_srid';
+                $feature['projection'] = $record->$srid_field;
               }
             }
             break;
@@ -446,30 +448,6 @@ class openlayers_views_style_map extends views_plugin_style {
       }
     }
     return $features;
-  }
-
-  /**
-   * Perform query
-   */
-  function query() {
-    $data_source = $this->options['data_source'];
-
-    // Load data from Node Locations
-    if ($data_source['value'] == 'node_locations') {
-      $table = $this->view->query->ensure_table('location');
-      $this->view->query->add_field($table, 'latitude', 'openlayers_node_locations_lat');
-      $this->view->query->add_field($table, 'longitude', 'openlayers_node_locations_lon');
-    }
-
-    if ($data_source['value'] == 'geo') {
-      $content_fields = content_fields();
-      foreach ($content_fields as $content_field) {
-        if (in_array($content_field['field_name'], array_keys($data_source['geo_fields']))) {
-          $content_table = $this->view->query->ensure_table('node_data_' . $content_field['field_name']);
-          $this->view->query->add_field($wkt_table, $content_field['field_name'] . '_wkt');
-        }
-      }
-    }
   }
 
   /**

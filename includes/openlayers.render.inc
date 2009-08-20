@@ -229,3 +229,49 @@ function _openlayers_create_map_id() {
   // Return ID
   return $map_id;
 }
+
+/**
+ * Debug Map
+ *
+ * Offers debugging if enabled.  Options are available in the
+ * administration interface to enable different kinds of
+ * debugging at different points of rendering.
+ *
+ * @param $op
+ *   The operation that is getting carried out
+ * @param $map
+ *   map array to debug
+ * @return
+ *   none
+ */
+function _openlayers_render_debug_map($op = NULL, $map = array()) {
+  // Check op
+  switch ($op) {
+    case 'pre-render':
+      // Screen output, check function first
+      if (function_exists('dpm')) {
+        if (variable_get('openlayers_debug_screen_pre_render', FALSE)) {
+          dpm($map);
+        }
+      }
+      // Check watchdog
+      if (variable_get('openlayers_debug_watchdog_pre_render', FALSE)) {
+        watchdog('openlayers', '<p>Pre render output.</p><pre>!array_output</pre>', array('!array_output' => var_export($map, TRUE)),  WATCHDOG_DEBUG);
+      }
+      break;
+
+    case 'post-render':
+      // Screen output, check function first
+      if (function_exists('dpm')) {
+        if (variable_get('openlayers_debug_screen_post_render', FALSE)) {
+          dpm($map);
+        }
+      }
+      // Check watchdog
+      if (variable_get('openlayers_debug_watchdog_post_render', FALSE)) {
+        watchdog('openlayers', '<p>Post render output.</p><pre>!array_output</pre>', array('!array_output' => var_export($map, TRUE)),  WATCHDOG_DEBUG);
+      }
+      break;
+
+  }
+}

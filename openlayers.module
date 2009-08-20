@@ -180,6 +180,9 @@ function openlayers_render_map($map = array(), $render = TRUE) {
   // Include extra rendering functions
   module_load_include('inc', 'openlayers', 'includes/openlayers.render');
 
+  // Debug pre-render
+  _openlayers_render_debug_map('pre-render', $map);
+
   // Check ID
   if (!$map['id']) {
     $map['id'] = _openlayers_create_map_id();
@@ -211,6 +214,9 @@ function openlayers_render_map($map = array(), $render = TRUE) {
     // Add themed HTML (no need for it to go to JS)
     $map['themed'] = theme('openlayers_map', $map);
   }
+
+  // Debug post-render
+  _openlayers_render_debug_map('post-render', $map);
 
   // Return map with or without errors
   return $map;

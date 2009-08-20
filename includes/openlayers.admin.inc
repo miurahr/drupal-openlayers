@@ -45,15 +45,16 @@ function openlayers_admin_settings() {
     '#default_value' => variable_get('openlayers_default_preset', 'default'),
   );
 
-  // Allow debug options if devel module is installed
-  if (module_exists('devel')) {
-    $form['openlayers_debug'] = array(
-      '#type' => 'fieldset',
-      '#title' => t('OpenLayers Debug Options'),
-      '#description' => t('Options to allow for different debugging.'),
-      '#collapsed' => FALSE,
-      '#collapsible' => TRUE,
-    );
+  // Allow debug options
+  $form['openlayers_debug'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('OpenLayers Debug Options'),
+    '#description' => t('Options to allow for different debugging.  Enabled the devel module to allow for screen output.'),
+    '#collapsed' => FALSE,
+    '#collapsible' => TRUE,
+  );
+  // Screen output is based on dpm() function
+  if (function_exists('dpm')) {
     $form['openlayers_debug']['openlayers_debug_screen_pre_render'] = array(
       '#type' => 'checkbox',
       '#title' => t('Pre-Render Screen'),
@@ -66,19 +67,19 @@ function openlayers_admin_settings() {
       '#description' => t('This will output each map array to the screen with dpm() after it is rendered.'),
       '#default_value' => variable_get('openlayers_debug_screen_post_render', FALSE),
     );
-    $form['openlayers_debug']['openlayers_debug_watchdog_pre_render'] = array(
-      '#type' => 'checkbox',
-      '#title' => t('Pre-Render Watchdog'),
-      '#description' => t('This will output each map array to the watchdog log before it is rendered.'),
-      '#default_value' => variable_get('openlayers_debug_watchdog_pre_render', FALSE),
-    );
-    $form['openlayers_debug']['openlayers_debug_watchdog_post_render'] = array(
-      '#type' => 'checkbox',
-      '#title' => t('Post-Render Watchdog'),
-      '#description' => t('This will output each map array to the watchdog log after it is rendered.'),
-      '#default_value' => variable_get('openlayers_debug_watchdog_post_render', FALSE),
-    );
   }
+  $form['openlayers_debug']['openlayers_debug_watchdog_pre_render'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Pre-Render Watchdog'),
+    '#description' => t('This will output each map array to the watchdog log before it is rendered.'),
+    '#default_value' => variable_get('openlayers_debug_watchdog_pre_render', FALSE),
+  );
+  $form['openlayers_debug']['openlayers_debug_watchdog_post_render'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Post-Render Watchdog'),
+    '#description' => t('This will output each map array to the watchdog log after it is rendered.'),
+    '#default_value' => variable_get('openlayers_debug_watchdog_post_render', FALSE),
+  );
 
   // Make a system setting form and return
   return system_settings_form($form);

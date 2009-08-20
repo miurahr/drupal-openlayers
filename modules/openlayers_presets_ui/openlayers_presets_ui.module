@@ -15,12 +15,14 @@
  * Implementation of hook_help().
  */
 function openlayers_presets_ui_help($path, $arg) {
+  $output = '';
+
   switch ($path) {
     case 'admin/help#openlayers_presets_ui':
       $output = '<p>'. t('The OpenLayers Preset UI module provides a User Interface to create map presets.') .'</p>';
-  }
+      return $output;
 
-  return $output;
+  }
 }
 
 /**

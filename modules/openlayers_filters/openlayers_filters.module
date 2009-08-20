@@ -13,12 +13,14 @@
  * Implementation of hook_help().
  */
 function openlayers_filters_help($path, $arg) {
+  $output = '';
+
   switch ($path) {
     case 'admin/help#openlayers_filters':
       $output = '<p>'. t('The OpenLayers Filters module provides input filters to allow for inline maps.') .'</p>';
-  }
+      return $output;
 
-  return $output;
+  }
 }
 
 /**

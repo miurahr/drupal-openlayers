@@ -13,11 +13,14 @@
  * Implementation of hook_help().
  */
 function openlayers_layers_help($path, $arg) {
+  $output = '';
+
   switch ($path) {
     case 'admin/help#openlayers_layers':
       $output = '<p>'. t('Provides a wide variety of freely available layers.') .'</p>';
+      return $output;
+
   }
-  return $output;
 }
 
 /**

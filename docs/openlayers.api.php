@@ -13,7 +13,7 @@
  *
  * Map array alter.  Fired after preparing the array, and
  * before checking for errors.  The whole array is passed
- * along and will allow you to alter it in any way.  This 
+ * along and will allow you to alter it in any way.  This
  * is a good place to alter the map, if the other hooks
  * do not provide the functionality you need.
  *
@@ -33,17 +33,17 @@ function hook_openlayers_map_alter(&$map = array()) {
  * @param $map
  *   Map array of map being rendered
  * @return
- *   Return a nested associative array with the top level 
+ *   Return a nested associative array with the top level
  *   being a unique string identifier key which corresponds to the
  *   layers' types.  The next level being an array of key/value
- *   pairs: 
+ *   pairs:
  *   - "layer_handler": This is the JS callback name that will
  *     belong to OL.Layers object.
  *   - "js_file": The JS file to include to look for the callback.
  */
 function hook_openlayers_layers_handler_info($map = array()) {
   // Take from openlayers.module
-  
+
   return array(
     'WMS' => array(
       'layer_handler' => 'WMS',
@@ -65,7 +65,7 @@ function hook_openlayers_layers_handler_info($map = array()) {
  * and these will show up in the Preset UI.
  *
  * @return
- *   Return a nested associative array with the top level 
+ *   Return a nested associative array with the top level
  *   being a unique string identifier, and the nested array
  *   containing the following key/pairs:
  *   - "name": Translated name of the layer.  This will show up
@@ -81,7 +81,7 @@ function hook_openlayers_layers_handler_info($map = array()) {
  */
 function hook_openlayers_layers_info() {
   // Taken from openlayers.module
-  
+
   // Define info array
   $info['openlayers_default_wms'] = array(
     'name' => t('Default OpenLayers WMS'),
@@ -102,7 +102,7 @@ function hook_openlayers_layers_info() {
  * that can be used by name in maps.
  *
  * @return
- *   Return a nested associative array with the top level 
+ *   Return a nested associative array with the top level
  *   being a unique string identifier, and the nested array
  *   containing the following key/pairs:
  *   - "name": Translated name of the behavior.
@@ -143,7 +143,7 @@ function hook_openlayers_behaviors_info() {
  * in the Preset UI.
  *
  * @return
- *   Return a nested associative array with the top level 
+ *   Return a nested associative array with the top level
  *   being a unique string identifier, and the nested array
  *   containing the following key/pairs:
  *   - "name": Translated name of the style.
@@ -180,10 +180,10 @@ function hook_openlayers_styles_info() {
  * clone.
  *
  * @return
- *   Return a nested associative array with the top level 
+ *   Return a nested associative array with the top level
  *   being a unique string identifier, and the nested array
  *   containing the following key/pairs:
- *   - "preset_name": Unique string with only lowercase characters 
+ *   - "preset_name": Unique string with only lowercase characters
  *     and underscores.
  *   - "preset_title": Translated title to be used listing presets.
  *   - "preset_description": Translated description.

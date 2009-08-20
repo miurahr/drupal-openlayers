@@ -299,7 +299,7 @@ class openlayers_views_style_map extends views_plugin_style {
     $form['style']['style_context_callback'] = array(
         '#type' => 'textfield',
         '#title' => t('Style-context callback'),
-        '#description' => t('If you want to be able to theme features on the fly with JavaScript, write a JS function that returns an associative array of functions and variables (a style context) and enter its name here.  You can then use these callbacks anywhere you define a style array (for example, in theme_openlayers_vector_styles) with "${func_name}".  For example: "pointRadius" => "${get_cluster_size}".  This is particularly useful when you have clustering enabled, as the clustering algorithm creates new features on the fly and it\'s difficult to theme them before runtime.  One caveat: if you define a style context, you cannot access feature.attributes with the ${} notation (although you can access feature.attributes directly from within your context\'s functions).<br>The function takes the parameters func(map_id, layer_id, render_intent) and so can return different contexts based on the map, layer, and render intent.'),
+        '#description' => t('If you want to be able to theme features on the fly with JavaScript, write a JS function that returns an associative array of functions and variables (a style context) and enter its name here.  You can then use these callbacks anywhere you define a style array (for example, in theme_openlayers_vector_styles) with "${func_name}".  For example: "pointRadius" => "${get_cluster_size}".  This is particularly useful when you have clustering enabled, as the clustering algorithm creates new features on the fly and it\'s difficult to theme them before runtime.  One caveat: if you define a style context, you cannot access feature.attributes with the ${} notation (although you can access feature.attributes directly from within your context\'s functions). <br /> The function takes the parameters func(map_id, layer_id, render_intent) and so can return different contexts based on the map, layer, and render intent.'),
         '#default_value' => $this->options['style']['style_context_callback'],
     );
     $form['style']['snippet'] = array(
@@ -477,7 +477,7 @@ class openlayers_views_style_map extends views_plugin_style {
     $map['id'] = OPENLAYERS_VIEWS_MAP_ID_PREFIX . '-' . $this->view->name;
 
     // Get the name of the JS callback that generates style contexts
-    if($this->options['style']['style_context_callback'])
+    if ($this->options['style']['style_context_callback'])
         $map['styleContextCallback'] = $this->options['style']['style_context_callback'];
 
     // Group the rows according to the grouping field, if specified.
@@ -548,13 +548,13 @@ class openlayers_views_style_map extends views_plugin_style {
             'layer' => $layer_id,
           );
 
-          if($this->options['behaviors']['cluster_distance'])
+          if ($this->options['behaviors']['cluster_distance'])
             $map['behaviors']['openlayers_views_cluster_' . $layer_id]['cluster_distance'] = $this->options['behaviors']['cluster_distance'];
-          if($this->options['behaviors']['cluster_threshold'])
+          if ($this->options['behaviors']['cluster_threshold'])
             $map['behaviors']['openlayers_views_cluster_' . $layer_id]['cluster_threshold'] = $this->options['behaviors']['cluster_threshold'];
-          if($this->options['behaviors']['cluster_popup'])
+          if ($this->options['behaviors']['cluster_popup'])
             $map['behaviors']['openlayers_views_cluster_' . $layer_id]['cluster_popup'] = $this->options['behaviors']['cluster_popup'];
-          if($this->options['behaviors']['cluster_popup_callback'])
+          if ($this->options['behaviors']['cluster_popup_callback'])
             $map['behaviors']['openlayers_views_cluster_' . $layer_id]['cluster_popup_callback'] = $this->options['behaviors']['cluster_popup_callback'];
         }
       }
@@ -569,7 +569,7 @@ class openlayers_views_style_map extends views_plugin_style {
 
       // Popups, which apply to all Vector layers when activated
       // @@TODO: Put checkboxes in the style plugin interface to choose layers to use popups with?
-      if($this->options['behaviors']['popup']) {
+      if ($this->options['behaviors']['popup']) {
         $map['behaviors'] = is_array($map['behaviors']) ? $map['behaviors'] : array();
         $map['behaviors']['openlayers_views_popup'] = array(
           'id' => 'openlayers_views_popup',

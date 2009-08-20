@@ -24,6 +24,8 @@ function openlayers_behaviors_process_zoom_to_layer($behavior, &$map) {
   if ($behavior['layer'] && $map['layers'][$behavior['layer']]) {
     return $behavior;
   }
+
+  return FALSE;
 }
 
 /**
@@ -34,7 +36,7 @@ function openlayers_behaviors_process_zoom_to_layer($behavior, &$map) {
  * @param $map
  *   Map array
  * @return
- *   Behavior array
+ *   Behavior array or FALSE if not valid
  */
 function openlayers_behaviors_process_tooltip($behavior, &$map) {
   // Check to make sure the layer attribute is properly set.
@@ -53,6 +55,8 @@ function openlayers_behaviors_process_tooltip($behavior, &$map) {
 
     return $behavior;
   }
+
+  return FALSE;
 }
 
 /**
@@ -66,13 +70,13 @@ function openlayers_behaviors_process_tooltip($behavior, &$map) {
  *   Behavior array
  */
 function openlayers_behaviors_process_popup($behavior, &$map) {
-    // Assume we want to display the name attribute if no attribute is specified
-    if (!$behavior['attribute']) {
-      $behavior['attribute'] = 'name';
-    }
-
-    return $behavior;
+  // Assume we want to display the name attribute if no attribute is specified
+  if (!$behavior['attribute']) {
+    $behavior['attribute'] = 'name';
   }
+
+  return $behavior;
+}
 
 /**
  * Callback for OpenLayers Behaviors (Draw Features)
@@ -82,7 +86,7 @@ function openlayers_behaviors_process_popup($behavior, &$map) {
  * @param $map
  *   Map array
  * @return
- *   Behavior array
+ *   Behavior array or FALSE if not valid
  */
 function openlayers_behaviors_process_draw_features($behavior, &$map) {
   // Check to make sure the layer attribute is properly set.
@@ -97,6 +101,8 @@ function openlayers_behaviors_process_draw_features($behavior, &$map) {
 
     return $behavior;
   }
+
+  return FALSE;
 }
 
 /**
@@ -122,7 +128,7 @@ function openlayers_behaviors_process_fullscreen($behavior, &$map) {
  * @param $map
  *   Map array
  * @return
- *   Behavior array
+ *   Behavior array or FALSE if not valid
  */
 function openlayers_behaviors_process_declutter($behavior, &$map) {
   if ($behavior['layer'] && $map['layers'][$behavior['layer']]) {
@@ -136,6 +142,8 @@ function openlayers_behaviors_process_declutter($behavior, &$map) {
 
     return $behavior;
   }
+
+  return FALSE;
 }
 
 
@@ -147,7 +155,7 @@ function openlayers_behaviors_process_declutter($behavior, &$map) {
  * @param $map
  *   Map array
  * @return
- *   Behavior array
+ *   Behavior array or FALSE if not valid
  */
 function openlayers_behaviors_process_cluster($behavior, &$map) {
   if ($behavior['layer'] && $map['layers'][$behavior['layer']]) {
@@ -161,4 +169,6 @@ function openlayers_behaviors_process_cluster($behavior, &$map) {
 
     return $behavior;
   }
+
+  return FALSE;
 }

@@ -137,6 +137,9 @@ function _openlayers_behaviors_process($behaviors = array(), &$map = array()) {
           $result['js_callback'] = $info['js_callback'];
           $processed[$bkey] = $result;
         }
+        else {
+          unset($processed[$bkey]);
+        }
       }
       // Include JavaScript
       if ($info['js_file']) {

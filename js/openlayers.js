@@ -234,6 +234,10 @@ OL.createMapOptions = function(options, controls, mapid) {
     if (controls.ZoomBox)         returnOptions.controls.push( new OpenLayers.Control.ZoomBox() );
     if (controls.ZoomToMaxExtent) returnOptions.controls.push( new OpenLayers.Control.ZoomToMaxExtent() );
   }
+
+  if(typeof(options.fractionalZoom) != 'undefined') {
+    returnOptions.fractionalZoom = options.fractionalZoom;
+  }
   
   // Return processed options
   return returnOptions;

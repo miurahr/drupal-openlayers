@@ -156,13 +156,16 @@ OL.Layers.Vector = function(layerOptions, mapid) {
   if (OL.isSet(OL.mapDefs[mapid].strategies)) {
     for(s in OL.mapDefs[mapid].strategies) {
       var strategy = OL.mapDefs[mapid].strategies[s];
+
       if(s == 'cluster') {
         var cluster = new OpenLayers.Strategy.Cluster({features: newFeatures});
         if(strategy.distance) cluster.distance = strategy.distance;
         if(strategy.threshold) cluster.threshold = strategy.threshold;
+
         strategies.push(cluster);
       }
     }
+    OL.mapDefs[mapid].strategies = strategies;
   }
 
   // Define layer object

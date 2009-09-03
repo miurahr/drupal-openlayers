@@ -97,8 +97,8 @@ function openlayers_behaviors_process_draw_features($behavior, &$map) {
     // Add mapReady Event
     $map['events'] = ($map['events']) ? $map['events'] : array();
     $map['events']['mapReady'] = ($map['events']['mapReady']) ? $map['events']['mapReady'] : array();
-    $map['events']['mapReady'][] = 'drawFeaturesMapReady';
-
+    $map['events']['mapReady']['drawFeaturesMapReady'] = 'drawFeaturesMapReady'; // We can only ever have one map control - even if it handles multiple draw behaviors
+    
     return $behavior;
   }
 

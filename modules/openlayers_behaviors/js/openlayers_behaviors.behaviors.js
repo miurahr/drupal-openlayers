@@ -410,6 +410,7 @@ OL.Behaviors.drawFeatures = function(event) {
  */
 OL.EventHandlers.drawFeaturesMapReady = function(event) {
   // Add click event to the action link (button)
+  
   $('.openlayers-controls-draw-feature-link').click(function() {
     var $thisLink = $(this);
     var $allControls = $('.openlayers-controls-draw-feature-link');
@@ -423,6 +424,8 @@ OL.EventHandlers.drawFeaturesMapReady = function(event) {
     $thisLink.addClass('openlayers-controls-draw-feature-link-on');
     $thisLink.removeClass('openlayers-controls-draw-feature-link-off');
     
+    var foundControl = false;
+    
     // Cycle through the different possible types of controls (polygon, line, point, pan)
     for (var b in OL.mapDefs[mapid].behaviors){
       var behavior  = OL.mapDefs[mapid].behaviors[b];
@@ -435,11 +438,32 @@ OL.EventHandlers.drawFeaturesMapReady = function(event) {
         // Deactivate everything
         createControl.deactivate();
         modifyControl.deactivate();
-          
+        
         // Activate it if it matches
         if (controlType == behavior.feature_type) {
+          foundControl = true;
           createControl.activate();
           modifyControl.activate();
+          
+          // Trigger optional startediting_handler
+          if (OL.isSet(behavior.startediting_handler)){
+            for (var ev in behavior.startediting_handler) {
+              var triggerFunction = OL.getObject(behavior.startediting_handler[ev]);
+              var event = {'behavior': behavior};
+              triggerFunction(event);
+            }
+          }
+        }
+      }
+    }
+    
+    if (foundControl == false){
+      // Trigger optional stopediting_handler
+      if (OL.isSet(behavior.stopediting_handler)){
+        for (var ev in behavior.stopediting_handler) {
+        var triggerFunction = OL.getObject(behavior.stopediting_handler[ev]);
+        var event = {'behavior': behavior};
+          triggerFunction(event);
         }
       }
     }

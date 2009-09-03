@@ -305,7 +305,7 @@ class openlayers_views_style_map extends views_plugin_style {
     $form['style']['snippet'] = array(
       '#type' => 'textarea',
       '#title' => t('Feature Styles function'),
-      '#description' => t('Enter PHP code that returns a style array for each feature. This will overrirde theme feature styling functions. <br/> $fields contains your defined fields, $row contains instances of those fields along with geometries. Array should be of the form \'styleProperty\' => \'styleValue\'. You may return false to use defaults. See documentation for available style Properties.'),
+      '#description' => t('Enter PHP code that returns a style array for each feature. This will overrirde theme feature styling functions. <br/> $fields contains your defined fields, $record contains instances of those fields along with geometries. Array should be of the form \'styleProperty\' => \'styleValue\'. You may return false to use defaults. See documentation for available style Properties.'),
       '#default_value' => $this->options['style']['snippet'],
     );
   }

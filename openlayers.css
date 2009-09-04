@@ -9,9 +9,16 @@
  * @ingroup openlayers
  */
 
+
+.openlayers-map {
+  z-index:0;
+}
+
+
 /**
  * Controls
  */
-.openlayers-controls{
+.openlayers-controls {
 	z-index:1000;
 }
+

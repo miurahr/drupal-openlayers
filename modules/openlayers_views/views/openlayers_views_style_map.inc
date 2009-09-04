@@ -513,6 +513,7 @@ class openlayers_views_style_map extends views_plugin_style {
 
       // Set up per-layer behaviors
       if (module_exists('openlayers_behaviors')) {
+        
         // Set up tooltip behavior
         if (!empty($this->options['behaviors']['tooltip'])) {
           $map['behaviors'] = is_array($map['behaviors']) ? $map['behaviors'] : array();
@@ -578,14 +579,25 @@ class openlayers_views_style_map extends views_plugin_style {
         );
       }
 
-      // Zoom to layer, assuming last layer
-      // @@TODO: Use better logic or use options
+      // Zoom to layer
       if ($this->options['behaviors']['zoom_to_layer']) {
         $map['behaviors']['openlayers_views_zoom_to_layer'] = array(
           'id' => 'openlayers_views_zoom_to_layer',
           'type' => 'openlayers_behaviors_zoom_to_layer',
-          'layer' => 'openlayers_views_layer_'. $this->view->name,
         );
+        
+        if ($grouped) {
+          $map['behaviors']['openlayers_views_zoom_to_layer']['layer'] = array();
+          foreach ($sets as $group_title => $records) {
+            $group_name = drupal_strtolower(str_replace(' ', '_', $group_title));
+            $layer_id = 'openlayers_views_layer_' . $this->view->name;
+            $layer_id .= $grouped ? '_' . $group_name : '';
+            $map['behaviors']['openlayers_views_zoom_to_layer']['layer'][] = $layer_id;
+          }
+        }
+        else {
+          $map['behaviors']['openlayers_views_zoom_to_layer']['layer'] = 'openlayers_views_layer_'. $this->view->name;
+        }
       }
 
       // Full screen

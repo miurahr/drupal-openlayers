@@ -245,30 +245,40 @@ OL.Behaviors.zoomToLayer = function(event) {
   var mapid = mapDef.id;
   var map = event.map;
   var behavior = event.behavior;
-  var layer = OL.maps[mapid].layers[behavior.layer];
-  if (layer.features.length != 0) {
-    // Check to see if we are dealing with just a single point.
-    if (layer.features.length == 1 && layer.features[0].geometry.getArea() == 0) {
-      var center = new OpenLayers.LonLat(layer.features[0].geometry.x, layer.features[0].geometry.y);
-      // If pointZoom has been set, then center and zoom, else just center and don't zoom
-      if (OL.isSet(behavior.pointZoom)) {
-        map.setCenter(center, mapDef.behaviors.pointZoom);
-      }
-      else {
-        map.setCenter(center); 
-      }
+  
+  if (typeof(behavior.layer) == 'string') {
+    var layers = [behavior.layer];
+  }
+  else {
+    var layers = behavior.layer;
+  } 
+  
+  var featureCount = 0;
+  var extentToZoom = new OpenLayers.Bounds();
+  
+  for (var l in layers){
+    var layer = OL.maps[mapid].layers[layers[l]];
+    for (var f in layer.features) {
+      var feature = layer.features[f];
+      extentToZoom.extend(feature.geometry.getBounds());
+      featureCount++;
     }
-    // Else we are dealing with either a polygon, a line, or 
-    // multiple points, all of which have bounds to which we can zoom
+  }
+
+  // Check to see if we are dealing with just a single point.
+  if (featureCount == 1 && feature.geometry.getArea() == 0) {
+    var center = new OpenLayers.LonLat(feature.geometry.x, feature.geometry.y);
+    // If pointZoom has been set, then center and zoom, else just center and don't zoom
+    if (OL.isSet(behavior.pointZoom)) {
+      map.setCenter(center, mapDef.behaviors.pointZoom);
+    }
     else {
-      var extentToZoom = new OpenLayers.Bounds();
-      // Go through the feautres of the layer, building out the bounds to which we wish to zoom.
-      for (var f in layer.features) {
-        extentToZoom.extend(layer.features[f].geometry.getBounds());
-      }
-      // Zoom the map to the bounds of the layer
-      map.zoomToExtent(extentToZoom);
+      map.setCenter(center); 
     }
+  }
+  else {
+    // Zoom the map to the bounds of the layer(s)
+    map.zoomToExtent(extentToZoom);
   }
 }
 
@@ -307,7 +317,7 @@ OL.Behaviors.drawFeatures = function(event) {
       
   }
   
-  // Create our conrols and attach them to our layer.
+  // Create our controls and attach them to our layer.
   var createControl = new OpenLayers.Control.DrawFeature(layer, handler);  
   var modifyControl = new OpenLayers.Control.ModifyFeature(layer, {deleteCodes:[68]});
   

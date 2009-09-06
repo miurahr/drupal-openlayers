@@ -168,9 +168,9 @@ OL.Behaviors.tooltipOver = function(event) {
   var mapDivOffset = $('#' + feature.layer.map.mapid).offset();
   var scrollTop = $(window).scrollTop();
   var scrollLeft = $(window).scrollLeft();
-  var containerHeight = $textContainer.height();
-  var containterWidth = $textContainer.width();
-  var absoluteTop = centroidPixel.y + mapDivOffset.top - scrollTop - behavior.offset_top;
+  var containerHeight = $tooltipContainer.height();
+  var containterWidth = $tooltipContainer.width();
+  var absoluteTop = centroidPixel.y + mapDivOffset.top - scrollTop - behavior.offset_top - containerHeight;
   var absoluteLeft = centroidPixel.x + mapDivOffset.left - scrollLeft - behavior.offset_left;
   
   // Create offset

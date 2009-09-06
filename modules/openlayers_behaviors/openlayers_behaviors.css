@@ -9,6 +9,8 @@
 
 /**
  * Tooltip
+ * You may also with to set offset_top, and offset_left in the behavior attributes
+ * in order to fine tune the position of the tooltip.
  */
 .openlayers-behaviors-tooltip {
   display: none;

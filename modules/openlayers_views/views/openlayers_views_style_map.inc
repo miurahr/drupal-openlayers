@@ -351,16 +351,14 @@ class openlayers_views_style_map extends views_plugin_style {
             break;
 
           case 'geo':
-            // @@TODO: Geo does not work
             foreach ($data_source['geo_fields'] as $geo_field) {
-              $wkb_field = 'node_data_' . $geo_field . '_' . $geo_field . '_wkb';
-              $wkb = $record->$wkb_field;
-              $wkt_object = geo_wkb_get_data($wkb, 'wkt');
+              $geo_alias = $fields[$geo_field .'_geo']['field_alias'];
+              $geo_record = $record->$geo_alias;
+              $wkt_object = geo_wkb_get_data($geo_record['wkb'], 'wkt');
               $wkt = $wkt_object['value'];
               if (!empty($wkt)) {
                 $feature['wkt'] = $wkt;
-                $srid_field = 'node_data_' . $geo_field . '_' . $geo_field . '_srid';
-                $feature['projection'] = $record->$srid_field;
+                $feature['projection'] = $geo_record['srid'];
               }
             }
             break;

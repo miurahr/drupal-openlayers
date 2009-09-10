@@ -203,10 +203,11 @@ function openlayers_render_map($map = array(), $render = TRUE) {
   // Hook for one last alter
   drupal_alter('openlayers_map_final', $map);
 
-  // Check our map for errors
-  $map['errors'] = openlayers_error_check_map($map);
+  // Check our map for errors. If we are rendering it, then log errors.
+  $errors = openlayers_error_check_map($map, $render);
+  
   // Add JS and theme if no errors found
-  if (!$map['errors'] || $render == FALSE) {
+  if (!$errors && $render) {
     // Add map container to drupal JS settings
     $openlayers = array(
       'openlayers' => array(
@@ -219,11 +220,11 @@ function openlayers_render_map($map = array(), $render = TRUE) {
 
     // Add themed HTML (no need for it to go to JS)
     $map['themed'] = theme('openlayers_map', $map);
+
+    // Debug post-render
+    _openlayers_render_debug_map('post-render', $map);
   }
-
-  // Debug post-render
-  _openlayers_render_debug_map('post-render', $map);
-
+  
   // Return map with or without errors
   return $map;
 }
@@ -312,7 +313,16 @@ function openlayers_save_preset($preset = array()) {
   if (empty($preset['preset_name'])) {
     return $successful;
   }
-
+  
+  // Check the map array for errors
+  $map_processed = openlayers_render_map($preset['preset_data'], FALSE);
+  if (isset($map_processed['errors']) && count($map_processed['errors'])){
+    foreach($map_processed['errors'] as $error){
+      drupal_set_message($error, 'error');
+    }
+    return $successful;
+  }
+  
   // Serialize
   $preset['preset_data'] = (is_array($preset['preset_data']))
     ? serialize($preset['preset_data']) : '';
@@ -597,7 +607,7 @@ function openlayers_merge_maps($map1 = array(), $map2 = array()) {
  * @return
  *   FALSE if passed. Array of descriptive errors if fail
  */
-function openlayers_error_check_map($map, $log_errors = TRUE) {
+function openlayers_error_check_map(&$map, $log_errors = TRUE) {
   // @TODO: Instead of manually specifying projections, we should do a lookup on the projections in a big table to get variables that it should be checked against.
   // @TODO: For next release, make hook
   $errors = array();
@@ -640,6 +650,12 @@ function openlayers_error_check_map($map, $log_errors = TRUE) {
   if (count($errors) > 0 && $log_errors) {
     // Log the Error(s)
     watchdog('openlayers', implode(', ', $errors), array(), WATCHDOG_ERROR);
+  }
+  
+  // Store the errors in our map array
+  if (count($errors) > 0) {
+    // Store the errors in our map array
+    $map['errors'] = $errors;
   }
 
   // Check if errors and return

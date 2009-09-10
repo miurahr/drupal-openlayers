@@ -601,8 +601,10 @@ function openlayers_presets_ui_presets_manage_add_validate($form, &$form_state) 
 
   // Convert form to map array
   $map = _openlayers_presets_ui_convert_form_to_map($form_state['values']);
+  
   // Attempt to render map to find any errors
   $map = openlayers_render_map($map, FALSE);
+  
   // Check if any errors found
   if (is_array($map['errors']) && count($map['errors']) > 0) {
     foreach ($map['errors'] as $error) {
@@ -847,7 +849,6 @@ function openlayers_presets_ui_presets_import_validate($form, &$form_state) {
       if (empty($preset['preset_data']['height'])) {
         form_set_error('import', t('No Map Height Found for key: %key', array('%k' => $k)));
       }
-      // Should we try to rendre map and test for errors.
     }
   }
 }
@@ -1097,7 +1098,6 @@ function _openlayers_presets_ui_form_center_map($defaults = array()) {
       'lon' => ($defaults['center']['lon']) ? $defaults['center']['lon'] : 0,
       'zoom' => ($defaults['center']['zoom']) ? $defaults['center']['zoom'] : 2,
     ),
-    'only_these_layers' => TRUE,
     'layers' => array(
       'openlayers_default_wms',
     ),

@@ -181,17 +181,17 @@ function openlayers_render_map($map = array(), $render = TRUE) {
 
   // Include extra rendering functions
   module_load_include('inc', 'openlayers', 'includes/openlayers.render');
-
-  // Debug pre-render
-  _openlayers_render_debug_map('pre-render', $map);
-  
-  // Hook for map alteration
-  drupal_alter('openlayers_map', $map);  
   
   // Check ID
   if (!$map['id']) {
     $map['id'] = _openlayers_create_map_id();
   }
+  
+  // Hook for map alteration
+  drupal_alter('openlayers_map', $map);  
+
+  // Debug pre-render
+  _openlayers_render_debug_map('pre-render', $map);
   
   // Process layers
   $map['layers'] = _openlayers_layers_process($map['layers'], $map);

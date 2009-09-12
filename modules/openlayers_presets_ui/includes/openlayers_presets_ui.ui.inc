@@ -1213,6 +1213,17 @@ function _openlayers_presets_ui_merge_maps($submitted_map = array(), $orig_map =
   unset($orig_map['preset_name']);
   unset($orig_map['preset_title']);
   unset($orig_map['preset_description']);
+  
+  // Any layer that is referenced by a string is an exposed / permanent layer and is visible to the UI.
+  // We should therefore remove it from our $orig_map display since we will prefer selections from the UI.
+  // Any layer that is an array will not have been exposed to the UI and therefore should be kept.
+  if ($orig_map['layers']) {
+    foreach ($orig_map['layers'] as $key => $layer) {
+      if (is_string($layer)) {
+        unset($orig_map['layers'][$key]);
+      }
+    }
+  }
 
   // Merge maps.  The passed in submitted map has not had empty values removed.
   // This ensures that there is a subtractive merge

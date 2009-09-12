@@ -257,7 +257,7 @@ class openlayers_views_style_map extends views_plugin_style {
         '#type' => 'checkbox',
         '#title' => t('Popups on clusters'),
         '#description' => t('Should clustered features permit popups?'),
-        '#default_value' => $this->options['behaviors']['cluster'],
+        '#default_value' => $this->options['behaviors']['cluster_popup'],
         '#process' => array('views_process_dependency'),
         '#dependency' => array('edit-style-options-behaviors-cluster' => array('1')),
       );

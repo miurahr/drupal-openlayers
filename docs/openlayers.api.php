@@ -11,6 +11,38 @@
 /**
  * OpenLayers Map Alter
  *
+ * Map array alter.  Fired before processing the array, and
+ * before checking for errors.  The whole array is passed
+ * along and will allow you to alter it in any way.  This
+ * is a good place to alter the map, if the other hooks
+ * do not provide the functionality you need.
+ *
+ * @param $map
+ *   Map array
+ */
+function hook_openlayers_map_alter(&$map = array()) {
+  // Do something to the $map
+}
+
+/**
+ * OpenLayers Map Final Alter
+ *
+ * Final Map array alter.  Fired after processing the array, and
+ * before checking for errors.  The whole array is passed
+ * along and will allow you to alter it in any way.  Adding behaviors,
+ * pre-defined layers here will not work. This is good for minor tweaks
+ * after the map has been processed.
+ *
+ * @param $map
+ *   Map array
+ */
+function hook_openlayers_map_final_alter(&$map = array()) {
+  // Do something to the $map
+}
+
+/**
+ * OpenLayers Map Alter
+ *
  * Map array alter.  Fired after preparing the array, and
  * before checking for errors.  The whole array is passed
  * along and will allow you to alter it in any way.  This

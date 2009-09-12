@@ -50,7 +50,7 @@ function openlayers_admin_settings() {
     '#type' => 'fieldset',
     '#title' => t('OpenLayers Debug Options'),
     '#description' => t('Options to allow for different debugging.  Enabled the devel module to allow for screen output.'),
-    '#collapsed' => FALSE,
+    '#collapsed' => TRUE,
     '#collapsible' => TRUE,
   );
   // Screen output is based on dpm() function

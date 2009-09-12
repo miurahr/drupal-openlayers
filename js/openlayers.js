@@ -55,10 +55,8 @@ OL.loadMaps = function() {
     // Check to see if there is a div on the page ready for the map. If there is then proceed.
     var $map = $('#' + map.id);
     if ($map.length > 0 && OL.isSet(map.width) && OL.isSet(map.height)) {
-      // Make div the right dimensions and add custom controls
-      $map.css('width', map.width)
-        .css('height', map.height)
-        .after(Drupal.theme('mapControls', map.id, map.height));
+      // Add any custom controls
+      $map.after(Drupal.theme('mapControls', map.id, map.height));
       
       // Set-up our registry of active OpenLayers javascript objects for this particular map.
       OL.maps[map.id] = {};

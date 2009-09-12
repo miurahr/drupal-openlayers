@@ -51,6 +51,7 @@ OL.Behaviors.popup = function(event) {
   }
 
   var selectControlOptions = {
+    hover: true,
     onSelect: OL.Behaviors.popupFeatureSelected, 
     onUnselect: OL.Behaviors.popupFeatureUnselected
   };

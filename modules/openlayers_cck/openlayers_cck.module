@@ -12,7 +12,8 @@
 /**
  * Map ID Prefix
  */
-define('OPENLAYERS_CCK_MAP_ID_PREFIX', 'openlayers-cck-map-auto-id');
+define('OPENLAYERS_CCK_WIDGET_MAP_ID_PREFIX', 'openlayers-cck-widget-map');
+define('OPENLAYERS_CCK_FORMATTER_MAP_ID_PREFIX', 'openlayers-cck-formatter-map');
 
 /**
  * Implementation of hook_help().
@@ -473,13 +474,24 @@ function theme_openlayers_cck_formatter_map($element) {
       'projection' => $element[$delta]['#item']['srid'] ? $element[$delta]['#item']['srid'] : '4326',
     );
   }
-    
+
   // Get preset name from formatter. Strip off 'openlayers_cck_formatter_' and 'openlayers_map_' from the begginging.
   if (substr($element['#formatter'], 25) == 'openlayers_cck_formatter_') $preset_name = substr($element['#formatter'], 25);
   if (substr($element['#formatter'], 0, 15) == 'openlayers_map_') $preset_name = substr($element['#formatter'], 15);
-  
+
   // Get map preset
   $map = openlayers_get_map($preset_name);
+
+  // Set map ID
+  static $formatter_count = array();
+  if (isset($formatter_count[$field['field_name']])) {
+    $formatter_count[$field['field_name']]++;
+  }
+  else {
+    $formatter_count[$field['field_name']] = 0;
+  }
+  $map['id'] = OPENLAYERS_CCK_FORMATTER_MAP_ID_PREFIX .'-'. str_replace('_','-',$field['field_name']) .'-'. $formatter_count[$field['field_name']];
+  $formatter_count++;
   
   // Add features and vector layer
   if (count($features) > 0) {
@@ -569,7 +581,7 @@ function openlayers_cck_gis_input_info($gis_type = NULL) {
  */
 function _openlayers_cck_render_element_map($field_name = '', $field_label = '', $values = array(), $field = array()) {
   $field_name_html = str_replace('_', '-', $field_name);
-  $map_id = OPENLAYERS_CCK_MAP_ID_PREFIX . '-' . $field_name;
+  $map_id = OPENLAYERS_CCK_WIDGET_MAP_ID_PREFIX . '-' . $field_name;
   $field_type = $field['type'];
   $widget = $field['widget'];
   $field_container = 'edit-' . $field_name_html . '-openlayers-wkt-wrapper';

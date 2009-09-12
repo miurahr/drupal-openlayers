@@ -132,7 +132,7 @@ OL.renderMap = function(map) {
   
   // Zoom to Center
   // @@TODO: Do this in the map options -- As isthis will result in a bug in the zoom map helper in the map form
-  if (OL.isSet(map.center)){
+  if (OL.isSet(map.center)) {
     var center = new OpenLayers.LonLat(map.center.lon, map.center.lat);
 	  var zoom = parseInt(map.center.zoom);
     OL.maps[map.id].map.setCenter(center, zoom, false, false);
@@ -222,7 +222,7 @@ OL.createMapOptions = function(options, controls, mapid) {
     returnOptions.controls = [];
     if (controls.LayerSwitcher)   returnOptions.controls.push( new OpenLayers.Control.LayerSwitcher() );
     if (controls.Navigation)      returnOptions.controls.push( new OpenLayers.Control.Navigation() );
-    if (controls.Attribution)      returnOptions.controls.push( new OpenLayers.Control.Attribution() );
+    if (controls.Attribution)     returnOptions.controls.push( new OpenLayers.Control.Attribution() );
     if (controls.PanZoomBar)      returnOptions.controls.push( new OpenLayers.Control.PanZoomBar() );
     if (controls.MousePosition)   returnOptions.controls.push( new OpenLayers.Control.MousePosition() );
     if (controls.Permalink)       returnOptions.controls.push( new OpenLayers.Control.Permalink() );

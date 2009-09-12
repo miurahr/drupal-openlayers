@@ -65,11 +65,16 @@ OL.Layers.Vector = function(layerOptions, mapid) {
   // Go through styles if there are any
   if (OL.isSet(OL.mapDefs[mapid].styles)) {
     for (var style in OL.mapDefs[mapid].styles) {
-
-        if(OL.mapDefs[mapid].styleContextCallback)
-            stylesAdded[style] = new OpenLayers.Style(OL.mapDefs[mapid].styles[style], {context: eval(OL.mapDefs[mapid].styleContextCallback)(mapid, layerOptions.name, style)});
-        else
-            stylesAdded[style] = new OpenLayers.Style(OL.mapDefs[mapid].styles[style]);
+      // Check for context callback
+      if (OL.mapDefs[mapid].styleContextCallback) {
+        stylesAdded[style] = new OpenLayers.Style(
+          OL.mapDefs[mapid].styles[style], 
+          { context: OL.getObject('OL.mapDefs[mapid].styleContextCallback')(mapid, layerOptions.name, style) }
+        );
+      }
+      else {
+        stylesAdded[style] = new OpenLayers.Style(OL.mapDefs[mapid].styles[style]);
+      }
     }
     styleMap = new OpenLayers.StyleMap(stylesAdded);
   }
@@ -149,15 +154,14 @@ OL.Layers.Vector = function(layerOptions, mapid) {
         }
       }
     }
-
   }
 
   // Go through strategies if there are any
   if (OL.isSet(OL.mapDefs[mapid].strategies)) {
-    for(s in OL.mapDefs[mapid].strategies) {
+    for (s in OL.mapDefs[mapid].strategies) {
       var strategy = OL.mapDefs[mapid].strategies[s];
 
-      if(s == 'cluster') {
+      if (s == 'cluster') {
         var cluster = new OpenLayers.Strategy.Cluster({features: newFeatures});
         if(strategy.distance) cluster.distance = strategy.distance;
         if(strategy.threshold) cluster.threshold = strategy.threshold;
@@ -172,8 +176,9 @@ OL.Layers.Vector = function(layerOptions, mapid) {
   var returnVector = new OpenLayers.Layer.Vector(layerOptions.name, {strategies: strategies, styleMap: styleMap});
     
   // Add new features if there are any
-  if (newFeatures.length != 0)
+  if (newFeatures.length != 0) {
     returnVector.addFeatures(newFeatures);
+  }
   
   // Return processed vector
   return returnVector;

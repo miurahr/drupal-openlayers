@@ -17,7 +17,7 @@
  * @param $style
  *   String ID for the style
  * @param $map
- *   Arrya of current map being processed
+ *   Array of current map being processed
  * @return
  *   Array formated for an OpenLayers map style
  */
@@ -36,7 +36,7 @@ function openlayers_process_styles($style = NULL, $map = array()) {
         'pointRadius' => 5,
         'fillColor' => '#FFCC66',
         'strokeColor' => '#FF9933',
-        'strokeWidth' => 4,
+        'strokeWidth' => 2,
         'fillOpacity' => 0.5
       );
       break;
@@ -46,7 +46,7 @@ function openlayers_process_styles($style = NULL, $map = array()) {
         'pointRadius' => 5,
         'fillColor' => '#66CCFF',
         'strokeColor' => '#3399FF',
-        'strokeWidth' => 4,
+        'strokeWidth' => 2,
         'fillOpacity' => 0.5
       );
       break;

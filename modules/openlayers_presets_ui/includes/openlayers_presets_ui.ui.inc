@@ -1160,10 +1160,6 @@ function _openlayers_presets_ui_available_controls() {
     'title' => t('Navigation'),
     'description' => t('Gives the user the ability to navigate the map interface.'),
   );
-  $available['OverviewMap'] = array(
-    'title' => t('Overview Map'),
-    'description' => t('Provides a small overview map in the interface.'),
-  );
   $available['PanZoomBar'] = array(
     'title' => t('Pan Zoom Bar'),
     'description' => t('Gives user ability to pan and zoom in the map interface.'),

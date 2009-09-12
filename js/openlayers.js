@@ -227,7 +227,6 @@ OL.createMapOptions = function(options, controls, mapid) {
     if (controls.MousePosition)   returnOptions.controls.push( new OpenLayers.Control.MousePosition() );
     if (controls.Permalink)       returnOptions.controls.push( new OpenLayers.Control.Permalink() );
     if (controls.ScaleLine)       returnOptions.controls.push( new OpenLayers.Control.ScaleLine() );
-    if (controls.OverviewMap)     returnOptions.controls.push( new OpenLayers.Control.OverviewMap() );
     if (controls.KeyboardDefaults)returnOptions.controls.push( new OpenLayers.Control.KeyboardDefaults() );
     if (controls.ZoomBox)         returnOptions.controls.push( new OpenLayers.Control.ZoomBox() );
     if (controls.ZoomToMaxExtent) returnOptions.controls.push( new OpenLayers.Control.ZoomToMaxExtent() );

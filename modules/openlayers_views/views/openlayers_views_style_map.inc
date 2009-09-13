@@ -248,8 +248,8 @@ class openlayers_views_style_map extends views_plugin_style {
       $form['behaviors']['cluster_threshold'] = array(
         '#type' => 'textfield',
         '#title' => t('Cluster threshold'),
-        '#description' => t('Optional threshold below which original features will be added to the layer instead of clusters.  For example, a threshold of 3 would mean that any time there are 2 or fewer features in a cluster, those features will be added directly to the layer instead of a cluster representing those features.  Default is null (which is equivalent to 1 - meaning that clusters may contain just one feature).'),
-        '#default_value' => $this->options['behaviors']['cluster_threshold'],
+        '#description' => t('Optional threshold below which original features will be added to the layer instead of clusters.  For example, a threshold of 3 would mean that any time there are 2 or fewer features in a cluster, those features will be added directly to the layer instead of a cluster representing those features.  Default is 2 (meaning that clusters must contain at least two features).'),
+        '#default_value' => $this->options['behaviors']['cluster_threshold'] ? $this->options['behaviors']['cluster_threshold'] : 2,
         '#process' => array('views_process_dependency'),
         '#dependency' => array('edit-style-options-behaviors-cluster' => array('1')),
       );

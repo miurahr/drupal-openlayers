@@ -64,7 +64,7 @@ class openlayers_views_style_map extends views_plugin_style {
           break;
 
         default:
-          $fields[$field_id] = $handler->definition['title'];
+          $fields[$field_id] = $handler->label() ? $handler->label() : $handler->ui_name();
           break;
 
       }

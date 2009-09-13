@@ -109,11 +109,11 @@ OL.Layers.Vector = function(layerOptions, mapid) {
       
       // If we have successfully extracted geometry add additional 
       // properties and queue it for addition to the layer
-      if (typeof(newFeatureObject) != 'undefined'){
+      if (typeof(newFeatureObject) != 'undefined') {
         var newFeatureSet = [];
         
         // Check to see if it is a new feature, or an array of new features.
-        if (typeof(newFeatureObject[0]) == 'undefined'){
+        if (typeof(newFeatureObject[0]) == 'undefined') {
           // It's an actual OpenLayers feature object.
           newFeatureSet[0] = newFeatureObject;
         }
@@ -128,7 +128,7 @@ OL.Layers.Vector = function(layerOptions, mapid) {
           
           // Transform the geometry if the 'projection' property is different from the map projection
           if (typeof(layerOptions.features[feat].projection) != 'undefined') {
-            if (layerOptions.features[feat].projection != OL.mapDefs[mapid].projection){
+            if (layerOptions.features[feat].projection != OL.mapDefs[mapid].projection) {
               var featureProjection = new OpenLayers.Projection("EPSG:" + layerOptions.features[feat].projection);
               var mapProjection = OL.maps[mapid].projection;
               newFeature.geometry.transform(featureProjection,mapProjection);
@@ -136,13 +136,13 @@ OL.Layers.Vector = function(layerOptions, mapid) {
           }
           
           // Add attribute data
-          if (typeof(layerOptions.features[feat].attributes) != "undefined"){
+          if (typeof(layerOptions.features[feat].attributes) != "undefined") {
             newFeature.attributes = layerOptions.features[feat].attributes;
             newFeature.data = layerOptions.features[feat].attributes;
           }
           
           // Add style information
-          if (typeof(layerOptions.features[feat].style) != "undefined"){
+          if (typeof(layerOptions.features[feat].style) != "undefined") {
             // Merge with defaults
             var featureStyle = jQuery.extend({}, OpenLayers.Feature.Vector.style['default'], layerOptions.features[feat].style);
             // Add style to feature

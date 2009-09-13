@@ -16,6 +16,20 @@
 function openlayers_admin_settings() {
   // Initialize
   openlayers_initialize();
+  
+  // Let user know about advanced help
+  if (module_exists('advanced_help')) {
+    $form['openlayers_advanced_help'] = array(
+      '#type' => 'item',
+      '#title' => t('OpenLayers Help') . theme('advanced_help_topic', 'openlayers', 'openlayers-about'),
+      '#value' => t('Access the advanced help here: !link or click the small help icon.', array(
+        '!link' => l(t('Advanced Help'), 'admin/advanced_help'),
+      )),
+    );
+  }
+  else {
+    drupal_set_message(t('This module has extensive help text available with the <a href="http://drupal.org/project/advanced_help">Advanced Help module</a>'));
+  }
 
   // Source description
   $source_description = t('The source for the OpenLayers library can be one of two things:')

@@ -5,95 +5,13 @@ documentation:
   * http://drupal.org/project/openlayers
 
 
- OpenLayers Theming
+ Advanced Help
 ======================================================
-See: THEMING.txt
+Browsable documentation is available through the Advanced
+Help module.
+  * http://drupal.org/project/advanced_help
 
 
  OpenLayers Hooks
 ======================================================
-See: HOOKS.txt (openlayers.api.php)
-
-
- OpenLayers Map Arrays
-======================================================
-See: MAP_ARRAY.txt
-
-
- OpenLayers API
-======================================================
-The following are the main public API functions for
-OpenLayers.  These functions are well documented with
-inline comments.  Please refer to the project page for
-up to date and browsable documentation.
-
-  * openlayers_initialize()
-    --
-    Use this function to include the OpenLayers JS
-    library.  Note: openlayers_render() will call
-    this.
-
-
-  * openlayers_render_map($map = array(), $render = TRUE)
-    --
-    Renders a map array and returns the rendered array
-    and errors if there were any.
-
-
-  * openlayers_layers_get_info($reset = FALSE)
-    --
-    Get array of layer info
-
-
-  * openlayers_behaviors_get_info($reset = FALSE)
-    --
-    Get array of behavior info
-
-
-  * openlayers_styles_get_info($reset = FALSE)
-    --
-    Get array of style info
-
-
-  * openlayers_save_preset($preset = array())
-    --
-    Save a preset in the DB
-
-
-  * openlayers_get_preset($name = '', $reset = FALSE)
-    --
-    Get a preset from DB or hooks
-
-
-  * openlayers_get_map($id = '')
-    --
-    A convient function to simply get just the map from
-    the preset
-
-
-  * openlayers_presets($reset = FALSE)
-    --
-    The main logic behind getting all presets
-
-
-  * openlayers_get_presets($format = 'simple', $reset = FALSE)
-    --
-    Better function to get all presets in a formatted (simple,
-    or full) array
-
-
-  * openlayers_get_default_map($reset = FALSE)
-    --
-    Get the map that is designated as the default map
-
-
-  * openlayers_merge_maps($map1 = array(), $map2 = array())
-    --
-    Function to merge two maps; the second parameter should
-    hold the preferred data
-
-
-  * openlayers_error_check_map($map, $log_errors = TRUE)
-    --
-    The render function will run this, but if you need
-    to manually check a map for errors
+See: openlayers.api.php

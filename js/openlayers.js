@@ -83,7 +83,7 @@ OL.renderMap = function(map) {
   // Create Projection objects
   OL.maps[map.id].projection = new OpenLayers.Projection('EPSG:' + map.projection);
   
-  if (OL.isSet(map.options)){
+  if (OL.isSet(map.options)) {
     OL.maps[map.id].displayProjection = new OpenLayers.Projection('EPSG:' + map.options.displayProjection);
   
     // Create base map options
@@ -232,7 +232,7 @@ OL.createMapOptions = function(options, controls, mapid) {
     if (controls.ZoomToMaxExtent) returnOptions.controls.push( new OpenLayers.Control.ZoomToMaxExtent() );
   }
 
-  if(typeof(options.fractionalZoom) != 'undefined') {
+  if(Ol.isSet(options.fractionalZoom)) {
     returnOptions.fractionalZoom = options.fractionalZoom;
   }
   

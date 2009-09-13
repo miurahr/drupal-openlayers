@@ -41,22 +41,6 @@ function hook_openlayers_map_final_alter(&$map = array()) {
 }
 
 /**
- * OpenLayers Map Alter
- *
- * Map array alter.  Fired after preparing the array, and
- * before checking for errors.  The whole array is passed
- * along and will allow you to alter it in any way.  This
- * is a good place to alter the map, if the other hooks
- * do not provide the functionality you need.
- *
- * @param $map
- *   Map array
- */
-function hook_openlayers_map_alter(&$map = array()) {
-  // Do something to the $map
-}
-
-/**
  * OpenLayers Layer Handler Info
  *
  * Provides information on layer handlers.  Every layer needs

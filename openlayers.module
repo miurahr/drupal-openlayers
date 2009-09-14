@@ -629,11 +629,11 @@ function openlayers_error_check_map(&$map, $log_errors = TRUE) {
     }
   }
 
-  // If we are using a web spherical mercador projection and maxResolution
+  // If we are using a web spherical mercator projection and maxResolution
   // and maxExtent are not set the map will not function.
   if ($map['projection'] == '900913' || $map['projection'] == '3785') {
     if (!$map['options']['maxExtent'] || !$map['options']['maxResolution']) {
-      $errors[] = t('You are using a web spherical mercador projection.  However maxExtent or maxResolution are not set.');
+      $errors[] = t('You are using a web spherical mercator projection.  However maxExtent or maxResolution are not set.');
     }
   }
 

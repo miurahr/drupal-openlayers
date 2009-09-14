@@ -1,6 +1,24 @@
 <!-- $Id$ -->
 This documentation can be found in the <em>docs/openlayers.api.php</em> file and may be more up to date and verbose.
 
+<h3>OpenLayers Map Preprocess Alter</h3>
+<p>Map array alter.  Fired before processing the array, and
+before checking for errors.  The whole array is passed
+along and will allow you to alter it in any way.  This
+is a good place to alter the map, if the other hooks
+do not provide the functionality you need.</p>
+
+<h4>Parameters</h4>
+<p>$map
+Map array</p>
+
+<h4>Code</h4>
+<pre><code>
+function hook_openlayers_map_preprocess_alter(&$map = array()) {
+  // Do something to the $map
+}
+</code></pre>
+
 <h3>OpenLayers Map Alter</h3>
 <p>Map array alter.  Fired after preparing the array, and
 before checking for errors.  The whole array is passed
@@ -14,7 +32,7 @@ Map array</p>
 
 <h4>Code</h4>
 <pre><code>
-function hook_openlayers_map_final_alter(&$map = array()) {
+function hook_openlayers_map_alter(&$map = array()) {
   // Do something to the $map
 }
 </code></pre>

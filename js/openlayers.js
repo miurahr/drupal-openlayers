@@ -232,7 +232,7 @@ OL.createMapOptions = function(options, controls, mapid) {
     if (controls.ZoomToMaxExtent) returnOptions.controls.push( new OpenLayers.Control.ZoomToMaxExtent() );
   }
 
-  if(Ol.isSet(options.fractionalZoom)) {
+  if(OL.isSet(options.fractionalZoom)) {
     returnOptions.fractionalZoom = options.fractionalZoom;
   }
   

@@ -270,8 +270,8 @@ OL.Behaviors.zoomToLayer = function(event) {
   if (featureCount == 1 && feature.geometry.getArea() == 0) {
     var center = new OpenLayers.LonLat(feature.geometry.x, feature.geometry.y);
     // If pointZoom has been set, then center and zoom, else just center and don't zoom
-    if (OL.isSet(behavior.pointZoom)) {
-      map.setCenter(center, mapDef.behaviors.pointZoom);
+    if (OL.isSet(behavior.pointzoom)) {
+      map.setCenter(center, behavior.pointzoom);
     }
     else {
       map.setCenter(center); 

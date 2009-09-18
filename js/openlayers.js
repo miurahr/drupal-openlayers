@@ -93,17 +93,17 @@ OL.renderMap = function(map) {
     OL.maps[map.id].displayProjection = OL.maps[map.id].projection;
     var options = [];
   }
+
+  // Change image path if specified
+  if (OL.isSet(map.image_path) && map.image_path) {
+    OpenLayers.ImgPath = map.image_path;
+  }
   
   // Store map in our registry of active OpenLayers objects
   OL.maps[map.id].map = new OpenLayers.Map(map.id, options);
   
   // Add ID to map.
   OL.maps[map.id].map.mapid = map.id;
-
-  // Change image path if specified
-  if (OL.isSet(map.image_path) && map.image_path) {
-    OpenLayers.ImgPath = map.image_path;
-  }
   
   // On MouseOver mark the map as "active".
   $('#' + map.id).mouseover(function() {
@@ -224,6 +224,7 @@ OL.createMapOptions = function(options, controls, mapid) {
     if (controls.Navigation)      returnOptions.controls.push( new OpenLayers.Control.Navigation() );
     if (controls.Attribution)     returnOptions.controls.push( new OpenLayers.Control.Attribution() );
     if (controls.PanZoomBar)      returnOptions.controls.push( new OpenLayers.Control.PanZoomBar() );
+    if (controls.PanZoom)         returnOptions.controls.push( new OpenLayers.Control.PanZoom() );
     if (controls.MousePosition)   returnOptions.controls.push( new OpenLayers.Control.MousePosition() );
     if (controls.Permalink)       returnOptions.controls.push( new OpenLayers.Control.Permalink() );
     if (controls.ScaleLine)       returnOptions.controls.push( new OpenLayers.Control.ScaleLine() );

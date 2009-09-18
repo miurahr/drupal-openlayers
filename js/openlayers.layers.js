@@ -67,10 +67,9 @@ OL.Layers.Vector = function(layerOptions, mapid) {
     for (var style in OL.mapDefs[mapid].styles) {
       // Check for context callback
       if (OL.mapDefs[mapid].styleContextCallback) {
-        stylesAdded[style] = new OpenLayers.Style(
-          OL.mapDefs[mapid].styles[style], 
-          { context: OL.getObject('OL.mapDefs[mapid].styleContextCallback')(mapid, layerOptions.name, style) }
-        );
+        stylesAdded[style] = new OpenLayers.Style(OL.mapDefs[mapid].styles[style], {
+          context: eval(OL.mapDefs[mapid].styleContextCallback)(mapid, layerOptions.name, style)
+        });
       }
       else {
         stylesAdded[style] = new OpenLayers.Style(OL.mapDefs[mapid].styles[style]);

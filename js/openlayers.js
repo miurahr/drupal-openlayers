@@ -131,7 +131,8 @@ OL.renderMap = function(map) {
   OL.triggerCustom(map, 'beforeCenter', event);
   
   // Zoom to Center
-  // @@TODO: Do this in the map options -- As isthis will result in a bug in the zoom map helper in the map form
+  // @@TODO: Do this in the map options -- As is,
+  // this will result in a bug in the zoom map helper in the map form
   if (OL.isSet(map.center)) {
     var center = new OpenLayers.LonLat(map.center.lon, map.center.lat);
 	  var zoom = parseInt(map.center.zoom);
@@ -217,9 +218,9 @@ OL.createMapOptions = function(options, controls, mapid) {
   }
  
   // Controls
+  returnOptions.controls = [];
   if (OL.isSet(controls)) {
     // @@TODO: This should be a little more dynamic
-    returnOptions.controls = [];
     if (controls.LayerSwitcher)   returnOptions.controls.push( new OpenLayers.Control.LayerSwitcher() );
     if (controls.Navigation)      returnOptions.controls.push( new OpenLayers.Control.Navigation() );
     if (controls.Attribution)     returnOptions.controls.push( new OpenLayers.Control.Attribution() );
@@ -233,7 +234,8 @@ OL.createMapOptions = function(options, controls, mapid) {
     if (controls.ZoomToMaxExtent) returnOptions.controls.push( new OpenLayers.Control.ZoomToMaxExtent() );
   }
 
-  if(OL.isSet(options.fractionalZoom)) {
+  // Handle fractional zoom
+  if (OL.isSet(options.fractionalZoom)) {
     returnOptions.fractionalZoom = options.fractionalZoom;
   }
   

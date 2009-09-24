@@ -1,0 +1,93 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * This file holds the main Drupal hook functions 
+ * and private functions for the openlayers_views module.
+ *
+ * @ingroup openlayers
+ */
+
+/**
+ * Implementation of hook_help().
+ */
+function openlayers_views_help($path, $arg) {
+  switch ($path) {
+    case 'admin/help#openlayers_views':
+      return '<p>'. t('The OpenLayers Views module provides a set of plugins for Views.') .'</p>';
+  }
+}
+
+/**
+ * Implementation of hook_views_api().
+ */
+function openlayers_views_views_api() {
+  return array(
+    'api' => 2,
+    'path' => drupal_get_path('module', 'openlayers_views') .'/views',
+  );
+}
+
+/**
+ * Implementation of hook_ctools_plugin_api().
+ */
+function openlayers_views_ctools_plugin_api($module, $api) {
+  if ($module == "openlayers") {
+    switch ($api) {
+      case 'openlayers_layers':
+        return array('version' => 1);
+    }
+  }
+}
+
+/**
+ * Implementation of hook_openlayers_layers_handler_info
+ */
+function openlayers_views_openlayers_layers_handler_info($map = array()) {
+  return array(
+    'view' => array('layer_handler' => 'view'),
+  );
+}
+
+
+/**
+ * Implementation of hook_openlayers_layers_info().
+ */
+function openlayers_views_openlayers_layers_info() {
+  $layers = array();
+
+  $views = views_get_all_views();
+  /**
+   * Loop through views for displays generatd by the openlayers data style plugin.  Provide each as
+   * available layer for map presets
+   *
+   * @Todo: think about what settings should be allowed to be defined by the view display options,
+   *        what should be automatic, and what to configure on the map preset level
+   *
+   */
+  foreach ($views as $view) {
+    foreach ($view->display as $display => $data) {
+      if ($data->display_options['style_plugin'] == 'openlayers_data') {        
+        //Build Layer
+        $layer = new StdClass();
+        $layer->api_version = 1;
+        $layer->name = $view->name . '_' . $display;
+        $layer->title = $data->display_options['title'] ? $data->display_options['title'] : $view->display['default']->display_options['title'];
+        $layer->description = $view->description . ' - ' . $data->display_title;
+        $layer->data = array(
+          'projection' => array('4326', '900913', '4269'),
+          'baselayer' => FALSE,
+          'type' => 'Vector',
+          'url' => array(),
+          'options' => array(),
+          'events' => array(),
+          'views' => array('view' => $view->name, 'display' => $display),
+        );
+        $layers[$layer->name] = $layer;
+      }
+    }
+  }
+
+  return $layers;
+} 

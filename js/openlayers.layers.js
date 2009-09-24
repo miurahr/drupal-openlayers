@@ -134,6 +134,9 @@ OL.Layers.Vector = function(layerOptions, mapid) {
             }
           }
           
+          // Add Feature ID
+          newFeature.fid = feat;
+          
           // Add attribute data
           if (typeof(layerOptions.features[feat].attributes) != "undefined") {
             newFeature.attributes = layerOptions.features[feat].attributes;

@@ -44,6 +44,44 @@ function openlayers_behaviors_process_zoom_to_layer($behavior, &$map) {
 }
 
 /**
+ * Callback for OpenLayers Behaviors (Zoom to Feature)
+ *
+ * @param $behavior
+ *   Data about behavior
+ * @param $map
+ *   Map array
+ * @return
+ *   Behavior array
+ */
+function openlayers_behaviors_process_zoom_to_feature($behavior, &$map) {
+  // Check to make sure the layer and feature attribute is properly set.
+  if ($behavior['layer'] && $behavior['feature']){
+    // Check to make sure the layer is a string and exists.
+    if (is_string($behavior['layer']) && $map['layers'][$behavior['layer']]) {
+      // If it's a sting, check to make sure the feature exists.
+      if (is_string($behavior['feature'])){
+        if ($map['layers'][$behavior['layer']]['features'][$behavior['feature']]) {
+          return $behavior;
+        }
+      }
+      // If it's an array, check to make sure all features exist.
+      if (is_array($behavior['feature'])) {
+        $pass = true;
+        foreach ($behavior['feature'] as $feature) {
+          if (!$map['layers'][$behavior['layer']]['features'][$feature]) $pass = false;
+        }
+        if ($pass) {
+          return $behavior;
+        }
+      }
+    }
+  }
+
+  return FALSE;
+}
+
+
+/**
  * Callback for OpenLayers Behaviors (Tooltip)
  *
  * @param $behavior

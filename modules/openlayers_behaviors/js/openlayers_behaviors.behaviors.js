@@ -282,6 +282,78 @@ OL.Behaviors.zoomToLayer = function(event) {
   }
 }
 
+
+/**
+ * OL Zoom to Feature Behavior
+ *
+ * @param event
+ *   Event Object
+ */
+OL.Behaviors.zoomToFeature = function(event) {
+  var mapDef = event.mapDef;
+  var mapid = mapDef.id;
+  var map = event.map;
+  var behavior = event.behavior;
+    
+  var featureCount = 0;
+  var extentToZoom = new OpenLayers.Bounds();
+  
+  var layer = OL.maps[mapid].layers[behavior.layer];
+  
+  if (typeof(behavior.feature) == 'string') {
+    var features = [behavior.feature];
+  }
+  else {
+    var features = behavior.feature;
+  }
+  
+  for (var f in layer.features) {
+    feature = layer.features[f];
+    for (var bf in features) {
+      if (feature.fid == features[bf]) {
+        extentToZoom.extend(feature.geometry.getBounds());
+        featureCount++;
+      }
+    } 
+  }
+  // Check to see if we are dealing with just a single point.
+  if (featureCount == 1 && feature.geometry.getArea() == 0) {
+    var center = new OpenLayers.LonLat(feature.geometry.x, feature.geometry.y);
+    // If pointZoom has been set, then center and zoom, else just center and don't zoom
+    if (OL.isSet(behavior.pointzoom)) {
+      map.setCenter(center, behavior.pointzoom);
+    }
+    else {
+      if (OL.isSet(behavior.zoom) && behavior.zoom > 0) {
+        map.setCenter(center, behavior.zoom); 
+      }
+      else {
+        map.setCenter(center); 
+      }
+    }
+  }
+  else {
+    if (OL.isSet(behavior.zoom)) {
+      if (behavior.zoom < 0) {
+        // A negative value implies a relative zoom.
+        map.zoomToExtent(extentToZoom);
+        var newZoom = map.getZoom() + behavior.zoom;
+        map.zoomTo(newZoom); 
+      }
+      else {
+        // A positive value implies an absolute zoom.
+        var center = extentToZoom.getCenterLonLat();
+        map.setCenter(center, behavior.zoom);
+      }
+    }
+    else {
+      // Zoom the map to the bounds of the layer(s)
+      map.zoomToExtent(extentToZoom);
+    }
+  }
+}
+
+
 /**
  * Process Draw Features. 
  *

@@ -55,6 +55,14 @@ function openlayers_behaviors_openlayers_behaviors_info() {
     'js_file' => $js_file,
     'js_callback' => 'zoomToLayer',
   );
+  $info['openlayers_behaviors_zoom_to_feature'] = array(
+    'name' => t('Zoom to Layer'),
+    'description' => t('When the map is finished loading, zoom to the given features'),
+    'file' => $file,
+    'callback' => 'openlayers_behaviors_process_zoom_to_feature',
+    'js_file' => $js_file,
+    'js_callback' => 'zoomToFeature',
+  );
   $info['openlayers_behaviors_tooltip'] = array(
     'name' => t('Tooltip'),
     'description' => t('When the user hover over a feature, provide a tooltip'),

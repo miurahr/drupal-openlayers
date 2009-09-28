@@ -446,7 +446,7 @@ function openlayers_get_resolutions($projection, $zoom_start = 0, $zoom_end = FA
       $res = array();
       break;
   }
-  $length = ($zoom_end) ? FALSE : $zoom_end - $zoom_start;
+  $length = ($zoom_end == FALSE) ? null : $zoom_end - $zoom_start;
   // By default this will not actually clip the array
   $resolutions = array_slice($res, $zoom_start, $length);
   return $resolutions;

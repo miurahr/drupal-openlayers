@@ -395,28 +395,31 @@ function openlayers_get_extent($projection) {
  * @param projection as string specifying which projection this should take, like 900913
  * @return array of resolutions
  */
-function openlayers_get_resolutions($projection, $zoom_start = FALSE, $zoom_end = FALSE) {
+function openlayers_get_resolutions($projection, $zoom_start = 0, $zoom_end = FALSE) {
   switch ($projection) {
     case '900913':
       // 16 zoom levels, taken from
       // openlayers.org TMS map
       $res = array(
         156543.0339,
-        78271.51695,
-        39135.758475,
-        19567.8792375,
-        9783.93961875,
-        4891.969809375,
-        2445.9849046875, 
-        1222.99245234375,
-        611.496226171875,
-        305.7481130859375,
-        152.87405654296876,
-        76.43702827148438,
-        38.21851413574219,
-        19.109257067871095,
-        9.554628533935547,
-        4.777314266967774);
+	      78271.51695,
+	      39135.758475,
+	      19567.8792375,
+	      9783.93961875,
+	      4891.969809375,
+	      2445.9849046875,
+	      1222.99245234375,
+	      611.496226171875,
+	      305.7481130859375,
+	      152.87405654296876,
+	      76.43702827148438,
+	      38.21851413574219,
+	      19.109257067871095,
+	      9.554628533935547,
+	      4.777314266967774,
+	      2.388657133483887,
+	      1.1943285667419434,
+	      0.5971642833709717);
       break;
     case '4326':
       // 16 zoom levels, taken from
@@ -443,7 +446,10 @@ function openlayers_get_resolutions($projection, $zoom_start = FALSE, $zoom_end 
       $res = array();
       break;
   }
-  return $res;
+  $length = ($zoom_end) ? FALSE : $zoom_end - $zoom_start;
+  // By default this will not actually clip the array
+  $resolutions = array_slice($res, $zoom_start, $length);
+  return $resolutions;
 }
 
 /**
@@ -526,20 +532,17 @@ function openlayers_openlayers_presets() {
     'default_layer' => 'openlayers_default_wms',
     'height' => '300px',
     'center' => array(
-      'lat' => '0',
-      'lon' => '0',
-      'zoom' => '2',
+      'initial' => array(
+        'centerpoint' => '0,0',
+        'zoom' => '1'
+      )
     ),
     'options' => array(
       'displayProjection' => '4326',
-      'maxResolution' => '1.40625',
       'maxExtent' => openlayers_get_extent('4326'),
     ),
-    'controls' => array(
-      'LayerSwitcher' => 'LayerSwitcher',
-      'Navigation' => 'Navigation',
-      'PanZoomBar' => 'PanZoomBar',
-      'MousePosition' => 'MousePosition',
+    'behaviors' => array(
+      'openlayers_behavior_panzoombar' => array(),
     ),
     'layer_styles' => array(),
   );

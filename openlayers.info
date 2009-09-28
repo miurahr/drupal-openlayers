@@ -3,3 +3,4 @@ name = OpenLayers
 description = OpenLayers base API module
 core = 6.x
 package = OpenLayers
+php = 5.2

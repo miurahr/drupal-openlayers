@@ -165,7 +165,6 @@ function openlayers_render_map($map = array(), $preset_name = '') {
 function openlayers_layers($reset = TRUE) {
   ctools_include('export');
   $layers = ctools_export_load_object('openlayers_layers', 'all', array(), $reset);
-    
   return $layers;
 }
 
@@ -305,36 +304,6 @@ function openlayers_preset_options($reset = FALSE) {
 }
 
 /**
- * Merge Maps
- *
- * Recursive function to merge maps.  PHP's array_merge_recursive
- * creates unnecesary arrays to values if keys are the same.  This
- * function simply overwrites a value, even if the key is numeric.
- *
- * @ingroup openlayers_api
- * @param $map1
- *   Map array that holds values that are not preferred
- * @param $map2
- *   Map array that holds values that are preferred
- * @return
- *   map array
- */
-function openlayers_merge_maps($map1 = array(), $map2 = array()) {
-  // Check maps
-  if (is_array($map1) && is_array($map2)) {
-    foreach ($map2 as $k => $v) {
-      if (isset($map1[$k]) && is_array($v) && is_array($map1[$k])) {
-        $map1[$k] = openlayers_merge_maps($map1[$k], $v);
-      }
-      else {
-        $map1[$k] = $v;
-      }
-    }
-  }
-  return $map1;
-}
-
-/**
  * Check Map Errors
  *
  * Checks map array for incompatibilities or errors.
@@ -363,17 +332,8 @@ function openlayers_error_check_map($map, $log_errors = TRUE) {
       }
     }
   }
-  
-  // If we are using a web spherical mercador projection and maxResolution 
-  // and maxExtent are not set the map will not function. 
-  /*
-  if ($map['projection'] == '900913' || $map['projection'] == '3785') {
-    if (!$map['options']['maxExtent'] || !$map['options']['maxResolution']) {
-      $errors[] = t("You are using a spherical mercator projection.  However maxExtent or maxResolution are not set. ");
-    }
-  }
-   */
 
+  // TODO: rewrite to use openlayers_get_extent
   // If we are using a degree based projection, then check to make sure 
   // our bounds are not over 180/90 degrees
   if ($map['projection'] == '4326' || $map['projection'] == '4269') {
@@ -400,6 +360,8 @@ function openlayers_error_check_map($map, $log_errors = TRUE) {
 
 /**
  * Implementation of hook_openlayers_layers_handler_info
+ * @return array of relationships between layer types and javascript
+ * layer handlers
  */
 function openlayers_openlayers_layers_handler_info($map = array()) {
   return array(
@@ -408,6 +370,80 @@ function openlayers_openlayers_layers_handler_info($map = array()) {
     'OSM' => array('layer_handler' => 'OSM'),
     'Vector' => array('layer_handler' => 'Vector'),
   );
+}
+
+/**
+ * Returns standard world-max-extents for common projections.
+ * Layers implementing other projections and subsets of the world should define their
+ * maxExtent in the layer array
+ * @param projection 900913, 4326
+ * @return array of maxExtent in OpenLayers toArray() format
+ */
+function openlayers_get_extent($projection) {
+  switch($projection) {
+    case '900913':
+      return array(-20037508.34, -20037508.34, 20037508.34, 20037508.34);
+    case '4326':
+      return array(-180, -90, 180, 90);
+  }
+}
+
+/**
+ * Returns a default set of resolutions for standard TMS, WMS, etc servers
+ * serving up common projections. Layers supporting less common projections and resolutions
+ * can easily define custom resolutions arrays
+ * @param projection as string specifying which projection this should take, like 900913
+ * @return array of resolutions
+ */
+function openlayers_get_resolutions($projection, $zoom_start = FALSE, $zoom_end = FALSE) {
+  switch ($projection) {
+    case '900913':
+      // 16 zoom levels, taken from
+      // openlayers.org TMS map
+      $res = array(
+        156543.0339,
+        78271.51695,
+        39135.758475,
+        19567.8792375,
+        9783.93961875,
+        4891.969809375,
+        2445.9849046875, 
+        1222.99245234375,
+        611.496226171875,
+        305.7481130859375,
+        152.87405654296876,
+        76.43702827148438,
+        38.21851413574219,
+        19.109257067871095,
+        9.554628533935547,
+        4.777314266967774);
+      break;
+    case '4326':
+      // 16 zoom levels, taken from
+      // openlayers.org default WMS map
+      $res = array(
+        0.703125,
+	      0.3515625,
+	      0.17578125,
+	      0.087890625,
+	      0.0439453125,
+	      0.02197265625,
+	      0.010986328125,
+	      0.0054931640625,
+	      0.00274658203125,
+	      0.001373291015625,
+	      0.0006866455078125,
+	      0.00034332275390625,
+	      0.000171661376953125,
+	      0.0000858306884765625,
+	      0.00004291534423828125,
+	      0.000021457672119140625);
+      break;
+    default:
+      $res = array();
+      break;
+  }
+  return $res;
 }
 
 /**
@@ -428,36 +464,8 @@ function openlayers_openlayers_layers_info() {
     'url' => 'http://labs.metacarta.com/wms/vmap0',
     'params' => array('layers' => 'basic'),
     'options' => array(
-      'resolutions' => array(
-        78271.51695,
-        39135.758475,
-        19567.8792375,
-        9783.93961875,
-        4891.969809375,
-        2445.9849046875, 
-        1222.99245234375,
-        611.496226171875,
-        305.7481130859375,
-      ),
-      'serverResolutions' => array(
-        156543.0339,
-        78271.51695,
-        39135.758475,
-        19567.8792375,
-        9783.93961875,
-        4891.969809375,
-        2445.9849046875, 
-        1222.99245234375,
-        611.496226171875,
-        305.7481130859375,
-        152.87405654296876,
-        76.43702827148438,
-        38.21851413574219,
-        19.109257067871095,
-        9.554628533935547,
-        4.777314266967774),
-      'maxExtent' => array(
-        -20037508.34, -20037508.34, 20037508.34, 20037508.34),),
+      'maxExtent' => openlayers_get_extent('4326'),
+    ),
     'events' => array(),
   );
   $layers[$layer->name] = $layer;
@@ -525,12 +533,7 @@ function openlayers_openlayers_presets() {
     'options' => array(
       'displayProjection' => '4326',
       'maxResolution' => '1.40625',
-      'maxExtent' => array(
-        'top' => 90,
-        'bottom' => -90,
-        'left' => -180,
-        'right' => 180
-      ),
+      'maxExtent' => openlayers_get_extent('4326'),
     ),
     'controls' => array(
       'LayerSwitcher' => 'LayerSwitcher',

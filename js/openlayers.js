@@ -39,6 +39,8 @@ Drupal.behaviors.openlayers = function(context) {
           options.projection = new OpenLayers.Projection('EPSG:' + map.projection);
           options.displayProjection = new OpenLayers.Projection('EPSG:' + map.displayProjection);
           options.maxExtent = new OpenLayers.Bounds(-20037508.34, -20037508.34, 20037508.34, 20037508.34);
+          options.maxExtent = new OpenLayers.Bounds(-180, -90, 180, 90);
+          options.maxResolution = 1.40625;
           options.controls = [];
         }
 
@@ -100,6 +102,7 @@ Drupal.openlayers = {
           break;
         case 'WMS':
           if (typeof(options.params.format) == "undefined"){
+            options.options.maxExtent = new OpenLayers.Bounds.fromArray(options.options.maxExtent);
             options.params.format = "image/png";
           }
           var layer = new OpenLayers.Layer.WMS(key, options.url, options.params, options.options);

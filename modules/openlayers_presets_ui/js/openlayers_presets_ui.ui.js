@@ -17,6 +17,11 @@ Drupal.behaviors.OLUI = function(context) {
   var $autoOptionsCheck = $('#edit-options-automatic-options');
   var $submitProjection = $('#edit-openlayers-projection-ahah');
   
+  
+  // Reproject center values when projection changes
+  $projectSelect.change(OL.updateCenterFormOnProjectionChange);
+  $projectOther.change(OL.updateCenterFormOnProjectionChange);
+  
   // Hide submit button
   $submitProjection.hide();
   
@@ -75,6 +80,31 @@ Drupal.behaviors.OLUI = function(context) {
   
   // Initial trigger of updateHelpmapCenter  
   OL.updateHelpmapCenter();
+}
+
+/**
+ * Update the values of the centering form whent the user changes projections
+ *
+ */
+OL.updateCenterFormOnProjectionChange = function(event) {
+  var $formItem = $(event.target);
+  var projection = $formItem.val();
+  
+  var helpmap = OL.maps['openlayers-center-helpmap'].map;
+  var zoom = helpmap.getZoom();
+  var center = helpmap.getCenter();
+  
+  // Transform center
+  center.transform(new OpenLayers.Projection('EPSG:4326'),new OpenLayers.Projection('EPSG:' + projection));
+  
+  // Get new lat and lon
+  var lat = center.lat;
+  var lon = center.lon;
+  
+  // Set new values in the field
+  $('#edit-center-lat').val(lat);
+  $('#edit-center-lon').val(lon);  
+  
 }
 
 /**

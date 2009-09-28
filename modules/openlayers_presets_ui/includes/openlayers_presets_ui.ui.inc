@@ -1101,6 +1101,12 @@ function _openlayers_presets_ui_form_center_map($defaults = array()) {
     'layers' => array(
       'openlayers_default_wms',
     ),
+    'controls' => array(
+      'LayerSwitcher' => TRUE,
+      'Navigation' => TRUE,
+      'PanZoomBar' => TRUE,
+      'MousePosition' => TRUE,
+    ),
     'options' => array(
       'displayProjection' => $defaults['projection'],
       'maxResolution' => '1.40625',

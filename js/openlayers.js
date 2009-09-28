@@ -38,8 +38,12 @@ Drupal.behaviors.openlayers = function(context) {
           var options = {};
           options.projection = new OpenLayers.Projection('EPSG:' + map.projection);
           options.displayProjection = new OpenLayers.Projection('EPSG:' + map.displayProjection);
-          options.maxExtent = new OpenLayers.Bounds(-20037508.34, -20037508.34, 20037508.34, 20037508.34);
-          options.maxExtent = new OpenLayers.Bounds(-180, -90, 180, 90);
+          if (map.projection == '900913') {
+            options.maxExtent = new OpenLayers.Bounds(-20037508.34, -20037508.34, 20037508.34, 20037508.34);
+          }
+          if (map.projection == '4326') {
+            options.maxExtent = new OpenLayers.Bounds(-180, -90, 180, 90);
+          }
           options.maxResolution = 1.40625;
           options.controls = [];
         }

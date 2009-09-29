@@ -1,4 +1,6 @@
 // $Id$
+/*jslint white: false */
+/*global OpenLayers Drupal $ */
 
 /**
  * @file
@@ -13,7 +15,7 @@
  * All additional operations occur in additional Drupal behaviors.
  */
 Drupal.behaviors.openlayers = function(context) {
-  if (typeof(Drupal.settings.openlayers) == 'object' && Drupal.settings.openlayers.maps && !$(context).data('openlayers')) {
+  if (typeof(Drupal.settings.openlayers) === 'object' && Drupal.settings.openlayers.maps && !$(context).data('openlayers')) {
     $('.openlayers-map:not(.openlayers-processed)').each(function() {
       $(this).addClass('openlayers-processed');
 
@@ -50,7 +52,7 @@ Drupal.behaviors.openlayers = function(context) {
 
         // Change image path if specified
         if (map.image_path) {
-          if (map.image_path.substr(map.image_path.length - 1) != '/') {
+          if (map.image_path.substr(map.image_path.length - 1) !== '/') {
             map.image_path = map.image_path + '/';
           }
           if (map.image_path.indexOf('://') >= 0) {
@@ -92,55 +94,16 @@ Drupal.behaviors.openlayers = function(context) {
  */
 Drupal.openlayers = {
   'addLayers': function(map, openlayers) {
-    for (var key in map['layers']) {
+    for (var name in map['layers']) {
       var layer;      
-      var options = map['layers'][key];
-      switch (options['layer_handler']) {
-        case 'Vector':
-          var styleMap = Drupal.openlayers.getStyleMap(map, options.name);
-          var layer = new OpenLayers.Layer.Vector(key, {'styleMap': styleMap});
-          if (options.features) {
-            Drupal.openlayers.addFeatures(map, layer, options.features);
-          }
-          layer.title = options.title;
-          break;
-        case 'WMS':
-          if (typeof(options.params.format) == "undefined"){
-            options.options.maxExtent = new OpenLayers.Bounds.fromArray(options.options.maxExtent);
-            options.params.format = "image/png";
-          }
-          var layer = new OpenLayers.Layer.WMS(key, options.url, options.params, options.options);
-          break;
-        case 'TMS':
-          var styleMap = Drupal.openlayers.getStyleMap(map, options.name);
-          if (typeof(options.options.maxExtent) !== 'undefined') {
-            options.options.maxExtent = new OpenLayers.Bounds.fromArray(options.options.maxExtent);
-          }
-          if (typeof(options.options.type) == "undefined"){
-            options.options.type = "png";
-          }
-          var layer = new OpenLayers.Layer.TMS(key, options.url, options.options);
-          layer.styleMap = styleMap;
-          break;
-        case 'OSM':
-          if (typeof(options.options.maxExtent) !== 'undefined') {
-            options.options.maxExtent = new OpenLayers.Bounds.fromArray(options.options.maxExtent);
-          }
-          if (typeof(options.options.type) == "undefined"){
-            options.options.type = "png";
-          }
-          var layer = new OpenLayers.Layer.OSM(key, options.url, options.options);  
-          layer.attribution = "(c) OpenStreetMap (and) contributors, CC-BY-SA";
-          break;
-      }
-      if (layer) {
-        if (!map['layer_activated'] || map['layer_activated'][key]) {
-          layer.visibility = true;
-        }
-        else {
-          layer.visibility = false;
-        }
+      var options = map['layers'][name];
+      if (Drupal.openlayers.layer[options['layer_handler']] !== undefined) {
+        var layer = Drupal.openlayers.layer[options['layer_handler']](name, map, options);
+
+        layer.visibility = (!map['layer_activated'] || map['layer_activated'][name]);
+
         if (map.center.wrapdateline == '1') {
+          // TODO: move into layer specific settings
           layer.wrapDateLine = true;
         }
         openlayers.addLayer(layer);

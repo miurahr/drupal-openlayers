@@ -92,6 +92,7 @@ function openlayers_include() {
     }
     drupal_add_css(drupal_get_path('module', 'openlayers') .'/openlayers.css', 'module');
     drupal_add_js(drupal_get_path('module', 'openlayers') .'/js/openlayers.js', 'module');
+    drupal_add_js(drupal_get_path('module', 'openlayers') .'/js/openlayers.layers.js', 'module');
   }
 }
 

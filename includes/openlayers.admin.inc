@@ -16,7 +16,7 @@
 function openlayers_admin_settings() {
   // Initialize
   openlayers_initialize();
-  
+
   // Let user know about advanced help
   if (module_exists('advanced_help')) {
     $form['openlayers_advanced_help'] = array(

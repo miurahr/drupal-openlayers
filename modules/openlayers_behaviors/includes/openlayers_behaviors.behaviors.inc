@@ -21,18 +21,18 @@
  */
 function openlayers_behaviors_process_zoom_to_layer($behavior, &$map) {
   // Check to make sure the layer attribute is properly set.
-  if ($behavior['layer']){
+  if ($behavior['layer']) {
     // If it's a sting, check to make sure the layer exists.
-    if (is_string($behavior['layer'])){
+    if (is_string($behavior['layer'])) {
       if ($map['layers'][$behavior['layer']]) {
         return $behavior;
       }
     }
     // If it's an array, check to make sure all layers exist.
     if (is_array($behavior['layer'])) {
-      $pass = true;
+      $pass = TRUE;
       foreach ($behavior['layer'] as $layer) {
-        if (!$map['layers'][$layer]) $pass = false;
+        if (!$map['layers'][$layer]) $pass = FALSE;
       }
       if ($pass) {
         return $behavior;
@@ -55,20 +55,20 @@ function openlayers_behaviors_process_zoom_to_layer($behavior, &$map) {
  */
 function openlayers_behaviors_process_zoom_to_feature($behavior, &$map) {
   // Check to make sure the layer and feature attribute is properly set.
-  if ($behavior['layer'] && $behavior['feature']){
+  if ($behavior['layer'] && $behavior['feature']) {
     // Check to make sure the layer is a string and exists.
     if (is_string($behavior['layer']) && $map['layers'][$behavior['layer']]) {
       // If it's a sting, check to make sure the feature exists.
-      if (is_string($behavior['feature'])){
+      if (is_string($behavior['feature'])) {
         if ($map['layers'][$behavior['layer']]['features'][$behavior['feature']]) {
           return $behavior;
         }
       }
       // If it's an array, check to make sure all features exist.
       if (is_array($behavior['feature'])) {
-        $pass = true;
+        $pass = TRUE;
         foreach ($behavior['feature'] as $feature) {
-          if (!$map['layers'][$behavior['layer']]['features'][$feature]) $pass = false;
+          if (!$map['layers'][$behavior['layer']]['features'][$feature]) $pass = FALSE;
         }
         if ($pass) {
           return $behavior;
@@ -151,7 +151,7 @@ function openlayers_behaviors_process_draw_features($behavior, &$map) {
     $map['events'] = ($map['events']) ? $map['events'] : array();
     $map['events']['mapReady'] = ($map['events']['mapReady']) ? $map['events']['mapReady'] : array();
     $map['events']['mapReady']['drawFeaturesMapReady'] = 'drawFeaturesMapReady'; // We can only ever have one map control - even if it handles multiple draw behaviors
-    
+
     return $behavior;
   }
 

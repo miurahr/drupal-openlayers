@@ -324,7 +324,7 @@ class openlayers_views_style_map extends views_plugin_style {
       $fields[$field_id] = $handler->definition;
       $fields[$field_id]['field_alias'] = $handler->field_alias;
     }
-    
+
     // Build feature. We create one feature per field per row.
     foreach ($records as $id => $record) {
       $feature = array();
@@ -341,9 +341,9 @@ class openlayers_views_style_map extends views_plugin_style {
 
       // Go through data sources
       // @@TODO: In theory, there could be multiple features per row., allow for multiple features per row
-      
+
       $feature['wkt'] = array();
-      
+
       foreach ($data_source['value'] as $data_source_value) {
         switch ($data_source_value) {
           case 'node_locations':
@@ -389,9 +389,9 @@ class openlayers_views_style_map extends views_plugin_style {
             // Go through selected field
             foreach ($data_source['other_wkt'] as $wkt_field) {
               $wkt_alias = $fields[$wkt_field]['field_alias'];
-              
+
               if ($wkt_alias == 'node_vid') {
-                // It's a grouped multi-value. 
+                // It's a grouped multi-value.
                 $wkt = array();
                 foreach ($this->view->field[$wkt_field]->field_values[$record->$wkt_alias] as $wkt_item) {
                   if ($wkt_item['openlayers_wkt']) {
@@ -403,9 +403,9 @@ class openlayers_views_style_map extends views_plugin_style {
                 // It's a normal field item;
                 $wkt = array($record->$wkt_alias);
               }
-              
+
               if (!empty($record->$wkt_alias)) {
-                $feature['wkt'] = array_merge($feature['wkt'],$wkt);
+                $feature['wkt'] = array_merge($feature['wkt'], $wkt);
                 // @@TODO: Allow different projections
                 $feature['projection'] ='4326';
               }
@@ -467,7 +467,7 @@ class openlayers_views_style_map extends views_plugin_style {
     }
     return $features;
   }
-  
+
   /**
    * Renders views (map)
    */
@@ -507,7 +507,7 @@ class openlayers_views_style_map extends views_plugin_style {
     foreach ($sets as $group_title => $records) {
       // Make 'machine readable' format
       $group_name = _openlayers_views_clean($group_title);
-      
+
       // @@TODO: Reduce and sort duplicates
 
       // Style the features based on group (can override this with the theme hook)
@@ -531,7 +531,7 @@ class openlayers_views_style_map extends views_plugin_style {
 
       // Set up per-layer behaviors
       if (module_exists('openlayers_behaviors')) {
-        
+
         // Set up tooltip behavior
         if (!empty($this->options['behaviors']['tooltip'])) {
           $map['behaviors'] = is_array($map['behaviors']) ? $map['behaviors'] : array();
@@ -603,7 +603,7 @@ class openlayers_views_style_map extends views_plugin_style {
           'id' => 'openlayers_views_zoom_to_layer',
           'type' => 'openlayers_behaviors_zoom_to_layer',
         );
-        
+
         if ($grouped) {
           $map['behaviors']['openlayers_views_zoom_to_layer']['layer'] = array();
           foreach ($sets as $group_title => $records) {

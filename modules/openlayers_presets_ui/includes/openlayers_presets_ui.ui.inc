@@ -601,10 +601,10 @@ function openlayers_presets_ui_presets_manage_add_validate($form, &$form_state) 
 
   // Convert form to map array
   $map = _openlayers_presets_ui_convert_form_to_map($form_state['values']);
-  
+
   // Attempt to render map to find any errors
   $map = openlayers_render_map($map, FALSE);
-  
+
   // Check if any errors found
   if (is_array($map['errors']) && count($map['errors']) > 0) {
     foreach ($map['errors'] as $error) {
@@ -1215,7 +1215,7 @@ function _openlayers_presets_ui_merge_maps($submitted_map = array(), $orig_map =
   unset($orig_map['preset_name']);
   unset($orig_map['preset_title']);
   unset($orig_map['preset_description']);
-  
+
   // Any layer that is referenced by a string is an exposed / permanent layer and is visible to the UI.
   // We should therefore remove it from our $orig_map display since we will prefer selections from the UI.
   // Any layer that is an array will not have been exposed to the UI and therefore should be kept.

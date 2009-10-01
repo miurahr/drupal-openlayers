@@ -17,8 +17,8 @@ function openlayers_module_builder_info() {
       'hook_files' => array(
         'openlayers.api.php' => '%module.module',
       ),
-    ),    
+    ),
   );
-  
+
   return $data;
 }

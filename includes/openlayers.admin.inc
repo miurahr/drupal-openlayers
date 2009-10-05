@@ -36,10 +36,12 @@ function openlayers_admin_settings() {
     .'<ul><li>'
     . t('URL: This means that the OpenLayers JS library is not hosted on this site.  OpenLayers provides a hosted JS file.  By default the Open Layers module will use this, since the JS file cannot be included with the module.  This is @ol_api_url.  This may effect performance as it is not hosted on your site. Also, depending on how the OpenLayers JS API changes, this module may not be compatible with this version.', array('@ol_api_url' => 'http://openlayers.org/api/OpenLayers.js'))
     .'</li><li>'
-    . t('Drupal Path: This is a path relative to the Drupal base.  For instance, if you <a href="!ol_url">Download OpenLayers</a> manually to the OpenLayers module folder and extract it, you may use a value like: @suggested_path.  It is important to know that you must <strong>download the full library</strong> with all the Javascript and CSS files, since the OpenLayers library will look for the CSS and image files in that directory as well.',
+    . t('Drupal Path: This is a path relative to the Drupal base.  For instance, if you <a href="!ol_url">Download OpenLayers</a> manually to the OpenLayers module folder and extract it, you may use a value like: @suggested_path.  It is important to know that you must <strong>download the full library</strong> with all the Javascript and CSS files, since the OpenLayers library will look for the CSS and image files in that directory as well.  You should also look at using either <a href="!build_url">OpenLayers Build Process</a> or <a href="!openlayerer_url">OpenLayerer</a> to build a custom library for better performance.',
       array(
-        '!ol_url' => 'http://openlayers.org/',
+        '!ol_url' => 'http://trac.openlayers.org/wiki/HowToDownload',
         '@suggested_path' => drupal_get_path('module', 'openlayers') . '/OpenLayers-2.8/OpenLayers.js',
+        '!build_url' => 'http://docs.openlayers.org/library/deploying.html',
+        '!openlayerer_url' => 'http://openlayerer.appspot.com/',
       )
     )
     .'</li></ul>';

@@ -1,5 +1,8 @@
 // $Id$
 
+/*jslint white: false */
+/*global OpenLayers Drupal $ */
+
 /**
  * @file
  * This file holds the main javascript API for OpenLayers. It is 
@@ -16,9 +19,9 @@ var OL = OL || {'Layers': {}, 'EventHandlers': {} ,'Behaviors': {}, 'maps': []};
 /**
  * OpenLayers Base Drupal Behavoirs
  */
-Drupal.behaviors.openlayers = function() {
+Drupal.behaviors.openlayers = function () {
   // Check for openlayers
-  if ((typeof(Drupal.settings.openlayers) == 'object') && (OL.isSet(Drupal.settings.openlayers.maps))) {
+  if ((typeof(Drupal.settings.openlayers) === 'object') && (OL.isSet(Drupal.settings.openlayers.maps))) {
     OL.loadMaps();
   }
 };
@@ -29,7 +32,7 @@ Drupal.behaviors.openlayers = function() {
  * Main function to sart loading maps by parsing
  * data from Drupal.
  */
-OL.loadMaps = function() {
+OL.loadMaps = function () {
   // @@TODO: Implement proxy
   OpenLayers.ProxyHost = "http://raider/proxy/?proxy_url=";
   
@@ -42,8 +45,8 @@ OL.loadMaps = function() {
     var $map = $('#' + map.id);
     
     // Check if map is already rendered
-    if (OL.isSet(OL.maps[map.id]) && OL.isSet(OL.maps[map.id].rendered) 
-      && (OL.maps[map.id].rendered == true)
+    if (OL.isSet(OL.maps[map.id]) && OL.isSet(OL.maps[map.id].rendered) &&
+      (OL.maps[map.id].rendered === true)
     ) {
       continue;
     }
@@ -79,7 +82,7 @@ OL.loadMaps = function() {
  * @param map
  *   The map definition array.
  */
-OL.renderMap = function(map) {
+OL.renderMap = function (map) {
   // Create Projection objects
   OL.maps[map.id].projection = new OpenLayers.Projection('EPSG:' + map.projection);
   
@@ -109,7 +112,7 @@ OL.renderMap = function(map) {
   $('#' + map.id).mouseover(function() {
     OL.maps[map.id].active = true;
   })
-  .mouseout(function() {
+  .mouseout(function () {
     OL.maps[map.id].active = false;
   });
 
@@ -135,7 +138,7 @@ OL.renderMap = function(map) {
   // this will result in a bug in the zoom map helper in the map form
   if (OL.isSet(map.center)) {
     var center = new OpenLayers.LonLat(map.center.lon, map.center.lat);
-	  var zoom = parseInt(map.center.zoom);
+	  var zoom = parseInt(map.center.zoom, 10);
     OL.maps[map.id].map.setCenter(center, zoom, false, false);
   }
   
@@ -181,7 +184,7 @@ OL.renderMap = function(map) {
       
   // Mark as Rendered
   OL.maps[map.id].rendered = true;
-}
+};
 
 /**
  * Get OpenLayers Map Options
@@ -208,7 +211,7 @@ OL.createMapOptions = function(options, controls, mapid) {
   if (OL.isSet(options.maxResolution)) {
     returnOptions.maxResolution = options.maxResolution;
   }
-  if (typeof(options.maxExtent) != "undefined") {
+  if (typeof(options.maxExtent) !== "undefined") {
     returnOptions.maxExtent =  new OpenLayers.Bounds(
       options.maxExtent.left,
       options.maxExtent.bottom,
@@ -221,17 +224,39 @@ OL.createMapOptions = function(options, controls, mapid) {
   returnOptions.controls = [];
   if (OL.isSet(controls)) {
     // @@TODO: This should be a little more dynamic
-    if (controls.LayerSwitcher)   returnOptions.controls.push( new OpenLayers.Control.LayerSwitcher() );
-    if (controls.Navigation)      returnOptions.controls.push( new OpenLayers.Control.Navigation() );
-    if (controls.Attribution)     returnOptions.controls.push( new OpenLayers.Control.Attribution() );
-    if (controls.PanZoomBar)      returnOptions.controls.push( new OpenLayers.Control.PanZoomBar() );
-    if (controls.PanZoom)         returnOptions.controls.push( new OpenLayers.Control.PanZoom() );
-    if (controls.MousePosition)   returnOptions.controls.push( new OpenLayers.Control.MousePosition() );
-    if (controls.Permalink)       returnOptions.controls.push( new OpenLayers.Control.Permalink() );
-    if (controls.ScaleLine)       returnOptions.controls.push( new OpenLayers.Control.ScaleLine() );
-    if (controls.KeyboardDefaults)returnOptions.controls.push( new OpenLayers.Control.KeyboardDefaults() );
-    if (controls.ZoomBox)         returnOptions.controls.push( new OpenLayers.Control.ZoomBox() );
-    if (controls.ZoomToMaxExtent) returnOptions.controls.push( new OpenLayers.Control.ZoomToMaxExtent() );
+    if (controls.LayerSwitcher) {
+      returnOptions.controls.push( new OpenLayers.Control.LayerSwitcher() );
+    }
+    if (controls.Navigation) {
+      returnOptions.controls.push( new OpenLayers.Control.Navigation() );
+    }
+    if (controls.Attribution) {
+      returnOptions.controls.push( new OpenLayers.Control.Attribution() );
+    }
+    if (controls.PanZoomBar) {
+      returnOptions.controls.push( new OpenLayers.Control.PanZoomBar() );
+    }
+    if (controls.PanZoom) {
+      returnOptions.controls.push( new OpenLayers.Control.PanZoom() );
+    }
+    if (controls.MousePosition) {
+      returnOptions.controls.push( new OpenLayers.Control.MousePosition() );
+    }
+    if (controls.Permalink) {
+      returnOptions.controls.push( new OpenLayers.Control.Permalink() );
+    }
+    if (controls.ScaleLine) {
+      returnOptions.controls.push( new OpenLayers.Control.ScaleLine() );
+    }
+    if (controls.KeyboardDefaults) {
+      returnOptions.controls.push( new OpenLayers.Control.KeyboardDefaults() );
+    }
+    if (controls.ZoomBox) {
+      returnOptions.controls.push( new OpenLayers.Control.ZoomBox() );
+    }
+    if (controls.ZoomToMaxExtent) {
+      returnOptions.controls.push( new OpenLayers.Control.ZoomToMaxExtent() );
+    }
   }
 
   // Handle fractional zoom
@@ -241,7 +266,7 @@ OL.createMapOptions = function(options, controls, mapid) {
   
   // Return processed options
   return returnOptions;
-}
+};
 
 /**
  * Process Layers
@@ -260,7 +285,7 @@ OL.processLayers = function(layers, mapid) {
   if (layers) {
     for (var layer in layers) {
       // Process layer, check for function
-      if (OL.isSet(OL.Layers) && typeof(OL.Layers[layers[layer].layer_handler]) == 'function') {
+      if (OL.isSet(OL.Layers) && typeof(OL.Layers[layers[layer].layer_handler]) === 'function') {
         var newLayer = OL.Layers[layers[layer].layer_handler](layers[layer], mapid);
         OL.maps[mapid].layers[layer] = newLayer;
   
@@ -277,7 +302,7 @@ OL.processLayers = function(layers, mapid) {
       }
     }
   }
-}
+};
 
 /**
  * Process Events
@@ -293,13 +318,16 @@ OL.processEvents = function(events, mapid) {
   // Go through events
   for (var evtype in events){
     // Exclude One-Time map events. 
-    if (evtype != 'beforeEverything' && evtype != 'beforeLayers' && evtype != 'beforeCenter' && evtype != 'beforeControls' && evtype != 'beforeEvents' && evtype != 'beforeBehaviors' && evtype != 'mapReady') {
+    var event_types = ['beforeEverything', 'beforeLayers', 'beforeCenter', 
+                'beforeControls', 'beforeEvents', 'beforeBehaviors', 
+                'mapReady'];
+    if ($.inArray(evtype, event_types) === -1) {
       for (var ev in events[evtype]) { 
         OL.maps[mapid].map.events.register(evtype, OL.maps[mapid].map, OL.EventHandlers[events[evtype][ev]]);
       }
     }
   }
-}
+};
 
 /**
  * Trigger Custom Event
@@ -317,7 +345,7 @@ OL.triggerCustom = function(map, eventName, event) {
       OL.EventHandlers[map.events[eventName][ev]](event);
     }
   }
-}
+};
 
 /**
  * Parse out key / value pairs out of a string that looks like "key:value;key2:value2"
@@ -334,7 +362,9 @@ OL.parseRel = function(rel) {
   // replace dangling whitespaces. Use regex?
   rel = rel.replace('; ',';');
   //Cut out final ; if it exists
-  if (rel.charAt(rel.length-1) == ";") rel = rel.substr(0,rel.length-1);
+  if (rel.charAt(rel.length-1) === ";") {
+    rel = rel.substr(0,rel.length-1);
+  }
   
   //Get all the key:value strings
   var keyValueStrings = rel.split(';');
@@ -346,7 +376,7 @@ OL.parseRel = function(rel) {
   }
   
   return outputArray;
-}
+};
 
 /**
  * Given a string of the form 'OL.This.that', get the object that the 
@@ -359,14 +389,14 @@ OL.parseRel = function(rel) {
  */
 OL.getObject = function(string) {
   var parts = string.split('.');
-  i = 0;
+  var i = 0;
   var object = window;
   while (i < parts.length){
     object = object[parts[i]];
     i++; 
   }
   return object;
-}
+};
 
 /**
  * Check if Variable is define
@@ -383,7 +413,7 @@ OL.isSet = function(variable) {
   else {
     return true;
   }
-}
+};
 
 /**
  * Map Controls Theme Function
@@ -399,4 +429,4 @@ Drupal.theme.prototype.mapControls = function(mapid, height) {
   var newcontainer = $('<div></div>');
   newcontainer.addClass('openlayers-controls').attr('id', 'openlayers-controls-' + mapid).css('position', 'relative').css('top', '-' + height);
   return newcontainer;
-}
+};

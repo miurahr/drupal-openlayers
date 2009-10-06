@@ -20,11 +20,8 @@ OL.Behaviors = OL.Behaviors || {};
  * @param event
  *   Event Object
  */
-
 OL.Behaviors.cluster = function(event) {
-
   // This is just a placeholder for now.  Cluster requires no at-map-ready processing as it stands.
-
 }
 
 /**
@@ -39,7 +36,7 @@ OL.Behaviors.popup = function(event) {
   var map = event.map;
   var behavior = event.behavior;
   var layers = Array();
-  
+
   // Set up the hover triggers
   for (layer in OL.maps[mapid].map.layers) {
     if (OL.maps[mapid].map.layers[layer].drupalData.type == 'Vector') {
@@ -50,13 +47,14 @@ OL.Behaviors.popup = function(event) {
     }
   }
 
+  // Create options
   var selectControlOptions = {
-    onSelect: OL.Behaviors.popupFeatureSelected, 
+    onSelect: OL.Behaviors.popupFeatureSelected,
     onUnselect: OL.Behaviors.popupFeatureUnselected
   };
 
+  // Add control and activate
   OL.maps[mapid].controls[behavior.id] = new OpenLayers.Control.SelectFeature(layers, selectControlOptions);
-  // Add control
   map.addControl(OL.maps[mapid].controls[behavior.id]);
   OL.maps[mapid].controls[behavior.id].activate();
 }
@@ -71,30 +69,41 @@ OL.Behaviors.popupFeatureSelected = function(feature) {
   popupText = '';
   var mapid = feature.layer.map.mapid;
 
-  if(feature.cluster) {
+  if (feature.cluster) {
     // If popups aren't enabled for clusters, do nothing
-    if(!OL.mapDefs[mapid].behaviors['openlayers_views_cluster_'+feature.layer.drupalId].cluster_popup) return;
-    
+    if (!OL.mapDefs[mapid].behaviors['openlayers_views_cluster_' + feature.layer.drupalId].cluster_popup) {
+      return;
+    }
     var mapid = feature.layer.map.mapid;
 
     // If we have a callback defined (in the style plugin interface) to generate cluster popups, use it
-    if(OL.mapDefs[mapid].behaviors['openlayers_views_cluster_'+feature.layer.drupalId].cluster_popup_callback)
-      popupText = eval(OL.mapDefs[mapid].behaviors['openlayers_views_cluster_'+feature.layer.drupalId].cluster_popup_callback)(feature);
-    else return; // Otherwise, act as though popups aren't enabled
+    if (OL.mapDefs[mapid].behaviors['openlayers_views_cluster_' + feature.layer.drupalId].cluster_popup_callback) {
+      popupText = eval(OL.mapDefs[mapid].behaviors['openlayers_views_cluster_' + feature.layer.drupalId].cluster_popup_callback)(feature);
+    }
+    else {
+      // Otherwise, act as though popups aren't enabled
+      return;
+    }
   }
-  else popupText = feature.attributes[feature.layer.drupalData.popupAttribute];
+  else {
+    popupText = feature.attributes[feature.layer.drupalData.popupAttribute];
+  }
 
-  popup = new OpenLayers.Popup.FramedCloud('popup', 
+  // Create popup
+  popup = new OpenLayers.Popup.FramedCloud(
+    'popup',
     feature.geometry.getBounds().getCenterLonLat(),
     null,
-    "<div class='openlayers-popup'>"+ popupText +"</div>",
-    null, true,
-      function () {
-        var mapid = feature.layer.map.mapid;
-        OL.maps[mapid].controls[feature.layer.drupalData.popupId].unselect(feature);
-      }
-    );
-  
+    "<div class='openlayers-popup'>" + popupText + "</div>",
+    null,
+    true,
+    function () {
+      var mapid = feature.layer.map.mapid;
+      OL.maps[mapid].controls[feature.layer.drupalData.popupId].unselect(feature);
+    }
+  );
+
+  // Add popup to feature
   feature.popup = popup;
   feature.layer.map.addPopup(popup);
 }
@@ -122,25 +131,25 @@ OL.Behaviors.tooltip = function(event) {
   var mapid = mapDef.id;
   var map = event.map;
   var behavior = event.behavior;
-  
+
   // Set up the hover triggers
   var layer = OL.maps[mapid].layers[behavior.layer];
   var options = {
-    hover: true, 
-    highlightOnly: true, 
-    renderIntent: 'temporary', 
+    hover: true,
+    highlightOnly: true,
+    renderIntent: 'temporary',
     eventListeners: {
-      featurehighlighted: OL.Behaviors.tooltipOver, 
+      featurehighlighted: OL.Behaviors.tooltipOver,
       featureunhighlighted: OL.Behaviors.tooltipOut
     }
   };
   layer.drupalData.tooltipData = behavior;
   OL.maps[mapid].controls[behavior.id] = new OpenLayers.Control.SelectFeature(layer, options);
-  
+
   // Add control
   map.addControl(OL.maps[mapid].controls[behavior.id]);
   OL.maps[mapid].controls[behavior.id].activate();
-  
+
   // Set up the HTML div from themed container
   $("#" + mapid).after(behavior.container);
 }
@@ -156,10 +165,10 @@ OL.Behaviors.tooltipOver = function(event) {
   var behavior = feature.layer.drupalData.tooltipData;
   var tooltipText = feature.attributes[behavior.attribute];
   var $textContainer = $('#' + behavior.attribute_id);
-  
+
   // Put text into tooltip
   $textContainer.html(tooltipText);
-  
+
   // Set the tooltip location
   // @@TODO: dynamically set offset based on height of tooltip...
   var $tooltipContainer = $('#' + behavior.container_id);
@@ -172,7 +181,7 @@ OL.Behaviors.tooltipOver = function(event) {
   var containterWidth = $tooltipContainer.width();
   var absoluteTop = centroidPixel.y + mapDivOffset.top - scrollTop - behavior.offset_top - containerHeight;
   var absoluteLeft = centroidPixel.x + mapDivOffset.left - scrollLeft - behavior.offset_left;
-  
+
   // Create offset
   $tooltipContainer
     .css('top', absoluteTop)
@@ -206,14 +215,14 @@ OL.Behaviors.tooltipGetCentroid = function(geometry) {
       // The polygon contains it's centroid, easy!
       var baseCentroid = firstCentroid;
     }
-    else {    
-      // The polygon is a funny shape and does not contain 
+    else {
+      // The polygon is a funny shape and does not contain
       // it's own centroid. Find the closest vertex to the centroid.
       var vertices = geometry.getVertices();
       var minDistance;
-      for (var v in vertices){
+      for (var v in vertices) {
         var distance = vertices[v].distanceTo(firstCentroid);
-        if (distance < minDistance || v == 0){
+        if (distance < minDistance || v == 0) {
           minDistance = distance;
           var closestVertices = vertices[v];
         }
@@ -222,7 +231,7 @@ OL.Behaviors.tooltipGetCentroid = function(geometry) {
     }
   }
   else if (geometry.CLASS_NAME == 'OpenLayers.Geometry.LineString') {
-    // Simply use the middle vertices as the centroid. One day 
+    // Simply use the middle vertices as the centroid. One day
     // we may want to take into account the lengths of the different segments
     var vertices = geometry.getVertices();
     var midVerticesIndex = Math.round((vertices.length -1) / 2);
@@ -245,18 +254,19 @@ OL.Behaviors.zoomToLayer = function(event) {
   var mapid = mapDef.id;
   var map = event.map;
   var behavior = event.behavior;
-  
+  var featureCount = 0;
+  var extentToZoom = new OpenLayers.Bounds();
+
+  // Determine layers
   if (typeof(behavior.layer) == 'string') {
     var layers = [behavior.layer];
   }
   else {
     var layers = behavior.layer;
-  } 
-  
-  var featureCount = 0;
-  var extentToZoom = new OpenLayers.Bounds();
-  
-  for (var l in layers){
+  }
+
+  // Go through layers
+  for (var l in layers) {
     var layer = OL.maps[mapid].layers[layers[l]];
     for (var f in layer.features) {
       var feature = layer.features[f];
@@ -273,7 +283,7 @@ OL.Behaviors.zoomToLayer = function(event) {
       map.setCenter(center, behavior.pointzoom);
     }
     else {
-      map.setCenter(center); 
+      map.setCenter(center);
     }
   }
   else {
@@ -281,7 +291,6 @@ OL.Behaviors.zoomToLayer = function(event) {
     map.zoomToExtent(extentToZoom);
   }
 }
-
 
 /**
  * OL Zoom to Feature Behavior
@@ -294,19 +303,19 @@ OL.Behaviors.zoomToFeature = function(event) {
   var mapid = mapDef.id;
   var map = event.map;
   var behavior = event.behavior;
-    
   var featureCount = 0;
   var extentToZoom = new OpenLayers.Bounds();
-  
   var layer = OL.maps[mapid].layers[behavior.layer];
-  
+
+  // Check what type of variable feature is
   if (typeof(behavior.feature) == 'string') {
     var features = [behavior.feature];
   }
   else {
     var features = behavior.feature;
   }
-  
+
+  // Go through features
   for (var f in layer.features) {
     feature = layer.features[f];
     for (var bf in features) {
@@ -314,7 +323,7 @@ OL.Behaviors.zoomToFeature = function(event) {
         extentToZoom.extend(feature.geometry.getBounds());
         featureCount++;
       }
-    } 
+    }
   }
   // Check to see if we are dealing with just a single point.
   if (featureCount == 1 && feature.geometry.getArea() == 0) {
@@ -325,10 +334,10 @@ OL.Behaviors.zoomToFeature = function(event) {
     }
     else {
       if (OL.isSet(behavior.zoom) && behavior.zoom > 0) {
-        map.setCenter(center, behavior.zoom); 
+        map.setCenter(center, behavior.zoom);
       }
       else {
-        map.setCenter(center); 
+        map.setCenter(center);
       }
     }
   }
@@ -338,7 +347,7 @@ OL.Behaviors.zoomToFeature = function(event) {
         // A negative value implies a relative zoom.
         map.zoomToExtent(extentToZoom);
         var newZoom = map.getZoom() + behavior.zoom;
-        map.zoomTo(newZoom); 
+        map.zoomTo(newZoom);
       }
       else {
         // A positive value implies an absolute zoom.
@@ -353,15 +362,14 @@ OL.Behaviors.zoomToFeature = function(event) {
   }
 }
 
-
 /**
- * Process Draw Features. 
+ * Process Draw Features.
  *
- * This is for marking vector layers as editable. It will add standard 
- * functionality for adding and editing features.  This function does 
- * not *do* anything with the features other than allow them to be 
- * drawn, edited and deleted by the interface.  Use featureadded_handler, 
- * featuremodified_handler and featureremoved_handler if you wish to 
+ * This is for marking vector layers as editable. It will add standard
+ * functionality for adding and editing features.  This function does
+ * not *do* anything with the features other than allow them to be
+ * drawn, edited and deleted by the interface.  Use featureadded_handler,
+ * featuremodified_handler and featureremoved_handler if you wish to
  * do something with the drawn/edited/deleted features.
  *
  * @param event
@@ -370,50 +378,50 @@ OL.Behaviors.zoomToFeature = function(event) {
 OL.Behaviors.drawFeatures = function(event) {
   var mapDef = event.mapDef;
   var mapid = mapDef.id;
-  var behavior = event.behavior;  
+  var behavior = event.behavior;
   var layer = OL.maps[mapid].layers[behavior.layer];
-    
+
   // Determine what handler we need to use.
   switch (behavior.feature_type) {
     case 'point':
       var handler = OpenLayers.Handler.Point;
       break;
-      
+
     case 'path':
       var handler = OpenLayers.Handler.Path;
       break;
-      
+
     case 'polygon':
       var handler = OpenLayers.Handler.Polygon;
       break;
-      
+
   }
-  
+
   // Create our controls and attach them to our layer.
-  var createControl = new OpenLayers.Control.DrawFeature(layer, handler);  
+  var createControl = new OpenLayers.Control.DrawFeature(layer, handler);
   var modifyControl = new OpenLayers.Control.ModifyFeature(layer, {deleteCodes:[68]});
-  
+
   // Add control to map
   OL.maps[mapid].map.addControl(createControl);
   OL.maps[mapid].map.addControl(modifyControl);
 
-  // Disable the active mode by default.  This could be 
+  // Disable the active mode by default.  This could be
   // changed if we wanted people to draw on the map immediately.
   createControl.activeByDefault = false;
   modifyControl.activeByDefault = false;
-  
+
   // Create space for Drupal data and
   // mark on the control what it is for drawing (point, path, or polygon)
   createControl.Drupal = {};
   modifyControl.Drupal = {};
   createControl.Drupal.DrawType = behavior.feature_type;
   modifyControl.Drupal.DrawType = behavior.feature_type;
-  
+
   // Add our create and modify controls to the controls object.
   // Use a # prefix since these are special controls created by drawFeatures.
   OL.maps[mapid].controls['#create-' + behavior.feature_type] = createControl;
   OL.maps[mapid].controls['#modify-' + behavior.feature_type] = modifyControl;
-  
+
   // Add special event handlers to controls
   if (behavior.featureadded_handler) {
     for (var ev in behavior.featureadded_handler) {
@@ -422,26 +430,26 @@ OL.Behaviors.drawFeatures = function(event) {
   }
   // Feature modified
   if (behavior.featuremodified_handler) {
-    for (var ev in behavior.featuremodified_handler) { 
+    for (var ev in behavior.featuremodified_handler) {
       layer.events.register('afterfeaturemodified', layer, OL.getObject(behavior.featuremodified_handler[ev]));
     }
   }
   // Feature moved
   if (behavior.featureremoved_handler) {
-    for (var ev in behavior.featureremoved_handler) { 
+    for (var ev in behavior.featureremoved_handler) {
       layer.events.register('beforefeatureremoved', layer, OL.getObject(behavior.featureremoved_handler[ev]));
     }
-    
-    // If a user presses the delete key, delete the currently selected polygon. 
-    // This will in turn trigger the featureremoved_handler function. 
+
+    // If a user presses the delete key, delete the currently selected polygon.
+    // This will in turn trigger the featureremoved_handler function.
     $(document).keydown(function(event) {
       vKeyCode = event.keyCode;
-      // If it is the Mac delete key (63272), or regular delete key (46) 
+      // If it is the Mac delete key (63272), or regular delete key (46)
       // delete all selected features for the active map.
       if ((vKeyCode == 63272) || vKeyCode == 46) {
-        for (var m in OL.maps){
-          if (OL.maps[m].active == true){
-            for (var b in OL.mapDefs[m].behaviors){
+        for (var m in OL.maps) {
+          if (OL.maps[m].active == true) {
+            for (var b in OL.mapDefs[m].behaviors) {
               var behavior = OL.mapDefs[m].behaviors[b];
               if (behavior.type == 'openlayers_behaviors_draw_features') {
                 var featureToErase = OL.maps[m].layers[behavior.layer].selectedFeatures[0];
@@ -457,7 +465,7 @@ OL.Behaviors.drawFeatures = function(event) {
       }
     });
   }
-    
+
   // Add Base Pan button, if not already added
   if ($('#openlayers-controls-pan-' + mapid).length == 0) {
     $('<a href="#"></a>')
@@ -470,7 +478,7 @@ OL.Behaviors.drawFeatures = function(event) {
       .data('mapid', mapid)
       .appendTo('#openlayers-controls-' + mapid);
   }
-  
+
   // Add other control link (button)
   $('<a href="#"></a>')
     .attr('id', 'openlayers-controls-draw-' + behavior.feature_type + '-' + mapid)
@@ -492,43 +500,42 @@ OL.Behaviors.drawFeatures = function(event) {
  */
 OL.EventHandlers.drawFeaturesMapReady = function(event) {
   // Add click event to the action link (button)
-  
   $('.openlayers-controls-draw-feature-link').click(function() {
     var $thisLink = $(this);
     var $allControls = $('.openlayers-controls-draw-feature-link');
     var mapid = $thisLink.data('mapid');
     var controlType = $thisLink.data('type');
     var behaviorid = $thisLink.data('behaviorid');
-    
+
     // Change the look of the action link
     $allControls.removeClass('openlayers-controls-draw-feature-link-on');
     $allControls.addClass('openlayers-controls-draw-feature-link-off');
     $thisLink.addClass('openlayers-controls-draw-feature-link-on');
     $thisLink.removeClass('openlayers-controls-draw-feature-link-off');
-    
+
     var foundControl = false;
-    
+
     // Cycle through the different possible types of controls (polygon, line, point, pan)
-    for (var b in OL.mapDefs[mapid].behaviors){
+    for (var b in OL.mapDefs[mapid].behaviors) {
       var behavior  = OL.mapDefs[mapid].behaviors[b];
-      
+
       // Check behavior type
       if (behavior.type == 'openlayers_behaviors_draw_features') {
         var createControl = OL.maps[mapid].controls['#create-' + behavior.feature_type];
         var modifyControl = OL.maps[mapid].controls['#modify-' + behavior.feature_type];
-        
+
         // Deactivate everything
         createControl.deactivate();
         modifyControl.deactivate();
-        
+
         // Activate it if it matches
         if (controlType == behavior.feature_type) {
           foundControl = true;
           createControl.activate();
           modifyControl.activate();
-          
+
           // Trigger optional startediting_handler
-          if (OL.isSet(behavior.startediting_handler)){
+          if (OL.isSet(behavior.startediting_handler)) {
             for (var ev in behavior.startediting_handler) {
               var triggerFunction = OL.getObject(behavior.startediting_handler[ev]);
               var event = {'behavior': behavior};
@@ -538,10 +545,10 @@ OL.EventHandlers.drawFeaturesMapReady = function(event) {
         }
       }
     }
-    
-    if (foundControl == false){
+
+    if (foundControl == false) {
       // Trigger optional stopediting_handler
-      if (OL.isSet(behavior.stopediting_handler)){
+      if (OL.isSet(behavior.stopediting_handler)) {
         for (var ev in behavior.stopediting_handler) {
         var triggerFunction = OL.getObject(behavior.stopediting_handler[ev]);
         var event = {'behavior': behavior};
@@ -549,7 +556,7 @@ OL.EventHandlers.drawFeaturesMapReady = function(event) {
         }
       }
     }
-    
+
     // Make sure the link doesn't go anywhere
     return false;
   });
@@ -566,7 +573,7 @@ OL.Behaviors.fullscreen = function(event) {
   var mapid = mapDef.id;
   var $map = $('#' + mapid);
   var $mapControls = $('#openlayers-controls-' + mapid);
-  
+
   $('<a href="#"></a>')
     .attr('id', 'openlayers-controls-fullscreen-' + mapid)
     .addClass('openlayers-controls-fullscreen')
@@ -574,7 +581,7 @@ OL.Behaviors.fullscreen = function(event) {
     .appendTo('#openlayers-controls-' + mapid)
     .click(function() {
       var $thisElement = $(this);
-    
+
       // Store data
       if (!OL.isSet(OL.Behaviors.fullscreenRegistry)) {
         OL.Behaviors.fullscreenRegistry = [];
@@ -585,11 +592,11 @@ OL.Behaviors.fullscreen = function(event) {
         OL.Behaviors.fullscreenRegistry[mapid].mapstyle = [];
         OL.Behaviors.fullscreenRegistry[mapid].controlsstyle = [];
       }
-      
+
       // Check if fullscreen
       if (!OL.Behaviors.fullscreenRegistry[mapid].fullscreen) {
         OL.Behaviors.fullscreenRegistry[mapid].fullscreen = true;
-      
+
         // Store old css values
         var mapStylesToStore = ['position','top','left','width','height','z-index'];
         var controlStylesToStore = ['position','top','right'];
@@ -599,7 +606,7 @@ OL.Behaviors.fullscreen = function(event) {
         for (var cs in controlStylesToStore) {
           OL.Behaviors.fullscreenRegistry[mapid].controlsstyle[controlStylesToStore[cs]] = $('#openlayers-controls-' + mapid).css(controlStylesToStore[cs]);
         }
-      
+
         // Resize the map.
         $map.css('position','fixed')
           .css('top','0px')
@@ -614,7 +621,7 @@ OL.Behaviors.fullscreen = function(event) {
         // Update classes
         $thisElement.removeClass('openlayers-controls-fullscreen')
           .addClass('openlayers-controls-unfullscreen');
-        
+
         // Update size of OpenLayers
         event.map.updateSize();
       }
@@ -626,11 +633,11 @@ OL.Behaviors.fullscreen = function(event) {
         for (var cs in OL.Behaviors.fullscreenRegistry[mapid].controlsstyle) {
           $('#openlayers-controls-' + mapid).css(cs,OL.Behaviors.fullscreenRegistry[mapid].controlsstyle[cs]);
         };
-        
+
         // Update classes
         $thisElement.removeClass('openlayers-controls-unfullscreen')
           .addClass('openlayers-controls-fullscreen');
-          
+
         // Update stored registry and OpenLayers map size
         OL.Behaviors.fullscreenRegistry[mapid].fullscreen = false;
         event.map.updateSize();
@@ -638,11 +645,9 @@ OL.Behaviors.fullscreen = function(event) {
     });
 }
 
-
-
 /**
  * De-clutter Behavoir
- * 
+ *
  * This function sets up the behavior - making a copy of the original geometry,
  * and calling the first SortAndMove
  *
@@ -651,40 +656,42 @@ OL.Behaviors.fullscreen = function(event) {
  */
 OL.Behaviors.declutter = function(event) {
   for (var l in event.map.layers) {
-    if (event.map.layers[l].drupalId == event.behavior.layer) var layer = event.map.layers[l];
+    if (event.map.layers[l].drupalId == event.behavior.layer) {
+      var layer = event.map.layers[l];
+    }
   }
   for (var f in layer.features) {
-    if (layer.features[f].geometry.CLASS_NAME == 'OpenLayers.Geometry.Point'){
+    if (layer.features[f].geometry.CLASS_NAME == 'OpenLayers.Geometry.Point') {
       layer.features[f].originalGeometry = layer.features[f].geometry.clone();
     }
   }
   OL.Behaviors.declutterSortAndMove(layer,event.behavior);
 }
 
-
 /**
  * De-Clutter Sort and Move
- * 
+ *
  * Given a layer, find all the points and move them so they are not overlapping.
- * 
+ *
  * @param layer
  *   Layer Object
  * @param behavior
  *   Behavior Definition Object
  */
-
 OL.Behaviors.declutterSortAndMove = function(layer,behavior) {
   // Set up our variables.
   var points = [];
 
-  if (OL.isSet(behavior.adjustment)){
+  // Check adjustment
+  if (OL.isSet(behavior.adjustment)) {
     var pixelAdjustment = parseInt(behavior.adjustment);
   }
   else {
     var pixelAdjustment = 0;
   }
-  
-  if (OL.isSet(behavior.limit)){
+
+  // Check limit
+  if (OL.isSet(behavior.limit)) {
     var recursionLimit = parseInt(behavior.limit);
   }
   else {
@@ -692,15 +699,15 @@ OL.Behaviors.declutterSortAndMove = function(layer,behavior) {
   }
 
   // Gather up our points. declutter currently only works with points.
-  for (var f in layer.features){
-    if (layer.features[f].geometry.CLASS_NAME == 'OpenLayers.Geometry.Point'){
+  for (var f in layer.features) {
+    if (layer.features[f].geometry.CLASS_NAME == 'OpenLayers.Geometry.Point') {
       points.push(layer.features[f]);
     }
   }
-  
+
   // Get the max pixel size of the icon or the vector representation
-  for (var p in points){
-    if (points[p].style){
+  for (var p in points) {
+    if (points[p].style) {
       var pointRadius     = parseInt(points[p].style.pointRadius);
       var strokeWidth     = parseInt(points[p].style.strokeWidth);
       var externalGraphic = points[p].style.externalGraphic;
@@ -715,10 +722,10 @@ OL.Behaviors.declutterSortAndMove = function(layer,behavior) {
       var graphicWidth    = parseInt(layer.styleMap.styles['default'].defaultStyle.graphicWidth);
       var graphicHeight   = parseInt(layer.styleMap.styles['default'].defaultStyle.graphicHeight);
     }
-    
-    if (OL.isSet(externalGraphic)){
+
+    if (OL.isSet(externalGraphic)) {
       // We are using a graphic
-      if (graphicWidth < graphicHeight){
+      if (graphicWidth < graphicHeight) {
         points[p].pixelSize = intvalgraphicHeight -2 + pixelAdjustment;
       }
       else {
@@ -729,19 +736,18 @@ OL.Behaviors.declutterSortAndMove = function(layer,behavior) {
       // We are using a vector style
       points[p].pixelSize = (strokeWidth * 2) + pointRadius + 2 + pixelAdjustment;
     }
-
   }
-  
+
   // Get the pixel coordinates of the points
   for (var p in points) {
     var centroidPixel = layer.map.getPixelFromLonLat(new OpenLayers.LonLat(points[p].geometry.x, points[p].geometry.y));
     points[p].pixelX = centroidPixel.x;
     points[p].pixelY = centroidPixel.y;
   }
-  
+
   // Check to see if there is a collision, and if there is then 'move' the point by adjusting the pixel
   for (var p in points) {
-    if (OL.EventHandlers.declutterCollision(points[p], points) == true){
+    if (OL.EventHandlers.declutterCollision(points[p], points) == true) {
       // We have a collision. Try moving the point.
       var testPoint = { 'pixelX': points[p].pixelX, 'pixelY': points[p].pixelY, 'pixelSize': points[p].pixelSize, 'id': points[p].id };
       var emptyPlace = OL.EventHandlers.declutterFindFreeSpace(testPoint, points, 0, 1, recursionLimit);
@@ -760,11 +766,11 @@ OL.Behaviors.declutterSortAndMove = function(layer,behavior) {
 
 /**
  * De-Clutter Find Free Space
- * 
+ *
  * Given a point, and a array of points, find the closet place that is has
  * enough free space to fit the point. It does this by recursively calling
  * itself, spiralling out to find a free spot.
- * 
+ *
  * @param testPoint
  *   Point we should find a free space for
  * @param points
@@ -774,15 +780,15 @@ OL.Behaviors.declutterSortAndMove = function(layer,behavior) {
  * @param distance
  *   Distance to try to find a free space at
  */
-OL.EventHandlers.declutterFindFreeSpace = function(testPoint, points, direction, distance, distanceLimit){
+OL.EventHandlers.declutterFindFreeSpace = function(testPoint, points, direction, distance, distanceLimit) {
   var tempPoint = testPoint;
   //@@TODO: Fix the use of direction instead of using math.random
   //var angle = (direction/8) * 2 * 3.1415;
   var angle = (Math.random()) * 2 * 3.141569;
   tempPoint.pixelY = tempPoint.pixelY + (((distance * tempPoint.pixelSize) + 4) * (Math.sin(angle)));
   tempPoint.pixelX = tempPoint.pixelX + (((distance * tempPoint.pixelSize) + 4) * (Math.cos(angle)));
-  
-  if (OL.EventHandlers.declutterCollision(tempPoint, points) == true){
+
+  if (OL.EventHandlers.declutterCollision(tempPoint, points) == true) {
     // We didn't find a free spot, adjust direction (and possibly distance) and try again.
     if (direction == 9) {
       // We have exausted all directions. Try furthur a-field.
@@ -790,11 +796,11 @@ OL.EventHandlers.declutterFindFreeSpace = function(testPoint, points, direction,
       distance = distance + 1;
     }
     else {
-      direction = direction + 1; 
+      direction = direction + 1;
     }
-    
+
     // Try again recursively.
-    if (OL.isSet(distanceLimit)){
+    if (OL.isSet(distanceLimit)) {
       if (distance == distanceLimit) return false;
     }
     return OL.EventHandlers.declutterFindFreeSpace(testPoint, points, direction, distance);
@@ -806,18 +812,18 @@ OL.EventHandlers.declutterFindFreeSpace = function(testPoint, points, direction,
 
 /**
  * De-Clutter Collision
- * 
+ *
  * Determine whether a given point collides with an array of points
- * 
+ *
  * @param testPoint
  *   Point we should find a free space for
  * @param points
  *   Array of points that the TetPoint should not overlap with.
  */
-OL.EventHandlers.declutterCollision = function(testPoint, points){
+OL.EventHandlers.declutterCollision = function(testPoint, points) {
   // Go through points and see if there is a collision with this point.
-  for (var p in points){
-    if (points[p].id != testPoint.id){
+  for (var p in points) {
+    if (points[p].id != testPoint.id) {
       // Distance as per Pythagorean theorem
       var distance = Math.sqrt(Math.pow((testPoint.pixelX - points[p].pixelX),2) + Math.pow((testPoint.pixelY - points[p].pixelY),2));
       if (distance < testPoint.pixelSize) return true;
@@ -828,26 +834,28 @@ OL.EventHandlers.declutterCollision = function(testPoint, points){
 
 /**
  * De-Clutter Zoom End
- * 
+ *
  * Event Handler for when the user zooms. We reset all the points to their original location,
  * then call declutterSortAndMove to seperate them out again.
- * 
+ *
  * @param event
  *   Event Object
  */
 OL.EventHandlers.declutterZoomEnd = function(event) {
   mapid = event.object.mapid;
   // Go through all declutter behaviors and trigger declutterSortAndMove
-  for (var b in OL.mapDefs[mapid].behaviors){
+  for (var b in OL.mapDefs[mapid].behaviors) {
     var behavior = OL.mapDefs[mapid].behaviors[b];
-    if (behavior.type == 'openlayers_behaviors_declutter'){
+    if (behavior.type == 'openlayers_behaviors_declutter') {
       for (var l in event.object.layers) {
         if (event.object.layers[l].drupalId == behavior.layer) var layer = event.object.layers[l];
       }
-      
-        // Go through features and put them back to their original place, so that we can shuffle them again for the next zoom.
+
+      // Go through features and put them back to their
+      // original place, so that we can shuffle them again
+      // for the next zoom.
       for (var f in layer.features) {
-        if (layer.features[f].geometry.CLASS_NAME == 'OpenLayers.Geometry.Point'){
+        if (layer.features[f].geometry.CLASS_NAME == 'OpenLayers.Geometry.Point') {
           layer.features[f].geometry.x = layer.features[f].originalGeometry.x;
           layer.features[f].geometry.y = layer.features[f].originalGeometry.y;
         }
@@ -856,5 +864,3 @@ OL.EventHandlers.declutterZoomEnd = function(event) {
     }
   }
 }
-
-

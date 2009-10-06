@@ -12,6 +12,24 @@
  */
 
 /**
+ * Implementation of hook_menu().
+ */
+function openlayers_test_menu() {
+  $items = array();
+
+  $items['admin/settings/openlayers/test'] = array(
+    'title' => 'OpenLayers Test Page',
+    'description' => 'Test Page for OpenLayers.',
+    'page callback' => 'openlayers_test_page',
+    'access arguments' => array('administer openlayers'),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 9999,
+  );
+
+  return $items;
+}
+
+/**
  * Implementation of hook_openlayers_presets().
  */
 function openlayers_test_openlayers_presets() {
@@ -47,5 +65,132 @@ function openlayers_test_openlayers_presets() {
     'preset_data' => $default_map,
   );
 
+  // Create style map array
+  $style_test = array(
+    'projection' => '4326',
+    'width' => 'auto',
+    'default_layer' => 'openlayers_default_wms',
+    'height' => '300px',
+    'center' => array(
+      'lat' => '0',
+      'lon' => '0',
+      'zoom' => '2',
+    ),
+    'options' => array(
+      'displayProjection' => '4326',
+    ),
+    'controls' => array(
+      'LayerSwitcher' => TRUE,
+      'Navigation' => TRUE,
+      'PanZoomBar' => TRUE,
+      'MousePosition' => TRUE,
+    ),
+    'behaviors' => array(
+      'openlayers_behaviors_fullscreen_test' => array(
+        'id' => 'openlayers_behaviors_fullscreen_test',
+        'type' => 'openlayers_behaviors_fullscreen',
+      ),
+    ),
+    'styles' => array(
+      'default' => array(     
+        'pointRadius' => 10,
+        'fillColor' => '#333333',
+        'strokeColor' => '#FFFFFF',
+        'strokeWidth' => 4,
+        'fillOpacity' => 0.75,
+      ),
+    ),
+    // 'styleContextCallback' => 'OL.StyleContextCallback', // Needs testing,
+    'layers' => array(
+      'style_vector' => array(
+        'id' => 'style_vector',
+        'type' => 'Vector',
+        'name' => t('Style Test Vector'),
+        'features' => array(
+          'feature_1' => array(
+            'wkt' => 'POLYGON((1 1,5 1,5 5,1 5,1 1),(2 2, 3 2, 3 3, 2 3,2 2))',
+            'attributes' => array(
+              'name' => t('A Polygon with a hole in it'),
+            ),
+            'style' => array(
+              'fillColor' => '#aa4400',
+              'fillOpacity' => '0.7',
+            ),
+          ),
+          'feature_2' => array(
+            'lat' => '40.123',
+            'lon' => '-20.123',
+            'attributes' => array(
+              'name' => t('A point'),
+            ),
+            'style' => array(
+              'externalGraphic' => 'http://openlayers.org/dev/img/marker.png',
+              'graphicWidth' => 21,
+              'graphicHeight' => 25,
+              'graphicXOffset' => 10,
+              'graphicYOffset' => 10,
+            ),
+          ),
+          'feature_3' => array(
+            'wkt' => 'POINT(-20.123 -20.123)',
+            'attributes' => array(
+              'name' => t('Another point'),
+            ),
+          ),
+        ),
+      ),
+    ),
+
+  );
+
+  // Create full preset array
+  $presets['style_test'] = array(
+    'preset_name' => 'style_test',
+    'preset_title' => t('Style Test'),
+    'preset_description' => t('This is a style test.'),
+    'preset_data' => $style_test,
+  );
+
   return $presets;
+}
+
+/**
+ * Callback for OpenLayers Test Page
+ */
+function openlayers_test_page() {
+  $output = '';
+  
+  // Add some extra testing JS
+  drupal_add_js(drupal_get_path('module', 'openlayers_test') . 'js/openlayers_test.js');
+
+  // Render maps
+  $render_default = openlayers_render_map();
+  $render_default_test = openlayers_render_map('default_test');
+  $render_style_test = openlayers_render_map('style_test');
+
+  // Create collapsed fieldset
+  $render_fieldset = openlayers_render_map();
+  $element = array(
+    '#value' => $render_fieldset['themed'],
+    '#title' => t('Fieldset Example'),
+    '#collapsed' => TRUE,
+    '#collapsible' => TRUE,
+  );
+  $fieldset = theme_fieldset($element);
+
+  // Create output
+  $output .= '
+    <h3>' . t('Default Map') . '</h3>
+     ' . $render_default['themed'] . '
+
+    <h3>' . t('Default Test Map') . '</h3>
+     ' . $render_default_test['themed'] . '
+
+    <h3>' . t('Style Test Map') . '</h3>
+     ' . $render_style_test['themed'] . '
+
+    <!-- Not including fieldset cause its broken -->
+  ';
+
+  return $output;
 }

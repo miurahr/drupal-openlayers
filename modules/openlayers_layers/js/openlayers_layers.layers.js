@@ -31,17 +31,17 @@ OL.Layers.Google = function(layerOptions, mapid) {
   else if (layerOptions.params.type == "physical") {
     mapType = G_PHYSICAL_MAP;
   }
-  
+
   var mapOptions = {
     type: mapType,
     sphericalMercator: true,
     maxExtent: new OpenLayers.Bounds(-20037508.34,-20037508.34,20037508.34,20037508.34)
   };
-  
+
   jQuery.extend(mapOptions, layerOptions.options);
-  
+
   var googleLayer = new OpenLayers.Layer.Google(
-    layerOptions.name, 
+    layerOptions.name,
     mapOptions
   );
   return googleLayer;
@@ -68,17 +68,17 @@ OL.Layers.Yahoo = function(layerOptions, mapid) {
   else if (layerOptions.params.type == "hybrid") {
     mapType = YAHOO_MAP_HYB;
   }
-  
+
   var mapOptions = {
     type: mapType,
     sphericalMercator: true,
     maxExtent: new OpenLayers.Bounds(-20037508.34,-20037508.34,20037508.34,20037508.34)
   };
-  
+
   jQuery.extend(mapOptions, layerOptions.options);
-  
+
   var yahooLayer = new OpenLayers.Layer.Yahoo(
-    layerOptions.name, 
+    layerOptions.name,
     mapOptions
   );
   return yahooLayer;
@@ -105,17 +105,17 @@ OL.Layers.VirtualEarth = function(layerOptions, mapid) {
   else if (layerOptions.params.type == "hybrid") {
     mapType = VEMapStyle.Hybrid;
   }
-  
+
   var mapOptions = {
     type: mapType,
     sphericalMercator: true,
     maxExtent: new OpenLayers.Bounds(-20037508.34,-20037508.34,20037508.34,20037508.34)
   };
-  
+
   jQuery.extend(mapOptions, layerOptions.options);
-  
+
   var virtualEarthLayer = new OpenLayers.Layer.VirtualEarth(
-    layerOptions.name, 
+    layerOptions.name,
     mapOptions
   );
   return virtualEarthLayer;
@@ -132,21 +132,21 @@ OL.Layers.VirtualEarth = function(layerOptions, mapid) {
  *   Valid OpenLayers layer
  */
 OL.Layers.KML = function(layerOptions, mapid) {
-  
+
   var mapOptions = {
     projection: new OpenLayers.Projection("EPSG:4326"),
     format: OpenLayers.Format.KML,
     formatOptions: {extractStyles: true, extractAttributes: true}
   };
-  
+
   jQuery.extend(mapOptions, layerOptions.options);
-  
+
   var returnKML = new OpenLayers.Layer.GML(
-    layerOptions.name, 
-    layerOptions.url, 
+    layerOptions.name,
+    layerOptions.url,
     mapOptions
   );
-  
+
   return returnKML;
 }
 
@@ -165,9 +165,9 @@ OL.Layers.XYZ = function(layerOptions, mapid) {
     sphericalMercator: true,
     maxExtent: new OpenLayers.Bounds(-20037508.34, -20037508.34, 20037508.34, 20037508.34)
   };
-  
+
   jQuery.extend(mapOptions, layerOptions.options);
-  
+
   var returnXYZ = new OpenLayers.Layer.XYZ(layerOptions.name, layerOptions.url, mapOptions);
   return returnXYZ;
 }
@@ -190,7 +190,7 @@ OL.Layers.CloudMade = function(layerOptions, mapid) {
       var mapOptions = {
       };
       jQuery.extend(mapOptions, layerOptions.options);
-    
+
       var cloudmade = new OpenLayers.Layer.CloudMade(layerOptions.name, layerOptions.options);
       return cloudmade;
     }

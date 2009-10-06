@@ -5,7 +5,7 @@
 
 /**
  * @file
- * This file holds the main javascript API for OpenLayers. It is 
+ * This file holds the main javascript API for OpenLayers. It is
  * responsable for loading and displaying the map.
  *
  * @ingroup openlayers
@@ -35,32 +35,32 @@ Drupal.behaviors.openlayers = function () {
 OL.loadMaps = function () {
   // @@TODO: Implement proxy
   OpenLayers.ProxyHost = "http://raider/proxy/?proxy_url=";
-  
+
   // Store rendered maps and other OpenLayer objects in OL object
   OL.mapDefs = Drupal.settings.openlayers.maps;
-  
+
   // Go through array and make maps
   for (var i in OL.mapDefs) {
     var map = OL.mapDefs[i];
     var $map = $('#' + map.id);
-    
+
     // Check if map is already rendered
     if (OL.isSet(OL.maps[map.id]) && OL.isSet(OL.maps[map.id].rendered) &&
       (OL.maps[map.id].rendered === true)
     ) {
       continue;
     }
-    
+
     // Trigger beforeEverything event
     var event = {'mapDef': map};
     OL.triggerCustom(map, 'beforeEverything', event);
-    
+
     // Check to see if there is a div on the page ready for the map. If there is then proceed.
     var $map = $('#' + map.id);
     if ($map.length > 0 && OL.isSet(map.width) && OL.isSet(map.height)) {
       // Add any custom controls
       $map.after(Drupal.theme('mapControls', map.id, map.height));
-      
+
       // Set-up our registry of active OpenLayers javascript objects for this particular map.
       OL.maps[map.id] = {};
       // Set up places for us to store layers, controls, etc.
@@ -76,19 +76,19 @@ OL.loadMaps = function () {
 
 /**
  * Render OpenLayers Map
- * 
+ *
  * The main function to go through all the steps nessisary for rendering a map.
- * 
+ *
  * @param map
  *   The map definition array.
  */
 OL.renderMap = function (map) {
   // Create Projection objects
   OL.maps[map.id].projection = new OpenLayers.Projection('EPSG:' + map.projection);
-  
+
   if (OL.isSet(map.options)) {
     OL.maps[map.id].displayProjection = new OpenLayers.Projection('EPSG:' + map.options.displayProjection);
-  
+
     // Create base map options
     var options = OL.createMapOptions(map.options, map.controls, map.id);
   }
@@ -101,13 +101,13 @@ OL.renderMap = function (map) {
   if (OL.isSet(map.image_path) && map.image_path) {
     OpenLayers.ImgPath = map.image_path;
   }
-  
+
   // Store map in our registry of active OpenLayers objects
   OL.maps[map.id].map = new OpenLayers.Map(map.id, options);
-  
+
   // Add ID to map.
   OL.maps[map.id].map.mapid = map.id;
-  
+
   // On MouseOver mark the map as "active".
   $('#' + map.id).mouseover(function() {
     OL.maps[map.id].active = true;
@@ -119,20 +119,20 @@ OL.renderMap = function (map) {
   // Trigger beforeLayers event
   var event = {'mapDef': map, 'map': OL.maps[map.id].map};
   OL.triggerCustom(map, 'beforeLayers', event);
-  
+
   // We set up all our layers
   OL.processLayers(map.layers, map.id);
-  
+
   // Add layers to map
   for (var l in OL.maps[map.id].layers) {
     var layer =  OL.maps[map.id].layers[l];
     OL.maps[map.id].map.addLayer(layer);
   }
-  
+
   // Trigger beforeCenter event
   var event = {'mapDef': map, 'map': OL.maps[map.id].map};
   OL.triggerCustom(map, 'beforeCenter', event);
-  
+
   // Zoom to Center
   // @@TODO: Do this in the map options -- As is,
   // this will result in a bug in the zoom map helper in the map form
@@ -141,14 +141,14 @@ OL.renderMap = function (map) {
 	  var zoom = parseInt(map.center.zoom, 10);
     OL.maps[map.id].map.setCenter(center, zoom, false, false);
   }
-  
+
   // Set our default base layer
   OL.maps[map.id].map.setBaseLayer(OL.maps[map.id].layers[map.default_layer]);
 
   // Trigger beforeControls event
   var event = {'mapDef': map, 'map': OL.maps[map.id].map};
   OL.triggerCustom(map, 'beforeControls', event);
-  
+
   // Add controls to map
   for (var c in OL.maps[map.id].controls) {
     var control = OL.maps[map.id].controls[c];
@@ -161,14 +161,14 @@ OL.renderMap = function (map) {
   // Trigger beforeEvents event
   var event = {'mapDef': map, 'map': OL.maps[map.id].map};
   OL.triggerCustom(map, 'beforeEvents', event);
-  
-  // Add events to the map 
-  OL.processEvents(map.events, map.id); 
+
+  // Add events to the map
+  OL.processEvents(map.events, map.id);
 
   // Trigger beforeBehaviors event
   var event = {'mapDef': map, 'map': OL.maps[map.id].map};
   OL.triggerCustom(map, 'beforeBehaviors', event);
-  
+
   // Add behaviors to map
   for (var b in OL.mapDefs[map.id].behaviors) {
     var event = {};
@@ -177,11 +177,11 @@ OL.renderMap = function (map) {
     event.behavior = OL.mapDefs[map.id].behaviors[b];
     OL.Behaviors[OL.mapDefs[map.id].behaviors[b].js_callback](event);
   }
-  
+
   // Trigger mapReady event
   var event = {'mapDef': map, 'map': OL.maps[map.id].map};
   OL.triggerCustom(map, 'mapReady', event);
-      
+
   // Mark as Rendered
   OL.maps[map.id].rendered = true;
 };
@@ -200,13 +200,13 @@ OL.renderMap = function (map) {
  */
 OL.createMapOptions = function(options, controls, mapid) {
   var returnOptions = {};
-  
-  // Projections 
+
+  // Projections
   if (OL.isSet(OL.maps[mapid].projection) && OL.isSet(OL.maps[mapid].displayProjection)) {
     returnOptions.projection = OL.maps[mapid].projection;
     returnOptions.displayProjection = OL.maps[mapid].displayProjection;
   }
-  
+
   // Max resolution and Extent
   if (OL.isSet(options.maxResolution)) {
     returnOptions.maxResolution = options.maxResolution;
@@ -219,7 +219,7 @@ OL.createMapOptions = function(options, controls, mapid) {
       options.maxExtent.top
     );
   }
- 
+
   // Controls
   returnOptions.controls = [];
   if (OL.isSet(controls)) {
@@ -263,7 +263,7 @@ OL.createMapOptions = function(options, controls, mapid) {
   if (OL.isSet(options.fractionalZoom)) {
     returnOptions.fractionalZoom = options.fractionalZoom;
   }
-  
+
   // Return processed options
   return returnOptions;
 };
@@ -272,7 +272,7 @@ OL.createMapOptions = function(options, controls, mapid) {
  * Process Layers
  *
  * Process the layers part of the map definition into OpenLayers layer objects
- * 
+ *
  * @param layers
  *   The layers section of the map definition array.
  * @param mapid
@@ -280,7 +280,7 @@ OL.createMapOptions = function(options, controls, mapid) {
  */
 OL.processLayers = function(layers, mapid) {
   OL.maps[mapid].layers = [];
-  
+
   // Go through layers
   if (layers) {
     for (var layer in layers) {
@@ -288,14 +288,14 @@ OL.processLayers = function(layers, mapid) {
       if (OL.isSet(OL.Layers) && typeof(OL.Layers[layers[layer].layer_handler]) === 'function') {
         var newLayer = OL.Layers[layers[layer].layer_handler](layers[layer], mapid);
         OL.maps[mapid].layers[layer] = newLayer;
-  
+
         // Add our Drupal data to the layer
         newLayer.drupalId = layer;
         newLayer.drupalData = layers[layer];
-        
+
         // Add events
         for (var evtype in layers[layer].events){
-          for (var ev in layers[layer].events[evtype]) { 
+          for (var ev in layers[layer].events[evtype]) {
             newLayer.events.register(evtype, newLayer, OL.EventHandlers[layers[layer].events[evtype][ev]]);
           }
         }
@@ -308,7 +308,7 @@ OL.processLayers = function(layers, mapid) {
  * Process Events
  *
  * Process the layers part of the map definition into OpenLayers layer objects
- * 
+ *
  * @param events
  *   The events section of the map definition array.
  * @param mapid
@@ -317,12 +317,12 @@ OL.processLayers = function(layers, mapid) {
 OL.processEvents = function(events, mapid) {
   // Go through events
   for (var evtype in events){
-    // Exclude One-Time map events. 
-    var event_types = ['beforeEverything', 'beforeLayers', 'beforeCenter', 
-                'beforeControls', 'beforeEvents', 'beforeBehaviors', 
+    // Exclude One-Time map events.
+    var event_types = ['beforeEverything', 'beforeLayers', 'beforeCenter',
+                'beforeControls', 'beforeEvents', 'beforeBehaviors',
                 'mapReady'];
     if ($.inArray(evtype, event_types) === -1) {
-      for (var ev in events[evtype]) { 
+      for (var ev in events[evtype]) {
         OL.maps[mapid].map.events.register(evtype, OL.maps[mapid].map, OL.EventHandlers[events[evtype][ev]]);
       }
     }
@@ -331,7 +331,7 @@ OL.processEvents = function(events, mapid) {
 
 /**
  * Trigger Custom Event
- * 
+ *
  * @param map
  *   Map object
  * @param eventName
@@ -349,7 +349,7 @@ OL.triggerCustom = function(map, eventName, event) {
 
 /**
  * Parse out key / value pairs out of a string that looks like "key:value;key2:value2"
- * 
+ *
  * @param rel
  *   The string to parse. Usually the rel attribute of a html tag.
  * @return
@@ -357,7 +357,7 @@ OL.triggerCustom = function(map, eventName, event) {
  */
 OL.parseRel = function(rel) {
   var outputArray = [];
-  
+
   // Some preprosessing
   // replace dangling whitespaces. Use regex?
   rel = rel.replace('; ',';');
@@ -365,23 +365,23 @@ OL.parseRel = function(rel) {
   if (rel.charAt(rel.length-1) === ";") {
     rel = rel.substr(0,rel.length-1);
   }
-  
+
   //Get all the key:value strings
   var keyValueStrings = rel.split(';');
-  
+
   // Process the key:value strings into key:value pairs
   for (var i in keyValueStrings){
     var singleKeyValue = keyValueStrings[i].split(':');
     outputArray[singleKeyValue[0]] = singleKeyValue[1];
   }
-  
+
   return outputArray;
 };
 
 /**
- * Given a string of the form 'OL.This.that', get the object that the 
+ * Given a string of the form 'OL.This.that', get the object that the
  * string refers to.
- * 
+ *
  * @param string
  *   The string to parse.
  * @return
@@ -393,7 +393,7 @@ OL.getObject = function(string) {
   var object = window;
   while (i < parts.length){
     object = object[parts[i]];
-    i++; 
+    i++;
   }
   return object;
 };

@@ -14,6 +14,22 @@
  * @see system_settings_form()
  */
 function openlayers_layers_admin_settings() {
+  // Get form items
+  $form = _openlayers_layers_settings_form();
+  return system_settings_form($form);
+}
+
+/**
+ * Abstracted Form Elements for Layer Settings
+ *
+ * Since the Domain module would like to know about our form elements,
+ * we abstract them into this function so that we can re-use code
+ * properly.
+ *
+ * @return
+ *   From array
+ */
+function _openlayers_layers_settings_form() {
   $form = array();
 
   // Google Map API Key
@@ -79,7 +95,5 @@ function openlayers_layers_admin_settings() {
     '#default_value' => variable_get('openlayers_layers_cloudmade_js', ''),
   );
 
-
-
-  return system_settings_form($form);
+  return $form;
 }

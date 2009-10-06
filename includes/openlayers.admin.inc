@@ -23,13 +23,34 @@ function openlayers_admin_settings() {
       '#type' => 'item',
       '#title' => t('OpenLayers Help') . theme('advanced_help_topic', 'openlayers', 'openlayers-about'),
       '#value' => t('Access the advanced help here: !link or click the small help icon.', array(
-        '!link' => l(t('Advanced Help'), 'admin/advanced_help'),
+        '!link' => l(t('Advanced Help'), 'admin/advanced_help/openlayers'),
       )),
     );
   }
   else {
     drupal_set_message(t('This module has extensive help text available with the <a href="http://drupal.org/project/advanced_help">Advanced Help module</a>'));
   }
+
+  // Get settings elements
+  $settings = _openlayers_settings_form();
+  $form = $form + $settings;
+
+  // Make a system setting form and return
+  return system_settings_form($form);
+}
+
+/**
+ * Abstracted Form Elements for OpenLayers Settings
+ *
+ * Since the Domain module would like to know about our form elements,
+ * we abstract them into this function so that we can re-use code
+ * properly.
+ *
+ * @return
+ *   From array
+ */
+function _openlayers_settings_form() {
+  $form = array();
 
   // Source description
   $source_description = t('The source for the OpenLayers library can be one of two things:')
@@ -97,6 +118,5 @@ function openlayers_admin_settings() {
     '#default_value' => variable_get('openlayers_debug_watchdog_post_render', FALSE),
   );
 
-  // Make a system setting form and return
-  return system_settings_form($form);
+  return $form;
 }

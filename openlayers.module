@@ -761,6 +761,19 @@ function openlayers_openlayers_presets() {
 }
 
 /**
+ * Implementation of hook_domainconf().
+ *
+ * See http://therickards.com/api/function/hook_domainconf/Domain
+ * Adds support for per-domain map keys
+ */
+function openlayers_domainconf() {
+  module_load_include('inc', 'openlayers', 'includes/openlayers.admin');
+
+  // Get form items and return
+  return _openlayers_settings_form();
+}
+
+/**
  * Implementation of hook_features_api().
  *
  * For features integration: provides map presets

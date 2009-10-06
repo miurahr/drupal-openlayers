@@ -267,3 +267,16 @@ function openlayers_layers_openlayers_layers_info() {
 
   return $info;
 }
+
+/**
+ * Implementation of hook_domainconf().
+ *
+ * See http://therickards.com/api/function/hook_domainconf/Domain
+ * Adds support for per-domain map keys
+ */
+function openlayers_layers_domainconf() {
+  module_load_include('inc', 'openlayers_layers', 'includes/openlayers_layers.admin');
+
+  // Get form items and return
+  return _openlayers_layers_settings_form();
+}

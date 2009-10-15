@@ -170,23 +170,23 @@ OL.Behaviors.tooltipOver = function(event) {
   $textContainer.html(tooltipText);
 
   // Set the tooltip location
-  // @@TODO: dynamically set offset based on height of tooltip...
   var $tooltipContainer = $('#' + behavior.container_id);
   var centroid = OL.Behaviors.tooltipGetCentroid(feature.geometry.clone());
   var centroidPixel = feature.layer.map.getPixelFromLonLat(centroid);
   var mapDivOffset = $('#' + feature.layer.map.mapid).offset();
   var scrollTop = $(window).scrollTop();
   var scrollLeft = $(window).scrollLeft();
+
+  $tooltipContainer.css('display', 'block');
+
   var containerHeight = $tooltipContainer.height();
   var containterWidth = $tooltipContainer.width();
+  
   var absoluteTop = centroidPixel.y + mapDivOffset.top - scrollTop - behavior.offset_top - containerHeight;
   var absoluteLeft = centroidPixel.x + mapDivOffset.left - scrollLeft - behavior.offset_left;
-
+  
   // Create offset
-  $tooltipContainer
-    .css('top', absoluteTop)
-    .css('left', absoluteLeft)
-    .css('display', 'block');
+  $tooltipContainer.css('top', absoluteTop).css('left', absoluteLeft)  
 }
 
 /**

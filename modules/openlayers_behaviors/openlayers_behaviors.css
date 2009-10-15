@@ -12,15 +12,21 @@
  * You may also with to set offset_top, and offset_left in the behavior attributes
  * in order to fine tune the position of the tooltip.
  */
-.openlayers-behaviors-tooltip {
+.openlayers-behaviors-tooltip-container {
   display: none;
   position: fixed;
   top: 0px;
   left: 0px;
-  border: 1px solid #006699;
-  background-color: white;
   z-index: 1004;
+}
+
+.openlayers-behaviors-tooltip {
+  position: relative;
+  right: 12px;
+  bottom: 6px;
+  background-color:white;
   padding: 2px 3px 2px 3px;
+  border: 1px solid #006699;
 }
 
 img.openlayers-tooltip-point {

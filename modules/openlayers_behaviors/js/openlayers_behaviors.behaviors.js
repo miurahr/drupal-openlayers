@@ -176,14 +176,48 @@ OL.Behaviors.tooltipOver = function(event) {
   var mapDivOffset = $('#' + feature.layer.map.mapid).offset();
   var scrollTop = $(window).scrollTop();
   var scrollLeft = $(window).scrollLeft();
-
-  $tooltipContainer.css('display', 'block');
-
-  var containerHeight = $tooltipContainer.height();
-  var containterWidth = $tooltipContainer.width();
   
-  var absoluteTop = centroidPixel.y + mapDivOffset.top - scrollTop - behavior.offset_top - containerHeight;
-  var absoluteLeft = centroidPixel.x + mapDivOffset.left - scrollLeft - behavior.offset_left;
+  // Show the tooltip
+  $tooltipContainer.css('display', 'block');
+  
+  // How much should we offset the tooltip from the top. Valid options are numeric or 'height' or 'width'.
+  if (behavior.offset_top !== undefined) {
+    if (isNaN(behavior.offset_top)) {
+      if (behavior.offset_top == 'height') {
+        var offset_top = $tooltipContainer.height();
+      }
+      if (behavior.offset_top == 'width') {
+        var offset_top = $tooltipContainer.width();
+      }
+    }
+    else {
+      var offset_top = behavior.offset_top
+    }
+  }
+  else {
+    offset_top = 0;
+  }
+
+  // How much should we offset the tooltip from the left. Valid options are numeric or 'height' or 'width'.
+  if (behavior.offset_left !== undefined) {
+    if (isNaN(behavior.offset_left)) {
+      if (behavior.offset_left == 'height') {
+        var offset_left = $tooltipContainer.height();
+      }
+      if (behavior.offset_left == 'width') {
+        var offset_left = $tooltipContainer.width();
+      }
+    }
+    else {
+      var offset_left = behavior.offset_left
+    }
+  }
+  else {
+    var offset_left = 0;
+  }
+  
+  var absoluteTop = centroidPixel.y + mapDivOffset.top - scrollTop - offset_top;
+  var absoluteLeft = centroidPixel.x + mapDivOffset.left - scrollLeft - offset_left;
   
   // Create offset
   $tooltipContainer.css('top', absoluteTop).css('left', absoluteLeft)  

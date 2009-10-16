@@ -81,7 +81,18 @@ Example:
       <dt>Values:</dt>
         <dd>string</dd>
       <dt>Description:</dt>
-        <dd>The HTML identifier to be used main tooltip div.  Defaults to <em>Map ID and 'tooltip'</em>.</dd>
+        <dd>The HTML identifier to be used main tooltip div.  Defaults to <em>Map ID and 'tooltip-container'</em>.</dd>
+      <dt>Example:</dt>
+        <dd>$map['id'] . '-tooltip-container'</dd>
+    </dl>
+  </li>
+
+  <li><strong>tooltip_id</strong>
+    <dl>
+      <dt>Values:</dt>
+        <dd>string</dd>
+      <dt>Description:</dt>
+        <dd>The HTML identifier to be used main tooltip div. This is the div you should use for theming. Defaults to <em>Map ID and 'tooltip'</em>.</dd>
       <dt>Example:</dt>
         <dd>$map['id'] . '-tooltip'</dd>
     </dl>
@@ -90,9 +101,9 @@ Example:
   <li><strong>offset_top</strong>
     <dl>
       <dt>Values:</dt>
-        <dd>integer</dd>
+        <dd>integer or string</dd>
       <dt>Description:</dt>
-        <dd>Pixels to offset tooltip from the top.  Defaults to <em>10</em>.</dd>
+        <dd>Pixels to offset tooltip from the top. May also use 'height' or 'width' to dynamically offset using the size of the container. Defaults to <em>'height'</em>.</dd>
       <dt>Example:</dt>
         <dd>10</dd>
     </dl>
@@ -101,14 +112,20 @@ Example:
   <li><strong>offset_left</strong>
     <dl>
       <dt>Values:</dt>
-        <dd>integer</dd>
+        <dd>integer or string</dd>
       <dt>Description:</dt>
-        <dd>Pixels to offset tooltip from the left.  Defaults to <em>12</em>.</dd>
+        <dd>Pixels to offset tooltip from the left.  May also use 'height' or 'width' to dynamically offset using the size of the container. Defaults to <em>0</em>.</dd>
       <dt>Example:</dt>
         <dd>12</dd>
     </dl>
   </li>
 </ul>
+
+<h4>Theming the tooltip</h4>
+
+<p>There are two ways to theme the tooltip. The first is simply using css. To do this override the css selector <code>.openlayers-behaviors-tooltip</code> .</p>
+
+<p>The second way to do this is to implement a theme override, this can be done by overriding <code>theme_openlayers_behaviors_tooltip_container</code> .</p>
 
 <h3>Popups</h3>
 

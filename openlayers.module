@@ -6,7 +6,7 @@
  *
  * Provides an API and Modules to interface with OpenLayers.  Needs work...
  */
- 
+
 /**
  * @defgroup openlayers_api OpenLayers API: Specific functions that are part of the OpenLayers API
  *
@@ -17,7 +17,7 @@
  * @file
  * Main OpenLayers API File
  *
- * This file holds the main Drupal hook functions, 
+ * This file holds the main Drupal hook functions,
  * and the openlayers API functions for the openlayers module.
  *
  * @ingroup openlayers
@@ -114,10 +114,10 @@ function openlayers_build_map($map = array()) {
   $map['id'] = !isset($map['id']) ? _openlayers_create_map_id() : $map['id'];
 
   $map['layers'] = _openlayers_layers_process($map['layers'], $map);
-  
+
   // Unset Map Arguments
   unset($map['args']);
-  
+
   $map['behaviors'] = _openlayers_behaviors_process($map['behaviors'], $map);
   $map['styles'] = _openlayers_styles_process($map['styles'], $map['layer_styles'], $map);
 
@@ -126,7 +126,7 @@ function openlayers_build_map($map = array()) {
 
   // Check map for errors
   $map['errors'] = openlayers_error_check_map($map);
-  
+
   return $map;
 }
 
@@ -142,7 +142,7 @@ function openlayers_build_map($map = array()) {
  * @return
  *   Boolean if successful
  */
-function openlayers_render_map($map = array(), $preset_name = '') {  
+function openlayers_render_map($map = array(), $preset_name = '') {
   $map = openlayers_build_map($map);
 
   // Return themed map if no errors found
@@ -321,7 +321,7 @@ function openlayers_error_check_map($map, $log_errors = TRUE) {
   // @TODO: Instead of manually specifying projections, we should do a lookup on the projections in a big table to get variables that it should be checked against.
   // @TODO: For next release, make hook
   $errors = array();
-  
+
   // Check layer projections
   foreach ($map['layers'] as $layer) {
     if ($layer['projection']) {
@@ -335,10 +335,10 @@ function openlayers_error_check_map($map, $log_errors = TRUE) {
   }
 
   // TODO: rewrite to use openlayers_get_extent
-  // If we are using a degree based projection, then check to make sure 
+  // If we are using a degree based projection, then check to make sure
   // our bounds are not over 180/90 degrees
   if ($map['projection'] == '4326' || $map['projection'] == '4269') {
-    if (  
+    if (
       ($map['options']['maxExtent']['top']     && $map['options']['maxExtent']['top']    > 90)   ||
       ($map['options']['maxExtent']['bottom']  && $map['options']['maxExtent']['bottom'] < -90)  ||
       ($map['options']['maxExtent']['left']    && $map['options']['maxExtent']['left']   < -180) ||
@@ -348,13 +348,13 @@ function openlayers_error_check_map($map, $log_errors = TRUE) {
       $errors[] = t("Your Maximum Extents are set greater than 180/90 degrees. Try Maximum Extent of: -180,180,-90,90 and a Maximum Resolution of 1.40625");
     }
   }
-  
+
   // Check if any errors found to log
   if (count($errors) > 0 && $log_errors) {
     // Log the Error(s)
     watchdog('openlayers', implode(', ', $errors), array(), WATCHDOG_ERROR);
   }
-  
+
   // Check if errors and return
   return (count($errors) > 0) ? $errors : FALSE;
 }
@@ -458,7 +458,7 @@ function openlayers_get_resolutions($projection, $zoom_start = 0, $zoom_end = FA
  */
 function openlayers_openlayers_layers_info() {
   $layers = array();
-  
+
   $layer = new StdClass();
   $layer->api_version = 1;
   $layer->name = 'openlayers_default_wms';
@@ -478,14 +478,14 @@ function openlayers_openlayers_layers_info() {
   $layers[$layer->name] = $layer;
 
   return $layers;
-} 
+}
 
 /**
  * Implementation of hook_openlayers_styles_info
  */
 function openlayers_openlayers_styles_info() {
   $styles = array();
-  
+
   $style = new stdClass();
   $style->api_version = 1;
   $style->name = 'default';
@@ -594,6 +594,7 @@ function openlayers_openlayers_behaviors() {
        'description' => t('Allows layers to provide attribution to the map if it exists.'),
        'type' => 'layer',
        'path' => drupal_get_path('module', 'openlayers') .'/includes/behaviors',
+       'file' => 'openlayers_behavior_attribution.inc',
        'behavior' => array(
          'class' => 'openlayers_behavior_attribution',
          'parent' => 'openlayers_behavior',
@@ -604,6 +605,7 @@ function openlayers_openlayers_behaviors() {
        'description' => t('Provides a the ability to use the keyboard to pan and zoom map.'),
        'type' => 'layer',
        'path' => drupal_get_path('module', 'openlayers') .'/includes/behaviors',
+       'file' => 'openlayers_behavior_keyboarddefaults.inc',
        'behavior' => array(
          'class' => 'openlayers_behavior_keyboarddefaults',
          'parent' => 'openlayers_behavior',
@@ -614,6 +616,7 @@ function openlayers_openlayers_behaviors() {
        'description' => t('Gives user ability to switch Layers in the map interface.'),
        'type' => 'map',
        'path' => drupal_get_path('module', 'openlayers') .'/includes/behaviors',
+       'file' => 'openlayers_behavior_layerswitcher.inc',
        'behavior' => array(
          'class' => 'openlayers_behavior_layerswitcher',
          'parent' => 'openlayers_behavior',
@@ -624,6 +627,7 @@ function openlayers_openlayers_behaviors() {
        'description' => t('Gives a visual indication of the mouse position to the user.'),
        'type' => 'map',
        'path' => drupal_get_path('module', 'openlayers') .'/includes/behaviors',
+       'file' => 'openlayers_behavior_mouseposition.inc',
        'behavior' => array(
          'class' => 'openlayers_behavior_mouseposition',
          'parent' => 'openlayers_behavior',
@@ -634,6 +638,7 @@ function openlayers_openlayers_behaviors() {
        'description' => t('Gives the user the ability to navigate the map interface.'),
        'type' => 'map',
        'path' => drupal_get_path('module', 'openlayers') .'/includes/behaviors',
+       'file' => 'openlayers_behavior_navigation.inc',
        'behavior' => array(
          'class' => 'openlayers_behavior_navigation',
          'parent' => 'openlayers_behavior',
@@ -644,6 +649,7 @@ function openlayers_openlayers_behaviors() {
       'description' => t('Gives user ability to pan in the map interface.'),
       'type' => 'map',
       'path' => drupal_get_path('module', 'openlayers') .'/includes/behaviors',
+      'file' => 'openlayers_behavior_dragpan.inc',
       'behavior' => array(
         'class' => 'openlayers_behavior_dragpan',
         'parent' => 'openlayers_behavior',
@@ -654,6 +660,7 @@ function openlayers_openlayers_behaviors() {
       'description' => t('Gives user ability to pan and zoom in the map interface.'),
       'type' => 'map',
       'path' => drupal_get_path('module', 'openlayers') .'/includes/behaviors',
+      'file' => 'openlayers_behavior_panzoombar.inc',
       'behavior' => array(
         'class' => 'openlayers_behavior_panzoombar',
         'parent' => 'openlayers_behavior',
@@ -664,6 +671,7 @@ function openlayers_openlayers_behaviors() {
       'description' => t('Private method for admin UI'),
       'type' => 'map',
       'path' => drupal_get_path('module', 'openlayers') .'/includes/behaviors',
+      'file' => 'openlayers_behavior_mapformvalues.inc',
       'behavior' => array(
         'class' => 'openlayers_behavior_mapformvalues',
         'parent' => 'openlayers_behavior',
@@ -674,6 +682,7 @@ function openlayers_openlayers_behaviors() {
       'description' => t('Allows the selection and display of a box.'),
       'type' => 'map',
       'path' => drupal_get_path('module', 'openlayers') .'/includes/behaviors',
+      'file' => 'openlayers_behavior_boxselect.inc',
       'behavior' => array(
         'class' => 'openlayers_behavior_boxselect',
         'parent' => 'openlayers_behavior',
@@ -684,6 +693,7 @@ function openlayers_openlayers_behaviors() {
       'description' => t('Creates a crosshair at the center of the map'),
       'type' => 'map',
       'path' => drupal_get_path('module', 'openlayers') .'/includes/behaviors',
+      'file' => 'openlayers_behavior_crosshair.inc',
       'behavior' => array(
         'class' => 'openlayers_behavior_crosshair',
         'parent' => 'openlayers_behavior',
@@ -694,6 +704,7 @@ function openlayers_openlayers_behaviors() {
       'description' =>  t('Prvides a URL that will link to a specific map position.'),
       'type' => 'map',
       'path' => drupal_get_path('module', 'openlayers') .'/includes/behaviors',
+      'file' => 'openlayers_behavior_permalink.inc',
       'behavior' => array(
         'class' => 'openlayers_behavior_permalink',
         'parent' => 'openlayers_behavior',
@@ -704,6 +715,7 @@ function openlayers_openlayers_behaviors() {
       'description' => t('Provides the user with a line of scale in the map interface.'),
       'type' => 'map',
       'path' => drupal_get_path('module', 'openlayers') .'/includes/behaviors',
+      'file' => 'openlayers_behavior_scaleline.inc',
       'behavior' => array(
         'class' => 'openlayers_behavior_scaleline',
         'parent' => 'openlayers_behavior',
@@ -714,6 +726,7 @@ function openlayers_openlayers_behaviors() {
       'description' => t('Allows user to draw a box on screen to zoom with Shift + Click.'),
       'type' => 'map',
       'path' => drupal_get_path('module', 'openlayers') .'/includes/behaviors',
+      'file' => 'openlayers_behavior_zoombox.inc',
       'behavior' => array(
         'class' => 'openlayers_behavior_zoombox',
         'parent' => 'openlayers_behavior',
@@ -724,6 +737,7 @@ function openlayers_openlayers_behaviors() {
       'description' => t('Provides button to zoom to the maximum extent of the map.'),
       'type' => 'map',
       'path' => drupal_get_path('module', 'openlayers') .'/includes/behaviors',
+      'file' => 'openlayers_behavior_zoomtomaxextent.inc',
       'behavior' => array(
         'class' => 'openlayers_behavior_zoomtomaxextent',
         'parent' => 'openlayers_behavior',

@@ -40,7 +40,7 @@ Drupal.openlayers.layer.TMS = function (name, map, options) {
     var layer = new OpenLayers.Layer.TMS(name, options.url, options.options);
     layer.styleMap = styleMap;
     return layer;
-}
+};
 
 Drupal.openlayers.layer.OSM = function (name, map, options) {
 if (typeof(options.options.maxExtent) !== 'undefined') {
@@ -52,7 +52,7 @@ if (typeof(options.options.maxExtent) !== 'undefined') {
     var layer = new OpenLayers.Layer.OSM(name, options.url, options.options);  
     layer.attribution = "(c) OpenStreetMap (and) contributors, CC-BY-SA";
     return layer;
-}
+};
 
 Drupal.openlayers.layer.Vector = function (name, map, options) {
     var styleMap = Drupal.openlayers.getStyleMap(map, options.name);

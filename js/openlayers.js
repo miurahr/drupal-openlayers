@@ -1,6 +1,6 @@
 // $Id$
 /*jslint white: false */
-/*global OpenLayers Drupal $ */
+/*global OpenLayers Drupal $ document jQuery */
 
 /**
  * @file
@@ -9,6 +9,14 @@
  *
  * @ingroup openlayers
  */
+
+/**
+ * This is a workaround for a bug involving IE and VML support.
+ * See the Drupal Book page describing this problem:
+ * http://drupal.org/node/613002
+ */
+
+document.namespaces;
 
 /**
  * Minimal OpenLayers map bootstrap.
@@ -40,10 +48,10 @@ Drupal.behaviors.openlayers = function(context) {
           var options = {};
           options.projection = new OpenLayers.Projection('EPSG:' + map.projection);
           options.displayProjection = new OpenLayers.Projection('EPSG:' + map.displayProjection);
-          if (map.projection == '900913') {
+          if (map.projection === '900913') {
             options.maxExtent = new OpenLayers.Bounds(-20037508.34, -20037508.34, 20037508.34, 20037508.34);
           }
-          if (map.projection == '4326') {
+          if (map.projection === '4326') {
             options.maxExtent = new OpenLayers.Bounds(-180, -90, 180, 90);
           }
           options.maxResolution = 1.40625;
@@ -94,7 +102,7 @@ Drupal.behaviors.openlayers = function(context) {
  */
 Drupal.openlayers = {
   'addLayers': function(map, openlayers) {
-    for (var name in map['layers']) {
+    for (var name in map.layers) {
       var layer;      
       var options = map['layers'][name];
       if (Drupal.openlayers.layer[options['layer_handler']] !== undefined) {
@@ -102,7 +110,7 @@ Drupal.openlayers = {
 
         layer.visibility = (!map['layer_activated'] || map['layer_activated'][name]);
 
-        if (map.center.wrapdateline == '1') {
+        if (map.center.wrapdateline === '1') {
           // TODO: move into layer specific settings
           layer.wrapDateLine = true;
         }
@@ -112,7 +120,7 @@ Drupal.openlayers = {
     
     // Set our default base layer
     for (var layer in openlayers.layers) {      
-      if (openlayers.layers[layer].name == map.layers[map.default_layer].name) {
+      if (openlayers.layers[layer].name === map.layers[map.default_layer].name) {
         openlayers.setBaseLayer(openlayers.layers[layer]); 
       }
     }
@@ -127,7 +135,7 @@ Drupal.openlayers = {
     // Set the restricted extent if wanted.
     // Prevents the map from being panned outside of a specfic bounding box.
     // TODO: needs to be aware of projection: currently the restrictedExtent string is always latlon
-    if (typeof map.center.restrict != 'undefined') {
+    if (typeof map.center.restrict !== 'undefined') {
       openlayers.restrictedExtent = new OpenLayers.Bounds.fromString(map.center.restrict.restrictedExtent);
     }
   },
@@ -143,7 +151,7 @@ Drupal.openlayers = {
       // Extract geometry either from wkt property or lon/lat properties
       if (feature.wkt) {
         // Check to see if it is a string of wkt, or an array for a multipart feature.
-        if (typeof(feature.wkt) == "string") {
+        if (typeof(feature.wkt) === "string") {
           var wkt = feature.wkt;
         }
         else if (typeof(feature.wkt) == "object" && feature.wkt !== null && feature.wkt.length !== 0) {
@@ -161,7 +169,7 @@ Drupal.openlayers = {
         var newFeatureSet = [];
 
         // Check to see if it is a new feature, or an array of new features.
-        if (typeof(newFeatureObject[0]) == 'undefined'){
+        if (typeof(newFeatureObject[0]) === 'undefined'){
           newFeatureSet[0] = newFeatureObject;
         }
         else{
@@ -174,7 +182,7 @@ Drupal.openlayers = {
 
           // Transform the geometry if the 'projection' property is different from the map projection
           if (feature.projection) {
-            if (feature.projection != map.projection){
+            if (feature.projection !== map.projection){
               var featureProjection = new OpenLayers.Projection("EPSG:" + feature.projection);
               var mapProjection = new OpenLayers.Projection("EPSG:" + map.projection);
               newFeature.geometry.transform(featureProjection, mapProjection);

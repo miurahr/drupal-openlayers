@@ -12,6 +12,14 @@
  */
 
 /**
+ * This is a workaround for a bug involving IE and VML support.
+ * See the Drupal Book page describing this problem:
+ * http://drupal.org/node/613002
+ */
+
+document.namespaces;
+
+/**
  * Global Object for Namespace
  */
 var OL = OL || {'Layers': {}, 'EventHandlers': {} ,'Behaviors': {}, 'maps': []};

@@ -310,7 +310,7 @@ OL.Behaviors.zoomToLayer = function(event) {
   }
 
   // Check to see if we are dealing with just a single point.
-  if (featureCount == 1 && feature.geometry.getArea() == 0) {
+  if (featureCount == 1 && feature.geometry.CLASS_NAME == 'OpenLayers.Geometry.Point') {
     var center = new OpenLayers.LonLat(feature.geometry.x, feature.geometry.y);
     // If pointZoom has been set, then center and zoom, else just center and don't zoom
     if (OL.isSet(behavior.pointzoom)) {
@@ -360,7 +360,7 @@ OL.Behaviors.zoomToFeature = function(event) {
     }
   }
   // Check to see if we are dealing with just a single point.
-  if (featureCount == 1 && feature.geometry.getArea() == 0) {
+  if (featureCount == 1 && feature.geometry.CLASS_NAME == 'OpenLayers.Geometry.Point') {
     var center = new OpenLayers.LonLat(feature.geometry.x, feature.geometry.y);
     // If pointZoom has been set, then center and zoom, else just center and don't zoom
     if (OL.isSet(behavior.pointzoom)) {

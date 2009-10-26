@@ -18,8 +18,9 @@ function openlayers_admin_settings() {
   openlayers_initialize();
 
   // Let user know about advanced help
+  $help = array();
   if (module_exists('advanced_help')) {
-    $form['openlayers_advanced_help'] = array(
+    $help['openlayers_advanced_help'] = array(
       '#type' => 'item',
       '#title' => t('OpenLayers Help') . theme('advanced_help_topic', 'openlayers', 'openlayers-about'),
       '#value' => t('Access the advanced help here: !link or click the small help icon.', array(
@@ -33,7 +34,7 @@ function openlayers_admin_settings() {
 
   // Get settings elements
   $settings = _openlayers_settings_form();
-  $form = $form + $settings;
+  $form = array_merge($help, $settings);
 
   // Make a system setting form and return
   return system_settings_form($form);

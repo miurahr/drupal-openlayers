@@ -163,3 +163,28 @@ Example:
 <h3>Declutter</h3>
 
 <h3>Fullscreen</h3>
+
+<p>This behavior displays a 'fullscreen' button that allows the map to be viewed fullscreen. Fullscreen mode can also be turned on by default, or locked fullscreen.
+
+<pre>
+'behaviors' = array (
+  'some_id' = array (
+    'id' => 'some_id',
+    'type' => 'openlayers_behaviors_fullscreen',
+    'defaut' => 'on', // optional, assumes 'off' if ommited.
+  ),
+),
+</pre>
+
+<ul>
+  <li><strong>default</strong>
+    <dl>
+      <dt>Values:</dt>
+        <dd>'off' - <i>default</i>, 'on', 'locked'</dd>
+      <dt>Description:</dt>
+        <dd>Should the fullscreen be on by default? off by default? or locked so that the user cannot un-fullscreen the map?</dd>
+      <dt>Example:</dt>
+        <dd>'locked'</dd>
+    </dl>
+  </li>
+  

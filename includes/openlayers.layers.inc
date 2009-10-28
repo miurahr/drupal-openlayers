@@ -47,7 +47,14 @@ function openlayers_process_layers($layer = NULL) {
         'options' => array(),
         'events' => array(),
       );
-      break;
+    
+    // If baselayer is set to false, we need to ask WMS for a transparent layer.
+    // If the user has set transparency explicitly, we do not ovverride.
+    if ($layer_data['baselayer'] == FALSE && !isset($layer_data['params']['transparent'])) {
+      $layer_data['params']['transparent'] = TRUE;
+    }
+    
+    break;
 
   }
 

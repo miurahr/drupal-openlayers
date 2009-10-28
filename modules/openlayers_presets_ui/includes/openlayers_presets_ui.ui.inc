@@ -1168,7 +1168,7 @@ function _openlayers_presets_ui_available_controls() {
   );
   $available['PanZoomBar'] = array(
     'title' => t('Pan Zoom Bar'),
-    'description' => t('Gives user ability to pan and zoom in the map interface.'),
+    'description' => t('Gives user ability to pan and zoom in the map interface. The Navigation control needs to be enabled for this to function.'),
   );
   $available['Permalink'] = array(
     'title' => t('Permanent Link'),

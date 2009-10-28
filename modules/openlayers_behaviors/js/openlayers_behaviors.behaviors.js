@@ -649,6 +649,7 @@ OL.Behaviors.fullscreen = function(event) {
           .css('height','100%')
           .css('z-index','999');
         // Change CSS on map controls
+        
         $mapControls.css('position','fixed')
           .css('top','0px')
           .css('right','0px');

@@ -677,14 +677,15 @@ OL.Behaviors.fullscreen = function(event) {
         event.map.updateSize();
       }
     });
-
-    if (event.behavior.default == 'on') {
+    
+  if ('default' in event.behavior) {
+    if (event.behavior['default'] == 'on') {
       $('#openlayers-controls-fullscreen-' + mapid).click();
     }
-    
-    if (event.behavior.default == 'locked') {
+    if (event.behavior['default'] == 'locked') {
       $('#openlayers-controls-fullscreen-' + mapid).click().hide();
     }
+  }
 }
 
 /**

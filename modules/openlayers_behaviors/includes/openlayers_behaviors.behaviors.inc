@@ -98,7 +98,7 @@ function openlayers_behaviors_process_tooltip($behavior, &$map) {
 
     // Designate some default values that match up with our default theme
     $behavior['attribute'] = (!empty($behavior['attribute'])) ? $behavior['attribute'] : 'name';
-    $behavior['container_id'] = (!empty($behavior['tooltip_id'])) ? $behavior['tooltip_id'] : $map['id'] . '-tooltip';
+    $behavior['tooltip_id'] = (!empty($behavior['tooltip_id'])) ? $behavior['tooltip_id'] : $map['id'] . '-tooltip';
     $behavior['container_id'] = (!empty($behavior['container_id'])) ? $behavior['container_id'] : $map['id'] . '-tooltip-container';
     $behavior['attribute_id'] = (!empty($behavior['attribute_id'])) ? $behavior['attribute_id'] : $map['id'] . '-tooltip-text';
     $behavior['offset_top'] = (!empty($behavior['offset_top'])) ? $behavior['offset_top'] : 'height';

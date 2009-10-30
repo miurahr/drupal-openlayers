@@ -688,17 +688,6 @@ function openlayers_openlayers_behaviors() {
         'parent' => 'openlayers_behavior',
       ),
     ),
-    'openlayers_behavior_crosshair' => array(
-      'title' => t('Crosshair'),
-      'description' => t('Creates a crosshair at the center of the map'),
-      'type' => 'map',
-      'path' => drupal_get_path('module', 'openlayers') .'/includes/behaviors',
-      'file' => 'openlayers_behavior_crosshair.inc',
-      'behavior' => array(
-        'class' => 'openlayers_behavior_crosshair',
-        'parent' => 'openlayers_behavior',
-      ),
-    ),
     'openlayers_behavior_permalink' => array(
       'title' => t('Permalink'),
       'description' =>  t('Prvides a URL that will link to a specific map position.'),

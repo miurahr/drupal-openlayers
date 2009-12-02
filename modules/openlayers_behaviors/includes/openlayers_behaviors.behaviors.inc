@@ -213,13 +213,9 @@ function openlayers_behaviors_process_declutter($behavior, &$map) {
  */
 function openlayers_behaviors_process_cluster($behavior, &$map) {
   if ($behavior['layer'] && $map['layers'][$behavior['layer']]) {
-
-    // This is just a placeholder for now
-    $map['strategies'] = ($map['strategies']) ? $map['strategies'] : array();
-    $map['strategies']['cluster'] = array(
-      'distance' => $behavior['cluster_distance'],
-      'threshold' => $behavior['cluster_threshold'],
-    );
+    // Make some defaults
+    $behavior['distance'] = empty($behavior['distance']) ? '20' : $behavior['distance'];
+    $behavior['threshold'] = empty($behavior['threshold']) ? '1' : $behavior['threshold'];
 
     return $behavior;
   }

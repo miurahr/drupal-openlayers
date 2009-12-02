@@ -150,6 +150,71 @@ function openlayers_test_openlayers_presets() {
     'preset_description' => t('This is a style test.'),
     'preset_data' => $style_test,
   );
+  
+  // Cluster and Grouping preset
+  $map = $default_map;
+  
+  $map['behaviors'] = array (
+    'clusterone' => array (
+      'id' => 'clusterone',
+      'type' => 'openlayers_behaviors_cluster',
+      'layer' => 'default_vector',
+      'distance' => '20',
+      'threshold' => '1',
+    ),
+    'clustertwo' => array (
+      'id' => 'clustertwo',
+      'type' => 'openlayers_behaviors_cluster',
+      'layer' => 'second_vector',
+    ),
+    'fullscreen' => array (
+      'id' => 'fullscreen',
+      'type' => 'openlayers_behaviors_fullscreen',
+    ),
+  );
+  $map['layers']['default_vector'] = array (
+    'id' => 'default_vector',
+    'type' => 'Vector',
+    'name' => t('Default Vector'),
+    'options' => array(),
+  );
+  
+  // Add points
+  $features = array();
+  for ($i = 0; $i < 30; $i++) {
+    $x = 2 + rand(-10, 10);
+    $y = 2 + rand(-10, 10);
+    $features['feature_' . $i . $j] = array(
+      'wkt' => 'POINT(' . $x . ' ' . $y . ')',
+      'projection' => '4326',
+    );
+  }
+  $map['layers']['default_vector']['features'] = $features;
+  
+  $map['layers']['second_vector'] = array (
+    'id' => 'second_vector',
+    'type' => 'Vector',
+    'name' => t('second Vector'),
+    'options' => array(),
+    'features' => array(
+      'yeah3' => array(
+        'wkt' => 'POINT(55 -55)',
+        'projection' => '4326',
+      ),
+      'yeah4' => array(
+        'wkt' => 'POINT(50 -50)',
+        'projection' => '4326',
+      ),
+    ),
+  );
+
+  // Create full preset array
+  $presets['cluster_group_example'] = array(
+    'preset_name' => 'cluster_group_example',
+    'preset_title' => t('Cluster Group Example'),
+    'preset_description' => t('Example to test clustering and grouping.'),
+    'preset_data' => $map,
+  );
 
   return $presets;
 }
@@ -167,6 +232,7 @@ function openlayers_test_page() {
   $render_default = openlayers_render_map();
   $render_default_test = openlayers_render_map('default_test');
   $render_style_test = openlayers_render_map('style_test');
+  $render_cluster_group_example = openlayers_render_map('cluster_group_example');
 
   // Create collapsed fieldset
   $render_fieldset = openlayers_render_map();
@@ -181,13 +247,16 @@ function openlayers_test_page() {
   // Create output
   $output .= '
     <h3>' . t('Default Map') . '</h3>
-     ' . $render_default['themed'] . '
+      ' . $render_default['themed'] . '
 
     <h3>' . t('Default Test Map') . '</h3>
-     ' . $render_default_test['themed'] . '
+      ' . $render_default_test['themed'] . '
 
     <h3>' . t('Style Test Map') . '</h3>
-     ' . $render_style_test['themed'] . '
+      ' . $render_style_test['themed'] . '
+     
+    <h3>' . t('Cluster Group Map') . '</h3>
+      ' . $render_cluster_group_example['themed'] . '
 
     <!-- Not including fieldset cause its broken -->
   ';

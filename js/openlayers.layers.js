@@ -158,19 +158,23 @@ OL.Layers.Vector = function(layerOptions, mapid) {
     }
   }
 
-  // Go through strategies if there are any
-  if (OL.isSet(OL.mapDefs[mapid].strategies)) {
-    for (s in OL.mapDefs[mapid].strategies) {
-      var strategy = OL.mapDefs[mapid].strategies[s];
-      if (s == 'cluster') {
-        var cluster = new OpenLayers.Strategy.Cluster({features: newFeatures});
-        if(strategy.distance) cluster.distance = strategy.distance;
-        if(strategy.threshold) cluster.threshold = strategy.threshold;
-
+  // Strategies
+  strategies = [];
+  
+  // Go through behaviors and try to find clustering (not most
+  // efficient way)
+  if (OL.isSet(OL.mapDefs[mapid].behaviors)) {
+    for (b in OL.mapDefs[mapid].behaviors) {
+      var behavior = OL.mapDefs[mapid].behaviors[b];
+      if (behavior.type == 'openlayers_behaviors_cluster' && OL.isSet(behavior.layer) && behavior.layer == layerOptions.id) {
+        var cluster = new OpenLayers.Strategy.Cluster({
+          features: newFeatures,
+          threshold: behavior.threshold,
+          distance: behavior.distance
+        });
         strategies.push(cluster);
       }
     }
-    OL.mapDefs[mapid].strategies = strategies;
   }
 
   // Define layer object

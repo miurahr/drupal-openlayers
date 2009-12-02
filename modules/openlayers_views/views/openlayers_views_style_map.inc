@@ -177,6 +177,12 @@ class openlayers_views_style_map extends views_plugin_style {
       '#options' => openlayers_get_presets(),
       '#default_value' => $this->options['presets']['map_preset'] ? $this->options['presets']['map_preset'] : variable_get('openlayers_default_preset', 'default'),
     );
+    $form['presets']['not_display_empty_map'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Do Not Display Empty Map'),
+      '#description' => t('Check this is you do not want a map to show if there is no data available in the view.'),
+      '#default_value' => $this->options['presets']['not_display_empty_map'],
+    );
 
     // Behavior options
     if (module_exists('openlayers_behaviors')) {
@@ -435,7 +441,7 @@ class openlayers_views_style_map extends views_plugin_style {
         }
       }
 
-       // Fill in popup attribute
+      // Fill in popup attribute
       if (!empty($this->options['behaviors']['popup'])) {
         if ($this->options['behaviors']['popup'] == '#all_fields') {
           $feature['attributes']['openlayers_popup'] = '<div class="map-pop-up openlayers-map-pop-up"><div class="map-pop-up-inner">' . $this->row_plugin->render($record) . '</div></div>';
@@ -515,6 +521,13 @@ class openlayers_views_style_map extends views_plugin_style {
 
       // Style the features based on group (can override this with the theme hook)
       $features = $this->map_features($records, $group_name);
+
+      // Check if plugin wants to display empty map and if features
+      if ($this->options['presets']['not_display_empty_map'] && count($features) == 0) {
+        // Ensure regular views ops
+        $output .= theme($this->theme_functions(), $this->view, $this->options, '', $group_name);
+        return $output;
+      }
 
       // Create name of layer and id
       $layer_name = $grouped ? $group_title : $this->display->display_title;

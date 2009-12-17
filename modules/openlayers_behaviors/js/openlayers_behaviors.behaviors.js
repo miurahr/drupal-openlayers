@@ -320,7 +320,7 @@ OL.Behaviors.zoomToLayer = function(event) {
       map.setCenter(center);
     }
   }
-  else if (featureCount != 1){
+  else if (featureCount != 0){
     // Zoom the map to the bounds of the layer(s)
     map.zoomToExtent(extentToZoom);
   }
@@ -375,7 +375,7 @@ OL.Behaviors.zoomToFeature = function(event) {
       }
     }
   }
-  else if (featureCount != 1){
+  else if (featureCount != 0){
     if (OL.isSet(behavior.zoom)) {
       if (behavior.zoom < 0) {
         // A negative value implies a relative zoom.

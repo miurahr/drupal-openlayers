@@ -466,7 +466,7 @@ function openlayers_cck_field_formatter_info() {
   foreach (openlayers_get_presets() as $name => $title) {
     $formatters['openlayers_map_' . $name] = array(
       'label' => t('OpenLayers Map: @preset', array('@preset' => check_plain($title))),
-      'field types' => array('geo', 'openlayers_wkt'),
+      'field types' => array('geo', 'geo_data', 'openlayers_wkt'),
       'multiple values' => CONTENT_HANDLE_MODULE,
       'gis types' => array('point', 'linestring', 'polygon'),
       'gis input' => 'wkt',

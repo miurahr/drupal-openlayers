@@ -51,3 +51,28 @@ function openlayers_cck_uninstall() {
     variable_del($row['name']);
   }
 }
+
+/**
+ * Implementation of hook_update_N().
+ *
+ * For the CCK Map formatters, the new default is to not
+ * show empty maps, so this update attempts to
+ * set that default to TRUE.
+ */
+function openlayers_cck_update_6100(&$sandbox) {
+  $ret = array();
+
+  // Get each field instance
+  $query = "SELECT * FROM {content_node_field_instance} WHERE widget_type = 'openlayers_wkt_widget'";
+  $results = db_query($query);
+  while ($row = db_fetch_object($results)) {
+    // Get current widget settings and update
+    $widget_settings = unserialize($row->widget_settings);
+    $widget_settings['openlayers_cck_show_empty_map'] = TRUE;
+    $widget_settings = serialize($widget_settings);
+    $query = "UPDATE {content_node_field_instance} SET widget_settings = '%s'";
+    $result = db_query($query, $widget_settings);
+  }
+
+  return $ret;
+}

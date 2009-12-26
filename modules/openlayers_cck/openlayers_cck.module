@@ -298,7 +298,7 @@ function openlayers_cck_widget(&$form, &$form_state, $field, $items, $delta = 0)
       '#gis_input' => $info['gis input'], // The format expected by the element.
       '#gis_output' => 'wkt', // The format expected by geo_field's storage.
       '#delta' => $delta,
-      '#title' => t($field['widget']['label']),
+      '#title' => $field['widget']['label'],
       '#required' => $field['required'],
       '#description' => $field['widget']['description'],
     ));
@@ -426,7 +426,7 @@ function openlayers_cck_validate($element, &$form_state) {
   if ($field['multiple'] >= 2) {
     if (count($items) > $field['multiple']) {
       $field_key  = $element['#columns'][0];
-      form_error($element[$field_key], t('%name: this field cannot hold more than @count values.', array('%name' => t($field['widget']['label']), '@count' => $field['multiple'])));
+      form_error($element[$field_key], t('%name: this field cannot hold more than @count values.', array('%name' => $field['widget']['label'], '@count' => $field['multiple'])));
     }
   }
 }
@@ -601,8 +601,8 @@ function theme_openlayers_cck_formatter_map($element) {
  * Theme function for openlayers_cck_map
  */
 function theme_openlayers_cck_map($field = array(), $map = array()) {
-  $title = check_plain(t($field['widget']['label']));
-  $description = content_filter_xss(t($field['widget']['description']));
+  $title = check_plain($field['widget']['label']);
+  $description = content_filter_xss($field['widget']['description']);
   $output = '';
 
   // Check for errors

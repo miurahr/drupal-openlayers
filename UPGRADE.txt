@@ -1,0 +1,12 @@
+$Id$
+
+This file describes any steps for upgrading openlayers to 
+different versions.
+=====================================
+
+
+Upgrading to 6.x-1.0-beta4
+=====================================
+  * CCK default behavior has changed to not show empty
+    maps.  This means you will have to manually go into
+    each field and update the new Show Empty Map option.

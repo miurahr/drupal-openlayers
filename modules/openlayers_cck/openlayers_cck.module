@@ -258,18 +258,18 @@ function openlayers_cck_widget_settings($op, $widget) {
       // Since there are not options for formatters, we are putting
       // this here.  This defines whethere or not to show an empty
       // map for the map formatters.
-      $form['openlayers_cck_do_show_empty_map'] = array(
+      $form['openlayers_cck_show_empty_map'] = array(
         '#type' => 'checkbox',
-        '#title' => t('Do Not Show Empty Map'),
-        '#description' => t('If the formatter for this field is a map, by default this field will show an empty map.  Check this if you want to ensure that the map does not show if there is no data in the field.  Please note that this setting actually affects the formatter and will be true in any of the displays that map formatters are used.'),
-        '#default_value' => isset($widget['openlayers_cck_do_show_empty_map']) ? $widget['openlayers_cck_do_show_empty_map'] : FALSE,
+        '#title' => t('Show Empty Map'),
+        '#description' => t('If the formatter for this field is a map, by default a map will not display if there are no features/data.  Check this if you want to ensure that the map does show if there is no data in the field.  Please note that this setting actually affects the formatter and will be true in any of the displays that map formatters are used.'),
+        '#default_value' => isset($widget['openlayers_cck_show_empty_map']) ? $widget['openlayers_cck_show_empty_map'] : FALSE,
       );
 
       // Return form
       return $form;
 
     case 'save':
-      return array('openlayers_cck_preset_map', 'openlayers_cck_do_show_empty_map');
+      return array('openlayers_cck_preset_map', 'openlayers_cck_show_empty_map');
   }
 }
 
@@ -550,7 +550,7 @@ function theme_openlayers_cck_formatter_map($element) {
   }
   
   // Check for features and if field wants to display empty map
-  if ((count($features) ==  0 || empty($features['openlayers_cck_vector_feature_0']['wkt'])) && $widget['openlayers_cck_do_show_empty_map'] == TRUE) {
+  if ((count($features) ==  0 || empty($features['openlayers_cck_vector_feature_0']['wkt'])) && $widget['openlayers_cck_show_empty_map'] == FALSE) {
     // Display nothing
     return '';
   }

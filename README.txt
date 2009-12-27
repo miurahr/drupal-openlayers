@@ -27,18 +27,25 @@ There are a number of modules that add on more functionality.
  1) Normal Drupal module installation
  
  2) Set OpenLayers Source at: admin/settings/openlayers
-    It is suggested to download the library and use it locally for performance.
-   
- 3) You can set defaults at: admin/settings/openlayers/defaults
+    It is suggested to download the library and use it 
+    locally for performance.
+ 
+ 4) You can manage maps at: admin/settings/openlayers/presets
 
 
  Documentation
 =====================================
-* See docs/ directory.
+Significant documentation can be found after installing the 
+Advanced Help module:
+  * http://drupal.org/project/advanced_help
+
+You can also check out the handbook pages:
+  * http://drupal.org/node/595850
 
   
  Authors/Credits
 =====================================
 bdragon: http://drupal.org/user/53081
-phayes: http://drupal.org/user/47098
-zzolo: http://drupal.org/user/147331
+phayes:  http://drupal.org/user/47098
+zzolo:   http://drupal.org/user/147331
+tmcw:    http://drupal.org/user/12664

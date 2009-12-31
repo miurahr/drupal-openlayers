@@ -164,6 +164,8 @@ function openlayers_initialize() {
  *   Boolean if successful
  */
 function openlayers_render_map($map = array(), $render = TRUE) {
+  static $map_ids = array();
+
   // Check array
   if (!is_array($map) && !is_string($map)) {
     return FALSE;
@@ -187,10 +189,16 @@ function openlayers_render_map($map = array(), $render = TRUE) {
   // Include extra rendering functions
   module_load_include('inc', 'openlayers', 'includes/openlayers.render');
 
-  // Check ID
+  // Check if any ID
   if (!$map['id']) {
     $map['id'] = _openlayers_create_map_id();
   }
+  // Check if already used
+  if (!empty($map_ids[$map['id']])) {
+    $map['id'] .= '-' . (count($map_ids) + 1);
+  }
+  // Track map IDs
+  $map_ids[$map['id']] = $map['id'];
 
   // Hook for map alteration
   drupal_alter('openlayers_map_preprocess', $map);

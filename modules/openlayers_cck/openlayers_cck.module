@@ -25,7 +25,7 @@ function openlayers_cck_help($path, $arg) {
     case 'admin/help#openlayers_cck':
       $output = '<p>'. t('The openlayers_cck module provides fields and widgets that interface with OpenLayers.') .'</p>';
       return $output;
-      
+
   }
 }
 
@@ -87,13 +87,13 @@ function openlayers_cck_field_settings($op, $field) {
   switch ($op) {
     case 'form':
       $form = array();
-      
+
       $features = array(
         'point' => t('Point'),
         'path' => t('Path'),
         'polygon' => t('Polygon'),
       );
-      
+
       // What type of features to accept
       $form['openlayers_cck_feature_types'] = array(
         '#type' => 'checkboxes',
@@ -103,7 +103,7 @@ function openlayers_cck_field_settings($op, $field) {
         '#required' => TRUE,
         '#default_value' => is_array($field['openlayers_cck_feature_types']) ? $field['openlayers_cck_feature_types'] : array('point', 'path', 'polygon'),
       );
-      
+
       return $form;
 
     case 'validate':
@@ -158,8 +158,8 @@ function openlayers_cck_content_is_empty($item, $field) {
 }
 
 /**
-* Implementation of hook content_generate().
-*/
+ * Implementation of hook_content_generate().
+ */
 function openlayers_cck_content_generate(&$node, $field) {
   $node_field = array();
   $types = array();
@@ -172,7 +172,7 @@ function openlayers_cck_content_generate(&$node, $field) {
       $types[] = $type;
     }
   }
-  
+
   // Check multiple
   if ($field['multiple'] == 0) {
     // Only one
@@ -182,7 +182,7 @@ function openlayers_cck_content_generate(&$node, $field) {
     // Unlimited
     $multiple_count = rand(3, 11);
   }
-  
+
   // Create WKT
   for ($i = 0; $i < $multiple_count; $i++) {
     $type = $types[array_rand($types)];
@@ -190,7 +190,7 @@ function openlayers_cck_content_generate(&$node, $field) {
       case 'point':
         $value = 'POINT('. _openlayers_cck_generate_pair() . ')';
         break;
-        
+
       case 'path':
         // Make random number of points
         $line_array = array();
@@ -199,7 +199,7 @@ function openlayers_cck_content_generate(&$node, $field) {
         }
         $value = 'LINESTRING(' . implode(',', $line_array) . ')';
         break;
-        
+
       case 'polygon':
         // Make random number of points
         $poly_array = array();
@@ -254,7 +254,7 @@ function openlayers_cck_widget_settings($op, $widget) {
         '#options' => $presets,
         '#default_value' => isset($widget['openlayers_cck_preset_map']) ? $widget['openlayers_cck_preset_map'] : $default_preset,
       );
-      
+
       // Since there are not options for formatters, we are putting
       // this here.  This defines whethere or not to show an empty
       // map for the map formatters.
@@ -278,12 +278,12 @@ function openlayers_cck_widget_settings($op, $widget) {
  */
 function openlayers_cck_widget(&$form, &$form_state, $field, $items, $delta = 0) {
   $element = array();
-  
+
   if ($field['type'] == 'geo') {
     // If we are using this widget for a geo field...
     $info = module_invoke_all('gis_input_info');
     $info = $info[$field['widget']['type']];
-    
+
     foreach ($items as $key => $item) {
       // Convert from the storage format (wkb) to the element's expected format (wkt).
       if ($info['gis input']) {
@@ -291,23 +291,25 @@ function openlayers_cck_widget(&$form, &$form_state, $field, $items, $delta = 0)
         $items[$key] = $data['value'];
       }
     }
-    
-    $element['geo'] = array_merge($info['element'], array (
-      '#default_value' => isset($items[$delta]) ? $items[$delta] : '',
-      '#gis_type' => $field['geo_type'],
-      '#gis_input' => $info['gis input'], // The format expected by the element.
-      '#gis_output' => 'wkt', // The format expected by geo_field's storage.
-      '#delta' => $delta,
-      '#title' => $field['widget']['label'],
-      '#required' => $field['required'],
-      '#description' => $field['widget']['description'],
-    ));
-    
+
+    $element['geo'] = array_merge($info['element'],
+      array(
+        '#default_value' => isset($items[$delta]) ? $items[$delta] : '',
+        '#gis_type' => $field['geo_type'],
+        '#gis_input' => $info['gis input'], // The format expected by the element.
+        '#gis_output' => 'wkt', // The format expected by geo_field's storage.
+        '#delta' => $delta,
+        '#title' => $field['widget']['label'],
+        '#required' => $field['required'],
+        '#description' => $field['widget']['description'],
+      )
+    );
+
     if (!isset($element['geo']['#after_build'])) {
       $element['geo']['#after_build'] = array();
     }
   }
-  
+
   switch ($field['widget']['type']) {
     case 'openlayers_wkt_widget':
       $element['#type'] = 'openlayers_wkt_widget';
@@ -385,7 +387,7 @@ function openlayers_cck_wkt_element_process($element, $edit, &$form_state, &$for
       $default_value = implode('||', $values);
     }
   }
-  
+
   // Hidden element.  This is used to store a more distinctly
   // delimited dataset
   $element['openlayers_wkt_hidden'] = array(
@@ -414,14 +416,14 @@ function openlayers_cck_validate($element, &$form_state) {
   // turning multiple selected options into multiple parent elements.
   // Immediate parent is the delta, need to get back to parent's parent
   // to create multiple elements.
-  
+
   // Get field array
   $field = $form_state['#field_info'][$element['#field_name']];
   // Convert data to array of values
   $items = _openlayers_cck_convert_form_data($element, $field);
   // Set value in form
   form_set_value($element, $items, $form_state);
-  
+
   // Check we don't exceed the allowed number of values.
   if ($field['multiple'] >= 2) {
     if (count($items) > $field['multiple']) {
@@ -491,32 +493,42 @@ function theme_openlayers_cck_formatter_default($element) {
 
   // Create array of $features
   foreach (element_children($element) as $delta) {
-    // First look in the 'wkt' key (where geo stores it), then look in 'openlayers_wkt' key (where the non-spatial openlayers wkt field stores it).
+    // First look in the 'wkt' key (where geo stores it),
+    // then look in 'openlayers_wkt' key (where the non-spatial
+    // openlayers wkt field stores it).
     $features[$delta] = $element[$delta]['#item']['wkt'] ? $element[$delta]['#item']['wkt'] : $element[$delta]['#item']['openlayers_wkt'];
   }
-  
+
   // Clean features array of empty and null values
   $features = array_filter($features);
-  
+
   // Check count and build geomtry collection
   if (count($features) > 0) {
     if (count($features) > 1) {
-      // There are multiple features, so output either a multipart feature or a geometrycollection.
+      // There are multiple features, so output either a
+      // multipart feature or a geometrycollection.
       // Check to see if all the feature types are the same.
       $samefeaturetype = TRUE;
       foreach ($features as $feature) {
         foreach ($features as $checkfeature) {
-          if (substr($feature, 0, 5) != substr($checkfeature, 0, 5)) {
+          if (drupal_substr($feature, 0, 5) != drupal_substr($checkfeature, 0, 5)) {
             $samefeaturetype = FALSE;
             break 2;
           }
         }
       }
+
       if ($samefeaturetype) {
         // All the same feature types, output a multipart feature.
-        if (substr($features[0], 0, 5) == 'POINT')        $output = 'MULTIPOINT(' . str_replace('POINT', '', implode(',', $features)) . ')';
-        if (substr($features[0], 0, 10) == 'LINESTRING')  $output = 'MULTILINESTRING(' . str_replace('LINESTRING', '', implode(',', $features)) . ')';
-        if (substr($features[0], 0, 7) == 'POLYGON')      $output = 'MULTIPOLYGON(' . str_replace('POLYGON', '', implode(',', $features)) . ')';        
+        if (drupal_substr($features[0], 0, 5) == 'POINT') {
+          $output = 'MULTIPOINT(' . str_replace('POINT', '', implode(',', $features)) . ')';
+        }
+        if (drupal_substr($features[0], 0, 10) == 'LINESTRING') {
+          $output = 'MULTILINESTRING(' . str_replace('LINESTRING', '', implode(',', $features)) . ')';
+        }
+        if (drupal_substr($features[0], 0, 7) == 'POLYGON') {
+          $output = 'MULTIPOLYGON(' . str_replace('POLYGON', '', implode(',', $features)) . ')';
+        }
       }
       else {
         // Different feature types, output a geometrycollection.
@@ -539,7 +551,7 @@ function theme_openlayers_cck_formatter_map($element) {
   $features = array();
   $field = content_fields($element['#field_name'], $element['#type_name']);
   $widget = $field['widget'];
-  
+
   // Create array of $features
   foreach (element_children($element) as $delta) {
     $features['openlayers_cck_vector_feature_' . $delta] = array(
@@ -548,16 +560,21 @@ function theme_openlayers_cck_formatter_map($element) {
       'projection' => $element[$delta]['#item']['srid'] ? $element[$delta]['#item']['srid'] : '4326',
     );
   }
-  
+
   // Check for features and if field wants to display empty map
   if ((count($features) ==  0 || empty($features['openlayers_cck_vector_feature_0']['wkt'])) && $widget['openlayers_cck_show_empty_map'] == FALSE) {
     // Display nothing
     return '';
   }
 
-  // Get preset name from formatter. Strip off 'openlayers_cck_formatter_' and 'openlayers_map_' from the begginging.
-  if (substr($element['#formatter'], 25) == 'openlayers_cck_formatter_') $preset_name = substr($element['#formatter'], 25);
-  if (substr($element['#formatter'], 0, 15) == 'openlayers_map_') $preset_name = substr($element['#formatter'], 15);
+  // Get preset name from formatter. Strip off
+  // 'openlayers_cck_formatter_' and 'openlayers_map_' from the begginging.
+  if (drupal_substr($element['#formatter'], 25) == 'openlayers_cck_formatter_') {
+    $preset_name = drupal_substr($element['#formatter'], 25);
+  }
+  if (drupal_substr($element['#formatter'], 0, 15) == 'openlayers_map_') {
+    $preset_name = drupal_substr($element['#formatter'], 15);
+  }
 
   // Get map preset
   $map = openlayers_get_map($preset_name);
@@ -570,9 +587,9 @@ function theme_openlayers_cck_formatter_map($element) {
   else {
     $formatter_count[$field['field_name']] = 0;
   }
-  $map['id'] = OPENLAYERS_CCK_FORMATTER_MAP_ID_PREFIX .'-'. str_replace('_','-',$field['field_name']) .'-'. $formatter_count[$field['field_name']];
+  $map['id'] = OPENLAYERS_CCK_FORMATTER_MAP_ID_PREFIX . '-' . str_replace('_', '-', $field['field_name']) . '-' . $formatter_count[$field['field_name']];
   $formatter_count++;
-  
+
   // Add features and vector layer
   if (count($features) > 0) {
     $map['layers']['openlayers_cck_vector'] = array(
@@ -584,10 +601,10 @@ function theme_openlayers_cck_formatter_map($element) {
     );
     $map['options']['displayProjection'] = ($field['srid'] != 0) ? $field['srid'] : '4326';
   }
-  
+
   // Render map
   $rendered = openlayers_render_map($map);
-  
+
   // Check for output
   if (!$map['errors'] && !empty($map['width'])) {
     return $rendered['themed'];
@@ -667,7 +684,7 @@ function _openlayers_cck_render_element_map($field_name = '', $field_label = '',
   $field_container = 'edit-' . $field_name_html . '-openlayers-wkt-wrapper';
   $field_id = 'edit-' . $field_name_html . '-openlayers-wkt';
   $hidden_field_id = 'edit-' . $field_name_html . '-openlayers-wkt-hidden';
-  
+
   // Get map to use for field
   if (isset($widget['openlayers_cck_preset_map'])) {
     $map = openlayers_get_map($widget['openlayers_cck_preset_map']);
@@ -708,16 +725,16 @@ function _openlayers_cck_render_element_map($field_name = '', $field_label = '',
 
   // Look for geo type
   if ($field_type == 'geo' && isset($field['geo_type'])) {
-    
+
     // Feature types are named slightly different for lines ('linestring' vs. 'path') so we need to check.
     $type = ($field['geo_type'] == 'linestring') ? 'path' : $field['geo_type'];
-    
+
     $map['behaviors']['openlayers_cck_edit_' . $type] = $behavior_base +
       array(
         'id' => 'openlayers_cck_edit_' . $type,
         'feature_type' => $type,
     );
-    
+
   }
   else {
     // Check which feature types are available
@@ -738,10 +755,10 @@ function _openlayers_cck_render_element_map($field_name = '', $field_label = '',
       return FALSE;
     }
   }
-  
+
   // Render Map
   $rendered_map = openlayers_render_map($map);
-  
+
   // Check errors
   if (!$rendered_map['errors']) {
     // Add JS

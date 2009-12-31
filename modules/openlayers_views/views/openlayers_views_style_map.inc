@@ -652,7 +652,16 @@ class openlayers_views_style_map extends views_plugin_style {
   }
 }
 
-function _openlayers_views_clean($dirty_name) {
+/**
+ * Format names so that they can be more easily used by
+ * Views.
+ *
+ * @param $dirty_name
+ *   String to manipulate
+ * @return
+ *   Manipulated string
+ */
+function _openlayers_views_clean($dirty_name = '') {
   $cleaning = strip_tags($dirty_name);
   $cleaning = drupal_strtolower(str_replace(' ', '_', $cleaning));
   $cleaning = preg_replace("/[^a-z0-9_.]+/i", "", $cleaning);

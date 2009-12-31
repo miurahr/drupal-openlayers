@@ -92,7 +92,7 @@ function openlayers_test_openlayers_presets() {
       ),
     ),
     'styles' => array(
-      'default' => array(     
+      'default' => array(
         'pointRadius' => 10,
         'fillColor' => '#333333',
         'strokeColor' => '#FFFFFF',
@@ -150,35 +150,35 @@ function openlayers_test_openlayers_presets() {
     'preset_description' => t('This is a style test.'),
     'preset_data' => $style_test,
   );
-  
+
   // Cluster and Grouping preset
   $map = $default_map;
-  
-  $map['behaviors'] = array (
-    'clusterone' => array (
+
+  $map['behaviors'] = array(
+    'clusterone' => array(
       'id' => 'clusterone',
       'type' => 'openlayers_behaviors_cluster',
       'layer' => 'default_vector',
       'distance' => '20',
       'threshold' => '1',
     ),
-    'clustertwo' => array (
+    'clustertwo' => array(
       'id' => 'clustertwo',
       'type' => 'openlayers_behaviors_cluster',
       'layer' => 'second_vector',
     ),
-    'fullscreen' => array (
+    'fullscreen' => array(
       'id' => 'fullscreen',
       'type' => 'openlayers_behaviors_fullscreen',
     ),
   );
-  $map['layers']['default_vector'] = array (
+  $map['layers']['default_vector'] = array(
     'id' => 'default_vector',
     'type' => 'Vector',
     'name' => t('Default Vector'),
     'options' => array(),
   );
-  
+
   // Add points
   $features = array();
   for ($i = 0; $i < 30; $i++) {
@@ -190,8 +190,8 @@ function openlayers_test_openlayers_presets() {
     );
   }
   $map['layers']['default_vector']['features'] = $features;
-  
-  $map['layers']['second_vector'] = array (
+
+  $map['layers']['second_vector'] = array(
     'id' => 'second_vector',
     'type' => 'Vector',
     'name' => t('second Vector'),
@@ -224,7 +224,7 @@ function openlayers_test_openlayers_presets() {
  */
 function openlayers_test_page() {
   $output = '';
-  
+
   // Add some extra testing JS
   drupal_add_js(drupal_get_path('module', 'openlayers_test') . 'js/openlayers_test.js');
 
@@ -254,7 +254,7 @@ function openlayers_test_page() {
 
     <h3>' . t('Style Test Map') . '</h3>
       ' . $render_style_test['themed'] . '
-     
+
     <h3>' . t('Cluster Group Map') . '</h3>
       ' . $render_cluster_group_example['themed'] . '
 

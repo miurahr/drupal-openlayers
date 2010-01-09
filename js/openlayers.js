@@ -41,9 +41,6 @@ Drupal.behaviors.openlayers = function () {
  * data from Drupal.
  */
 OL.loadMaps = function () {
-  // @@TODO: Implement proxy
-  // OpenLayers.ProxyHost = "http://raider/proxy/?proxy_url=";
-
   // Store rendered maps and other OpenLayer objects in OL object
   OL.mapDefs = Drupal.settings.openlayers.maps;
 
@@ -51,6 +48,11 @@ OL.loadMaps = function () {
   for (var i in OL.mapDefs) {
     var map = OL.mapDefs[i];
     var $map = $('#' + map.id);
+    
+    // Define proxy host, if available.
+    if (map.proxy_host) {
+      OpenLayers.ProxyHost = map.proxy_host;
+    }
 
     // Check if map is already rendered
     if (OL.isSet(OL.maps[map.id]) && OL.isSet(OL.maps[map.id].rendered) &&
@@ -63,13 +65,15 @@ OL.loadMaps = function () {
     var event = {'mapDef': map};
     OL.triggerCustom(map, 'beforeEverything', event);
 
-    // Check to see if there is a div on the page ready for the map. If there is then proceed.
+    // Check to see if there is a div on the page ready for the map. 
+    // If there is then proceed.
     var $map = $('#' + map.id);
     if ($map.length > 0 && OL.isSet(map.width) && OL.isSet(map.height)) {
       // Add any custom controls
       $map.after(Drupal.theme('mapControls', map.id, map.height));
 
-      // Set-up our registry of active OpenLayers javascript objects for this particular map.
+      // Set-up our registry of active OpenLayers javascript objects 
+      // for this particular map.
       OL.maps[map.id] = {};
       // Set up places for us to store layers, controls, etc.
       OL.maps[map.id].controls = [];

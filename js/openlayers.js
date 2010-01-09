@@ -42,7 +42,7 @@ Drupal.behaviors.openlayers = function () {
  */
 OL.loadMaps = function () {
   // @@TODO: Implement proxy
-  OpenLayers.ProxyHost = "http://raider/proxy/?proxy_url=";
+  // OpenLayers.ProxyHost = "http://raider/proxy/?proxy_url=";
 
   // Store rendered maps and other OpenLayer objects in OL object
   OL.mapDefs = Drupal.settings.openlayers.maps;

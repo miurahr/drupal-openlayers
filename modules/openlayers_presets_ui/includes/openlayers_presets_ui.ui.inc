@@ -1152,31 +1152,31 @@ function _openlayers_presets_ui_available_controls() {
   );
   $available['KeyboardDefaults'] = array(
     'title' => t('Keyboard Defaults'),
-    'description' => t('Provides a the ability to use the keyboard to pan and zoom map.'),
+    'description' => t('Provides the ability to use the keyboard to pan and zoom map.'),
   );
   $available['LayerSwitcher'] = array(
     'title' => t('Layer Switcher'),
-    'description' => t('Gives user ability to switch Layers in the map interface.'),
+    'description' => t('Provides the ability to switch Layers in the map interface.'),
   );
   $available['MousePosition'] = array(
     'title' => t('Mouse Position'),
-    'description' => t('Gives a visual indication of the mouse position to the user.'),
+    'description' => t('Provides a visual indication of the mouse position to the user.'),
   );
   $available['Navigation'] = array(
     'title' => t('Navigation'),
-    'description' => t('Gives the user the ability to navigate the map interface.'),
+    'description' => t('Provides the ability to navigate the map interface.'),
   );
   $available['PanZoomBar'] = array(
     'title' => t('Pan Zoom Bar'),
-    'description' => t('Gives user ability to pan and zoom in the map interface. The Navigation control needs to be enabled for this to function.'),
+    'description' => t('Provides the ability to pan and zoom in the map interface. The Navigation control needs to be enabled for this to function to work properly.'),
   );
   $available['PanZoom'] = array(
     'title' => t('Pan Zoom'),
-    'description' => t('A smaller version of the Pan Zoom Bar, providing a control for panning and a small zoom control.  The Navigation control needs to be enabled for this to function.'),
+    'description' => t('Provides a smaller version of the Pan Zoom Bar.  The Navigation control needs to be enabled for this to function.'),
   );
   $available['Permalink'] = array(
     'title' => t('Permanent Link'),
-    'description' => t('Prvides a URL that will link to a specific map position.'),
+    'description' => t('Provides a URL that will link to a specific map position.'),
   );
   $available['ScaleLine'] = array(
     'title' => t('Scale Line'),
@@ -1184,11 +1184,11 @@ function _openlayers_presets_ui_available_controls() {
   );
   $available['ZoomBox'] = array(
     'title' => t('Zoom Box'),
-    'description' => t('Allows user to draw a box on screen to zoom with Shift + Click.'),
+    'description' => t('Provides the ability for the user to draw a box on screen to zoom with Shift + Click.'),
   );
   $available['ZoomToMaxExtent'] = array(
     'title' => t('Zoom to Max Extent'),
-    'description' => t('Provides button to zoom to the maximum extent of the map.'),
+    'description' => t('Provides a button to zoom to the maximum extent of the map.'),
   );
 
   return $available;

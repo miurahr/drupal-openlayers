@@ -15,6 +15,13 @@
 define('OPENLAYERS_CCK_WIDGET_MAP_ID_PREFIX', 'openlayers-cck-widget-map');
 define('OPENLAYERS_CCK_FORMATTER_MAP_ID_PREFIX', 'openlayers-cck-formatter-map');
 
+
+/**
+ * Include hooks into other modules
+ */
+module_load_include('inc', 'openlayers_cck', 'openlayers_cck.feeds');
+
+
 /**
  * Implementation of hook_help().
  */
@@ -25,7 +32,6 @@ function openlayers_cck_help($path, $arg) {
     case 'admin/help#openlayers_cck':
       $output = '<p>'. t('The openlayers_cck module provides fields and widgets that interface with OpenLayers.') .'</p>';
       return $output;
-
   }
 }
 

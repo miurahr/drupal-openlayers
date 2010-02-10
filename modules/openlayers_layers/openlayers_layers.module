@@ -251,20 +251,6 @@ function openlayers_layers_openlayers_layers_info() {
     );
   }
 
-  // If Geo module is enabled, create layer for each geo table
-  if (module_exists('geo_data')) {
-    // Get the data tables loaded from shapefiles, and include them as available layers
-    $geo_tables  = geo('tables', '/^content_field/');
-    foreach ($geo_tables as $key => $table) {
-      $info[$key] = array(
-        // @@TODO: Actually have a real name
-        'name' => t('Geo Table (@key)', array('@key' => $key)),
-        'file' => $file,
-        'callback' => 'openlayers_layers_process_geo_data_layers',
-      );
-    }
-  }
-
   return $info;
 }
 

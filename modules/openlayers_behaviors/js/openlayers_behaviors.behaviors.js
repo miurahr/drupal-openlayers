@@ -106,6 +106,9 @@ OL.Behaviors.popupFeatureSelected = function(feature) {
   // Add popup to feature
   feature.popup = popup;
   feature.layer.map.addPopup(popup);
+  
+  // Run all Drupal behaviors on freshly generated popup content. 
+  Drupal.attachBehaviors();
 }
 
 /**
@@ -220,7 +223,10 @@ OL.Behaviors.tooltipOver = function(event) {
   var absoluteLeft = centroidPixel.x + mapDivOffset.left - scrollLeft - offset_left;
   
   // Create offset
-  $tooltipContainer.css('top', absoluteTop).css('left', absoluteLeft)  
+  $tooltipContainer.css('top', absoluteTop).css('left', absoluteLeft);
+  
+  // Run all Drupal behaviors on freshly generated tooltip content. 
+  Drupal.attachBehaviors();
 }
 
 /**

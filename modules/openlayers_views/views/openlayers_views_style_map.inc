@@ -332,8 +332,8 @@ class openlayers_views_style_map extends views_plugin_style {
     }
 
     // Build feature. We create one feature per field per row.
-    $this->view->row_index = 0;
     foreach ($records as $id => $record) {
+      $this->view->row_index = $id;
       $feature = array();
       // In order for any kind of substitution/replacement
       // token/convert to link/trim/etc. functionality to work, we
@@ -471,7 +471,6 @@ class openlayers_views_style_map extends views_plugin_style {
       if (!empty($feature['wkt'])) {
         $features[] = $feature;
       }
-      $this->view->row_index++;
     }
     unset($this->view->row_index);
     return $features;

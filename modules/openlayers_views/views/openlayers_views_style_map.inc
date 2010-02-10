@@ -74,10 +74,6 @@ class openlayers_views_style_map extends views_plugin_style {
     if (count($geo_field_options) > 0) {
       $data_source_options['geo'] = t('Geo Module');
     }
-    // Check Location fields found
-    if (count($location_field_options) > 0) {
-      $data_source_options['location'] = t('Location CCK Fields');
-    }
     // Check Node Location found
     if (module_exists('location_node')) {
       $data_source_options['node_locations'] = t('Node Locations');
@@ -374,10 +370,6 @@ class openlayers_views_style_map extends views_plugin_style {
                 $feature['projection'] = $geo_record['srid'];
               }
             }
-            break;
-
-          case 'location':
-            // @@TODO
             break;
 
           case 'other_latlon':

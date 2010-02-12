@@ -212,6 +212,11 @@ function openlayers_render_map($map = array(), $render = TRUE) {
   $map['behaviors'] = _openlayers_behaviors_process($map['behaviors'], $map);
   // Process styles
   $map['styles'] = _openlayers_styles_process($map['styles'], $map);
+  
+  // A little proxy convienence
+  if (module_exists('proxy') && !isset($map['proxy_path'])) {
+    $map['proxy_path'] = base_path() . PROXY_ROUTER_PATH . '?' . PROXY_ROUTER_QUERY_VAR . '=';
+  }
 
   // Hook for one last alter (this should be changed to _postprocess for 2.x)
   drupal_alter('openlayers_map', $map);

@@ -136,7 +136,8 @@ function openlayers_initialize() {
       drupal_set_html_head('<script src="'. check_url($path) .'" type="text/javascript"></script>');
     }
     else {
-      drupal_add_js($path);
+      // Ensure that the JS file is not aggregated with the rest
+      drupal_add_js($path, 'module', 'header', FALSE, TRUE, FALSE);
     }
 
     // Add CSS

@@ -16,6 +16,13 @@ function openlayers_cck_enable() {
   // Let content/cck know about our actions
   drupal_load('module', 'content');
   content_notify('enable', 'openlayers_cck');
+
+  // As needed for upgrading to 2.x (while accounting
+  // for 0.x), we set a variable that can help
+  // the upgrade function in 2.x understand what needs
+  // to be done.  Note, it is not meant to actually
+  // maintain the schema version.
+  variable_set('openlayers_cck_schema_version', 6100);
 }
 
 /**
@@ -58,6 +65,9 @@ function openlayers_cck_uninstall() {
  * For the CCK Map formatters, the new default is to not
  * show empty maps, so this update attempts to
  * set that default to TRUE.
+ *
+ * No need for translation in update function:
+ * http://drupal.org/node/322731
  */
 function openlayers_cck_update_6100(&$sandbox) {
   $ret = array();
@@ -75,4 +85,25 @@ function openlayers_cck_update_6100(&$sandbox) {
   }
 
   return $ret;
+}
+
+/**
+ * Implementation of hook_update_N().
+ *
+ * No need for translation in update function:
+ * http://drupal.org/node/322731
+ */
+function openlayers_cck_update_6101(&$sandbox) {
+  // As needed for upgrading to 2.x (while accounting
+  // for 0.x), we set a variable that can help
+  // the upgrade function in 2.x understand what needs
+  // to be done.  Note, it is not meant to actually
+  // maintain the schema version.
+  variable_set('openlayers_cck_schema_version', 6100);
+  return array(
+    0 => array(
+      'success' => TRUE,
+      'query' => 'Setup for upgrading to 2.x: openlayers_cck_schema_version',
+    ),
+  );
 }

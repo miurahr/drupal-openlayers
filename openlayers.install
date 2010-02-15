@@ -10,6 +10,18 @@
  */
 
 /**
+ * Implementation of hook_enable().
+ */
+function openlayers_enable() {
+  // As needed for upgrading to 2.x (while accounting
+  // for 0.x), we set a variable that can help
+  // the upgrade function in 2.x understand what needs
+  // to be done.  Note, it is not meant to actually
+  // maintain the schema version.
+  variable_set('openlayers_schema_version', 6100);
+}
+
+/**
  * Implementation of hook_install().
  */
 function openlayers_install() {
@@ -72,4 +84,25 @@ function openlayers_schema() {
   );
 
   return $schema;
+}
+
+/**
+ * Implementation of hook_update_N().
+ *
+ * No need for translation in update function:
+ * http://drupal.org/node/322731
+ */
+function openlayers_update_6100(&$sandbox) {
+  // As needed for upgrading to 2.x (while accounting
+  // for 0.x), we set a variable that can help
+  // the upgrade function in 2.x understand what needs
+  // to be done.  Note, it is not meant to actually
+  // maintain the schema version.
+  variable_set('openlayers_schema_version', 6100);
+  return array(
+    0 => array(
+      'success' => TRUE,
+      'query' => 'Setup for upgrading to 2.x: openlayers_schema_version',
+    ),
+  );
 }

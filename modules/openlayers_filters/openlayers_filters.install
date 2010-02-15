@@ -4,7 +4,7 @@
 /**
  * @file
  * This file holds the functions for the installing
- * and enabling of the openlayers_behaviors module.
+ * and enabling of the openlayers_filters module.
  *
  * @ingroup openlayers
  */
@@ -12,9 +12,9 @@
 /**
  * Implementation of hook_uninstall().
  */
-function openlayers_behaviors_uninstall() {
+function openlayers_filters_uninstall() {
   // Get module variables
-  $results = db_query("SELECT v.name FROM {variable} AS v WHERE v.name LIKE '%s%%'", 'openlayers_behaviors_');
+  $results = db_query("SELECT v.name FROM {variable} AS v WHERE v.name LIKE '%s%%'", 'openlayers_filters_');
   // Remove variables
   while ($row = db_fetch_array($results)) {
     variable_del($row['name']);
@@ -24,13 +24,13 @@ function openlayers_behaviors_uninstall() {
 /**
  * Implementation of hook_enable().
  */
-function openlayers_behaviors_enable() {
+function openlayers_filters_enable() {
   // As needed for upgrading to 2.x (while accounting
   // for 0.x), we set a variable that can help
   // the upgrade function in 2.x understand what needs
   // to be done.  Note, it is not meant to actually
   // maintain the schema version.
-  variable_set('openlayers_behaviors_schema_version', 6100);
+  variable_set('openlayers_filters_schema_version', 6100);
 }
 
 /**
@@ -39,17 +39,17 @@ function openlayers_behaviors_enable() {
  * No need for translation in update function:
  * http://drupal.org/node/322731
  */
-function openlayers_behaviors_update_6100(&$sandbox) {
+function openlayers_filters_update_6100(&$sandbox) {
   // As needed for upgrading to 2.x (while accounting
   // for 0.x), we set a variable that can help
   // the upgrade function in 2.x understand what needs
   // to be done.  Note, it is not meant to actually
   // maintain the schema version.
-  variable_set('openlayers_behaviors_schema_version', 6100);
+  variable_set('openlayers_filters_schema_version', 6100);
   return array(
     0 => array(
       'success' => TRUE,
-      'query' => 'Setup for upgrading to 2.x: openlayers_behaviors_schema_version',
+      'query' => 'Setup for upgrading to 2.x: openlayers_filters_schema_version',
     ),
   );
 }

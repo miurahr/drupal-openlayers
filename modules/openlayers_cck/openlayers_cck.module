@@ -261,6 +261,26 @@ function openlayers_cck_widget_settings($op, $widget) {
         '#options' => $presets,
         '#default_value' => isset($widget['openlayers_cck_preset_map']) ? $widget['openlayers_cck_preset_map'] : $default_preset,
       );
+      
+      // Zoom to layer behavior
+      $form['openlayers_cck_zoom_to_layer'] = array(
+        '#type' => 'checkbox',
+        '#title' => t('Zoom to Layer'),
+        '#description' => t('This option will affect how the map will display on the node view.  The zoom to layer behavior means that the map will automatically be centered and zoomed onto the features that are created.'),
+        '#default_value' => isset($widget['openlayers_cck_zoom_to_layer']) ? $widget['openlayers_cck_zoom_to_layer'] : FALSE,
+      );
+      // Zoom levels
+      $zoom_levels = array();
+      for ($i = 0; $i <= 20; $i++) {
+        $zoom_levels[$i] = $i;
+      }
+      $form['openlayers_cck_zoom_to_layer_level'] = array(
+        '#type' => 'select',
+        '#title' => t('Input Map Preset'),
+        '#description' => t('Choose the zoom level that the Zoom to Layer behavior will have.  This will only apply for single feature maps, meaning if you have one point on the map, this level will be given.  These levels are arbitrary and the levels will depend on your map and layers.  The lower the number the more zoomed in the map will be.'),
+        '#options' => $zoom_levels,
+        '#default_value' => isset($widget['openlayers_cck_zoom_to_layer_level']) ? $widget['openlayers_cck_zoom_to_layer_level'] : 10,
+      );
 
       // Since there are not options for formatters, we are putting
       // this here.  This defines whethere or not to show an empty
@@ -276,7 +296,7 @@ function openlayers_cck_widget_settings($op, $widget) {
       return $form;
 
     case 'save':
-      return array('openlayers_cck_preset_map', 'openlayers_cck_show_empty_map');
+      return array('openlayers_cck_preset_map', 'openlayers_cck_show_empty_map', 'openlayers_cck_zoom_to_layer', 'openlayers_cck_zoom_to_layer_level');
   }
 }
 
@@ -607,6 +627,16 @@ function theme_openlayers_cck_formatter_map($element) {
       'features' => $features,
     );
     $map['options']['displayProjection'] = ($field['srid'] != 0) ? $field['srid'] : '4326';
+    
+    // Zoom to layer
+    if ($widget['openlayers_cck_zoom_to_layer']) {
+      $map['behaviors']['cck_zoom_to_layer'] = array(
+        'id' => 'cck_zoom_to_layer',
+        'type' => 'openlayers_behaviors_zoom_to_layer',
+        'layer' => 'openlayers_cck_vector',
+        'pointzoom' => $widget['openlayers_cck_zoom_to_layer_level'],
+      );
+    }
   }
 
   // Render map

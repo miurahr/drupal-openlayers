@@ -82,6 +82,10 @@ OL.loadMaps = function () {
 
       // Render Map
       OL.renderMap(map);
+      
+      if ($.browser.msie) {
+        OL.redrawVectors(OL.maps[map.id].map);
+      } 
     }
   }
 };
@@ -314,7 +318,17 @@ OL.processLayers = function(layers, mapid) {
       }
     }
   }
-};
+}; 
+
+/**
+ * Redraw Vector Layers
+ */
+OL.redrawVectors = function(map) {
+  // Get each vector layer
+  $.each(map.getLayersByClass('OpenLayers.Layer.Vector'), function(i, layer) {
+    layer.redraw();
+  });
+}
 
 /**
  * Process Events

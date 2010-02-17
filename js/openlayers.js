@@ -84,7 +84,10 @@ OL.loadMaps = function () {
       OL.renderMap(map);
       
       if ($.browser.msie) {
-        OL.redrawVectors(OL.maps[map.id].map);
+        $(window).load(function() {
+          OL.redrawVectors(OL.maps[map.id].map);
+        });
+        
       } 
     }
   }

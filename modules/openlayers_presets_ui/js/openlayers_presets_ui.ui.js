@@ -17,52 +17,38 @@ Drupal.behaviors.OLUI = function(context) {
   var $autoOptionsCheck = $('#edit-options-automatic-options');
   var $submitProjection = $('#edit-openlayers-projection-ahah');
 
+  // When the user selects a projection, update the projectOther field.
+  // projectOther is where we actually store projection values
+  $projectSelect.click(function(event) {
+    if (event.target.value != 'other') {
+      $projectOtherWrapper.hide();
+      $projectOther.val(event.target.value);
+    }
+    else {
+      $projectOtherWrapper.show();
+    }
+    $projectOther.trigger('change');
+  });
+  //TODO: process above function on page load for the currently selected item
+  $projectSelect.addClass('projection-processed');
+  
   // Reproject center values when projection changes
-  $projectSelect.change(OL.updateCenterFormOnProjectionChange);
   $projectOther.change(OL.updateCenterFormOnProjectionChange);
 
   // Hide submit button
   $submitProjection.hide();
 
-  // Add class
-  $projectSelect.addClass('projection-processed');
-
-  // Hide the other projection_field
-  if ($projectSelect.length > 0) {
-    if ($projectSelect.val() != 'other') {
-      // $projectOtherWrapper.hide();
-    }
-  }
-
-  // Change event for select and add class
-  $projectSelect.change(function(e) {
-    var val = $(this).val();
-    if (val == 'other') {
-      $projectOtherWrapper.show();
-    }
-    else {
-      $projectOther.val(val);
-      // $projectOtherWrapper.hide();
-    }
-  });
-
   // Automatic options.  We do it here, instead of in Form API because
   // Form API enforces the disabled
   $autoOptionsCheck.change(function() {
     var $thisCheck = $(this);
-    var $autoOptions = $thisCheck.parent().parent().parent().find('input:not("#edit-options-automatic-options")');
+    var $autoOptions = $thisCheck.parent().parent().parent().find('fieldset, div:not("#edit-options-automatic-options-wrapper")');
     if ($thisCheck.is(':checked')) {
-      $autoOptions.attr('disabled', 'disabled');
+      $autoOptions.hide();;
     }
     else {
-      $autoOptions.removeAttr('disabled');
+      $autoOptions.show('disabled');
     }
-  });
-
-  // When form is submitted, if diabled, FAPI does not read values
-  jQuery($autoOptionsCheck.form).submit(function() {
-    $autoOptionsCheck.attr('checked', false);
-    $autoOptionsCheck.trigger('change');
   });
 
   // Trigger change
@@ -86,8 +72,9 @@ Drupal.behaviors.OLUI = function(context) {
  *
  */
 OL.updateCenterFormOnProjectionChange = function(event) {
+  
   var $formItem = $(event.target);
-  var projection = $formItem.val();
+  var projection = event.target.value;
   var helpmap = OL.maps['openlayers-center-helpmap'].map;
   var zoom = helpmap.getZoom();
   var center = helpmap.getCenter();

@@ -11,15 +11,19 @@
 
 
 .openlayers-map {
-  z-index:0;
-  position:relative;
+  z-index: 0;
+  position: relative;
 }
 
+/* Reset Image Margins */
+.openlayers-map img {
+  margin: 0px;
+}
 
 /**
  * Controls
  */
 .openlayers-controls {
-	z-index:1000;
+	z-index: 1000;
 }
 

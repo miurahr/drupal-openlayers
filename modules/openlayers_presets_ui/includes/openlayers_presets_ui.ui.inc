@@ -388,11 +388,6 @@ function openlayers_presets_ui_presets_manage_add(&$form_state, $preset = array(
     '#default_value' => $defaults['projections']['easy_projection'],
     '#options' => $projections,
     '#attributes' => array('class' => 'openlayers-form-easy-projection'),
-    '#ahah' => array(
-      'path' => 'openlayers/ahah/preset',
-      'wrapper' => 'openlayers-layers-select',
-      'event' => 'change',
-    ),
   );
   $form['projections']['projection'] = array(
     '#type' => 'textfield',
@@ -401,6 +396,11 @@ function openlayers_presets_ui_presets_manage_add(&$form_state, $preset = array(
     '#attributes' => array('class' => 'openlayers-form-projection'),
     '#default_value' => $defaults['projections']['projection'],
     '#maxlength' => 16,
+    '#ahah' => array(
+      'path' => 'openlayers/ahah/preset',
+      'wrapper' => 'openlayers-layers-select',
+      'event' => 'change',
+    ),
   );
 
   // Start AHAH Wrapper

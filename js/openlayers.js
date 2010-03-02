@@ -16,7 +16,7 @@
  * See the Drupal Book page describing this problem:
  * http://drupal.org/node/613002
  */
-document.namespaces;
+document.namespaces = document.namespaces || {};
 
 /**
  * Global Object for Namespace
@@ -26,7 +26,7 @@ var OL = OL || {'Layers': {}, 'EventHandlers': {} ,'Behaviors': {}, 'maps': []};
 /**
  * OpenLayers Base Drupal Behavoirs
  */
-Drupal.behaviors.openlayers = function () {
+Drupal.behaviors.openlayers = function() {
   // Check for openlayers
   if ((typeof(Drupal.settings.openlayers) === 'object') && (OL.isSet(Drupal.settings.openlayers.maps))) {
     OL.loadMaps();
@@ -39,15 +39,15 @@ Drupal.behaviors.openlayers = function () {
  * Main function to sart loading maps by parsing
  * data from Drupal.
  */
-OL.loadMaps = function () {
+OL.loadMaps = function() {
   // Store rendered maps and other OpenLayer objects in OL object
   OL.mapDefs = Drupal.settings.openlayers.maps;
 
   // Go through array and make maps
-  for (var i in OL.mapDefs) {
+  $.each(OL.mapDefs, function(i, value) {
     var map = OL.mapDefs[i];
     var $map = $('#' + map.id);
-    
+
     // Define proxy host, if available.
     if (map.proxy_host) {
       OpenLayers.ProxyHost = map.proxy_host;
@@ -57,39 +57,39 @@ OL.loadMaps = function () {
     if (OL.isSet(OL.maps[map.id]) && OL.isSet(OL.maps[map.id].rendered) &&
       (OL.maps[map.id].rendered === true)
     ) {
-      continue;
+      // Do somthing for rendered maps
     }
+    else {
+      // Trigger beforeEverything event
+      var event = {'mapDef': map};
+      OL.triggerCustom(map, 'beforeEverything', event);
 
-    // Trigger beforeEverything event
-    var event = {'mapDef': map};
-    OL.triggerCustom(map, 'beforeEverything', event);
+      // Check to see if there is a div on the page ready for the map.
+      // If there is then proceed.
+      if ($map.length > 0 && OL.isSet(map.width) && OL.isSet(map.height)) {
+        // Add any custom controls
+        $map.after(Drupal.theme('mapControls', map.id, map.height));
 
-    // Check to see if there is a div on the page ready for the map. 
-    // If there is then proceed.
-    var $map = $('#' + map.id);
-    if ($map.length > 0 && OL.isSet(map.width) && OL.isSet(map.height)) {
-      // Add any custom controls
-      $map.after(Drupal.theme('mapControls', map.id, map.height));
+        // Set-up our registry of active OpenLayers javascript objects
+        // for this particular map.
+        OL.maps[map.id] = {};
+        // Set up places for us to store layers, controls, etc.
+        OL.maps[map.id].controls = [];
+        OL.maps[map.id].layers = [];
+        OL.maps[map.id].active = false;
 
-      // Set-up our registry of active OpenLayers javascript objects 
-      // for this particular map.
-      OL.maps[map.id] = {};
-      // Set up places for us to store layers, controls, etc.
-      OL.maps[map.id].controls = [];
-      OL.maps[map.id].layers = [];
-      OL.maps[map.id].active = false;
+        // Render Map
+        OL.renderMap(map);
 
-      // Render Map
-      OL.renderMap(map);
-      
-      // Hack for IE so points show up
-      if ($.browser.msie) {
-        $(window).load(function() {
-          OL.redrawVectors(OL.maps[map.id].map);
-        });
-      } 
+        // Hack for IE so points show up
+        if ($.browser.msie) {
+          $(window).load(function() {
+            OL.redrawVectors(OL.maps[map.id].map);
+          });
+        }
+      }
     }
-  }
+  });
 };
 
 /**
@@ -101,18 +101,21 @@ OL.loadMaps = function () {
  *   The map definition array.
  */
 OL.renderMap = function (map) {
+  var options = [];
+  var event = {};
+
   // Create Projection objects
   OL.maps[map.id].projection = new OpenLayers.Projection('EPSG:' + map.projection);
 
+  // Check map options
   if (OL.isSet(map.options)) {
     OL.maps[map.id].displayProjection = new OpenLayers.Projection('EPSG:' + map.options.displayProjection);
 
     // Create base map options
-    var options = OL.createMapOptions(map.options, map.controls, map.id);
+    options = OL.createMapOptions(map.options, map.controls, map.id);
   }
   else {
     OL.maps[map.id].displayProjection = OL.maps[map.id].projection;
-    var options = [];
   }
 
   // Change image path if specified
@@ -135,7 +138,7 @@ OL.renderMap = function (map) {
   });
 
   // Trigger beforeLayers event
-  var event = {'mapDef': map, 'map': OL.maps[map.id].map};
+  event = {'mapDef': map, 'map': OL.maps[map.id].map};
   OL.triggerCustom(map, 'beforeLayers', event);
 
   // We set up all our layers
@@ -143,12 +146,14 @@ OL.renderMap = function (map) {
 
   // Add layers to map
   for (var l in OL.maps[map.id].layers) {
-    var layer =  OL.maps[map.id].layers[l];
-    OL.maps[map.id].map.addLayer(layer);
+    if (OL.isSet(OL.maps[map.id].layers[l])) {
+      var layer =  OL.maps[map.id].layers[l];
+      OL.maps[map.id].map.addLayer(layer);
+    }
   }
 
   // Trigger beforeCenter event
-  var event = {'mapDef': map, 'map': OL.maps[map.id].map};
+  event = {'mapDef': map, 'map': OL.maps[map.id].map};
   OL.triggerCustom(map, 'beforeCenter', event);
 
   // Zoom to Center
@@ -164,40 +169,39 @@ OL.renderMap = function (map) {
   OL.maps[map.id].map.setBaseLayer(OL.maps[map.id].layers[map.default_layer]);
 
   // Trigger beforeControls event
-  var event = {'mapDef': map, 'map': OL.maps[map.id].map};
+  event = {'mapDef': map, 'map': OL.maps[map.id].map};
   OL.triggerCustom(map, 'beforeControls', event);
 
   // Add controls to map
-  for (var c in OL.maps[map.id].controls) {
-    var control = OL.maps[map.id].controls[c];
+  $.each(OL.maps[map.id].controls, function(c, control) {
     OL.maps[map.id].map.addControl(control);
     if (control.activeByDefault) {
       control.activate();
     }
-  }
+  });
 
   // Trigger beforeEvents event
-  var event = {'mapDef': map, 'map': OL.maps[map.id].map};
+  event = {'mapDef': map, 'map': OL.maps[map.id].map};
   OL.triggerCustom(map, 'beforeEvents', event);
 
   // Add events to the map
   OL.processEvents(map.events, map.id);
 
   // Trigger beforeBehaviors event
-  var event = {'mapDef': map, 'map': OL.maps[map.id].map};
+  event = {'mapDef': map, 'map': OL.maps[map.id].map};
   OL.triggerCustom(map, 'beforeBehaviors', event);
 
   // Add behaviors to map
-  for (var b in OL.mapDefs[map.id].behaviors) {
-    var event = {};
+  $.each(OL.mapDefs[map.id].behaviors, function(b, behavior) {
+    event = {};
     event.mapDef = map;
     event.map = OL.maps[map.id].map;
     event.behavior = OL.mapDefs[map.id].behaviors[b];
     OL.Behaviors[OL.mapDefs[map.id].behaviors[b].js_callback](event);
-  }
+  });
 
   // Trigger mapReady event
-  var event = {'mapDef': map, 'map': OL.maps[map.id].map};
+  event = {'mapDef': map, 'map': OL.maps[map.id].map};
   OL.triggerCustom(map, 'mapReady', event);
 
   // Mark as Rendered
@@ -312,15 +316,19 @@ OL.processLayers = function(layers, mapid) {
         newLayer.drupalData = layers[layer];
 
         // Add events
-        for (var evtype in layers[layer].events){
-          for (var ev in layers[layer].events[evtype]) {
-            newLayer.events.register(evtype, newLayer, OL.EventHandlers[layers[layer].events[evtype][ev]]);
+        for (var evtype in layers[layer].events) {
+          if (OL.isSet(layers[layer].events[evtype])) {
+            for (var ev in layers[layer].events[evtype]) {
+              if (OL.isSet(layers[layer].events[evtype][ev])) {
+                newLayer.events.register(evtype, newLayer, OL.EventHandlers[layers[layer].events[evtype][ev]]);
+              }
+            }
           }
         }
       }
     }
   }
-}; 
+};
 
 /**
  * Redraw Vector Layers
@@ -330,7 +338,7 @@ OL.redrawVectors = function(map) {
   $.each(map.getLayersByClass('OpenLayers.Layer.Vector'), function(i, layer) {
     layer.redraw();
   });
-}
+};
 
 /**
  * Process Events
@@ -344,14 +352,16 @@ OL.redrawVectors = function(map) {
  */
 OL.processEvents = function(events, mapid) {
   // Go through events
-  for (var evtype in events){
-    // Exclude One-Time map events.
-    var event_types = ['beforeEverything', 'beforeLayers', 'beforeCenter',
-                'beforeControls', 'beforeEvents', 'beforeBehaviors',
-                'mapReady'];
-    if ($.inArray(evtype, event_types) === -1) {
-      for (var ev in events[evtype]) {
-        OL.maps[mapid].map.events.register(evtype, OL.maps[mapid].map, OL.EventHandlers[events[evtype][ev]]);
+  for (var evtype in events) {
+    if (OL.isSet(events[evtype])) {
+      // Exclude One-Time map events.
+      var eventTypes = ['beforeEverything', 'beforeLayers', 'beforeCenter', 'beforeControls', 'beforeEvents', 'beforeBehaviors', 'mapReady'];
+      if ($.inArray(evtype, eventTypes) === -1) {
+        for (var ev in events[evtype]) {
+          if (OL.isSet(events[evtype][ev])) {
+            OL.maps[mapid].map.events.register(evtype, OL.maps[mapid].map, OL.EventHandlers[events[evtype][ev]]);
+          }
+        }
       }
     }
   }
@@ -370,7 +380,9 @@ OL.processEvents = function(events, mapid) {
 OL.triggerCustom = function(map, eventName, event) {
   if (OL.isSet(map.events) && OL.isSet(map.events[eventName])) {
     for (var ev in map.events[eventName]) {
-      OL.EventHandlers[map.events[eventName][ev]](event);
+      if (OL.isSet(map.events[eventName][ev])) {
+        OL.EventHandlers[map.events[eventName][ev]](event);
+      }
     }
   }
 };
@@ -398,9 +410,11 @@ OL.parseRel = function(rel) {
   var keyValueStrings = rel.split(';');
 
   // Process the key:value strings into key:value pairs
-  for (var i in keyValueStrings){
-    var singleKeyValue = keyValueStrings[i].split(':');
-    outputArray[singleKeyValue[0]] = singleKeyValue[1];
+  for (var i in keyValueStrings) {
+    if (OL.isSet(keyValueStrings[i])) {
+      var singleKeyValue = keyValueStrings[i].split(':');
+      outputArray[singleKeyValue[0]] = singleKeyValue[1];
+    }
   }
 
   return outputArray;

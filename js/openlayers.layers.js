@@ -27,7 +27,7 @@ OL.Layers.WMS = function(layerOptions, mapid) {
 
   // Return Layer object
   return new OpenLayers.Layer.WMS(layerOptions.name, layerOptions.url, layerOptions.params, layerOptions.options);
-}
+};
 
 /**
  * Process Vector Layers
@@ -67,6 +67,7 @@ OL.Layers.Vector = function(layerOptions, mapid) {
     for (var style in OL.mapDefs[mapid].styles) {
       // Check for context callback
       if (OL.mapDefs[mapid].styleContextCallback) {
+        // Eval is evil!!
         stylesAdded[style] = new OpenLayers.Style(OL.mapDefs[mapid].styles[style], {
           context: eval(OL.mapDefs[mapid].styleContextCallback)(mapid, layerOptions.name, style)
         });
@@ -84,75 +85,80 @@ OL.Layers.Vector = function(layerOptions, mapid) {
   // Add features if they are defined
   if (OL.isSet(layerOptions.features)) {
     var wktFormat = new OpenLayers.Format.WKT();
+    var newFeatureObject  = {};
 
     // Go through features
     for (var feat in layerOptions.features) {
-      // Extract geometry either from wkt property or lon/lat properties
-      if (typeof(layerOptions.features[feat].wkt) != "undefined") {
-        var wkt;
+      if (OL.isSet(layerOptions.features[feat])) {
+        // Extract geometry either from wkt property or lon/lat properties
+        if (typeof(layerOptions.features[feat].wkt) != "undefined") {
+          var wkt;
 
-        // Check to see if it is a string of wkt, or an array for a multipart feature.
-        if (typeof(layerOptions.features[feat].wkt) == "string") {
-          wkt = layerOptions.features[feat].wkt;
+          // Check to see if it is a string of wkt, or an array for a multipart feature.
+          if (typeof(layerOptions.features[feat].wkt) == "string") {
+            wkt = layerOptions.features[feat].wkt;
+          }
+          if (typeof(layerOptions.features[feat].wkt) == "object" && layerOptions.features[feat].wkt !== null && layerOptions.features[feat].wkt.length !== 0) {
+            wkt = "GEOMETRYCOLLECTION(" + layerOptions.features[feat].wkt.join(',') + ")";
+          }
+
+          // Get new feature
+          newFeatureObject = wktFormat.read(wkt);
         }
-        if (typeof(layerOptions.features[feat].wkt) == "object" && layerOptions.features[feat].wkt != null && layerOptions.features[feat].wkt.length != 0) {
-          wkt = "GEOMETRYCOLLECTION(" + layerOptions.features[feat].wkt.join(',') + ")";
-        }
-
-        // Get new feature
-        var newFeatureObject = wktFormat.read(wkt);
-      }
-      else if (typeof(layerOptions.features[feat].lon) != "undefined") {
-        var newFeatureObject = wktFormat.read("POINT(" + layerOptions.features[feat].lon + " " + layerOptions.features[feat].lat + ")");
-      }
-
-      // If we have successfully extracted geometry add additional
-      // properties and queue it for addition to the layer
-      if (typeof(newFeatureObject) != 'undefined') {
-        var newFeatureSet = [];
-
-        // Check to see if it is a new feature, or an array of new features.
-        if (typeof(newFeatureObject[0]) == 'undefined') {
-          // It's an actual OpenLayers feature object.
-          newFeatureSet[0] = newFeatureObject;
-        }
-        else{
-          // It's an array of OpenLayers objects
-          newFeatureSet = newFeatureObject;
+        else if (typeof(layerOptions.features[feat].lon) != "undefined") {
+          newFeatureObject = wktFormat.read("POINT(" + layerOptions.features[feat].lon + " " + layerOptions.features[feat].lat + ")");
         }
 
-        // Go through new features
-        for (var i in newFeatureSet) {
-          var newFeature = newFeatureSet[i];
+        // If we have successfully extracted geometry add additional
+        // properties and queue it for addition to the layer
+        if (OL.isSet(newFeatureObject)) {
+          var newFeatureSet = [];
 
-          // Transform the geometry if the 'projection' property is different from the map projection
-          if (typeof(layerOptions.features[feat].projection) != 'undefined') {
-            if (layerOptions.features[feat].projection != OL.mapDefs[mapid].projection) {
-              var featureProjection = new OpenLayers.Projection("EPSG:" + layerOptions.features[feat].projection);
-              var mapProjection = OL.maps[mapid].projection;
-              newFeature.geometry.transform(featureProjection,mapProjection);
+          // Check to see if it is a new feature, or an array of new features.
+          if (typeof(newFeatureObject[0]) == 'undefined') {
+            // It's an actual OpenLayers feature object.
+            newFeatureSet[0] = newFeatureObject;
+          }
+          else{
+            // It's an array of OpenLayers objects
+            newFeatureSet = newFeatureObject;
+          }
+
+          // Go through new features
+          for (var i in newFeatureSet) {
+            if (OL.isSet(newFeatureSet[i])) {
+              var newFeature = newFeatureSet[i];
+
+              // Transform the geometry if the 'projection' property is different from the map projection
+              if (typeof(layerOptions.features[feat].projection) != 'undefined') {
+                if (layerOptions.features[feat].projection != OL.mapDefs[mapid].projection) {
+                  var featureProjection = new OpenLayers.Projection("EPSG:" + layerOptions.features[feat].projection);
+                  var mapProjection = OL.maps[mapid].projection;
+                  newFeature.geometry.transform(featureProjection,mapProjection);
+                }
+              }
+
+              // Add Feature ID
+              newFeature.fid = feat;
+
+              // Add attribute data
+              if (typeof(layerOptions.features[feat].attributes) != "undefined") {
+                newFeature.attributes = layerOptions.features[feat].attributes;
+                newFeature.data = layerOptions.features[feat].attributes;
+              }
+
+              // Add style information
+              if (typeof(layerOptions.features[feat].style) != "undefined") {
+                // Merge with defaults
+                var featureStyle = jQuery.extend({}, OpenLayers.Feature.Vector.style['default'], layerOptions.features[feat].style);
+                // Add style to feature
+                newFeature.style = featureStyle;
+              }
+
+              // Push new features
+              newFeatures.push(newFeature);
             }
           }
-
-          // Add Feature ID
-          newFeature.fid = feat;
-
-          // Add attribute data
-          if (typeof(layerOptions.features[feat].attributes) != "undefined") {
-            newFeature.attributes = layerOptions.features[feat].attributes;
-            newFeature.data = layerOptions.features[feat].attributes;
-          }
-
-          // Add style information
-          if (typeof(layerOptions.features[feat].style) != "undefined") {
-            // Merge with defaults
-            var featureStyle = jQuery.extend({}, OpenLayers.Feature.Vector.style['default'], layerOptions.features[feat].style);
-            // Add style to feature
-            newFeature.style = featureStyle;
-          }
-
-          // Push new features
-          newFeatures.push(newFeature);
         }
       }
     }
@@ -160,19 +166,21 @@ OL.Layers.Vector = function(layerOptions, mapid) {
 
   // Strategies
   strategies = [];
-  
+
   // Go through behaviors and try to find clustering (not most
   // efficient way)
   if (OL.isSet(OL.mapDefs[mapid].behaviors)) {
-    for (b in OL.mapDefs[mapid].behaviors) {
-      var behavior = OL.mapDefs[mapid].behaviors[b];
-      if (behavior.type == 'openlayers_behaviors_cluster' && OL.isSet(behavior.layer) && behavior.layer == layerOptions.id) {
-        var cluster = new OpenLayers.Strategy.Cluster({
-          features: newFeatures,
-          threshold: behavior.threshold,
-          distance: behavior.distance
-        });
-        strategies.push(cluster);
+    for (var b in OL.mapDefs[mapid].behaviors) {
+      if (OL.isSet(OL.mapDefs[mapid].behaviors[b])) {
+        var behavior = OL.mapDefs[mapid].behaviors[b];
+        if (behavior.type == 'openlayers_behaviors_cluster' && OL.isSet(behavior.layer) && behavior.layer == layerOptions.id) {
+          var cluster = new OpenLayers.Strategy.Cluster({
+            features: newFeatures,
+            threshold: behavior.threshold,
+            distance: behavior.distance
+          });
+          strategies.push(cluster);
+        }
       }
     }
   }
@@ -181,10 +189,10 @@ OL.Layers.Vector = function(layerOptions, mapid) {
   var returnVector = new OpenLayers.Layer.Vector(layerOptions.name, {strategies: strategies, styleMap: styleMap});
 
   // Add new features if there are any
-  if (newFeatures.length != 0) {
+  if (newFeatures.length !== 0) {
     returnVector.addFeatures(newFeatures);
   }
 
   // Return processed vector
   return returnVector;
-}
+};

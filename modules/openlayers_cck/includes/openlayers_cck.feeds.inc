@@ -1,5 +1,13 @@
 <?php
-// $Id $
+// $Id$
+
+/**
+ * @file
+ * This file holds the Feeds module integration
+ * with the OpenLayers CCK module.
+ *
+ * @ingroup openlayers
+ */
 
 /**
  * Implementation of feeds_node_processor_targets_alter().

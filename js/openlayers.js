@@ -16,7 +16,6 @@
  * See the Drupal Book page describing this problem:
  * http://drupal.org/node/613002
  */
-
 document.namespaces;
 
 /**
@@ -83,11 +82,11 @@ OL.loadMaps = function () {
       // Render Map
       OL.renderMap(map);
       
+      // Hack for IE so points show up
       if ($.browser.msie) {
         $(window).load(function() {
           OL.redrawVectors(OL.maps[map.id].map);
         });
-        
       } 
     }
   }

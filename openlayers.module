@@ -448,7 +448,7 @@ function openlayers_presets($reset = FALSE) {
     cache_clear_all('openlayers:presets', 'cache');
 
     // Clear the content.module cache
-    // (refreshes the list of formatters provided by imagefield.module)
+    // (refreshes the list of formatters)
     if (module_exists('content')) {
       content_clear_type_cache();
     }

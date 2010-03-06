@@ -100,7 +100,7 @@ function openlayers_test_openlayers_presets() {
         'fillOpacity' => 0.75,
       ),
     ),
-    // 'styleContextCallback' => 'OL.StyleContextCallback', // Needs testing,
+    'styleContextCallback' => 'OL.Testing.StyleContextCallback', // Needs testing,
     'layers' => array(
       'style_vector' => array(
         'id' => 'style_vector',
@@ -228,11 +228,17 @@ function openlayers_test_page() {
   // Add some extra testing JS
   drupal_add_js(drupal_get_path('module', 'openlayers_test') . 'js/openlayers_test.js');
 
-  // Render maps
-  $render_default = openlayers_render_map();
-  $render_default_test = openlayers_render_map('default_test');
-  $render_style_test = openlayers_render_map('style_test');
-  $render_cluster_group_example = openlayers_render_map('cluster_group_example');
+  // Render all maps
+  $presets = openlayers_get_presets();
+  foreach ($presets as $name => $title) {
+    $rendered = openlayers_render_map($name);
+    if ($rendered['themed']) {
+      $output .= '
+        <h3> ' . $name . '</h3>
+        ' . $rendered['themed'] . '
+      ';
+    }
+  }
 
   // Create collapsed fieldset
   $render_fieldset = openlayers_render_map();
@@ -246,18 +252,6 @@ function openlayers_test_page() {
 
   // Create output
   $output .= '
-    <h3>' . t('Default Map') . '</h3>
-      ' . $render_default['themed'] . '
-
-    <h3>' . t('Default Test Map') . '</h3>
-      ' . $render_default_test['themed'] . '
-
-    <h3>' . t('Style Test Map') . '</h3>
-      ' . $render_style_test['themed'] . '
-
-    <h3>' . t('Cluster Group Map') . '</h3>
-      ' . $render_cluster_group_example['themed'] . '
-
     <!-- Not including fieldset cause its broken -->
   ';
 

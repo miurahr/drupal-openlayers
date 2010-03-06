@@ -16,7 +16,7 @@
  * See the Drupal Book page describing this problem:
  * http://drupal.org/node/613002
  */
-document.namespaces = document.namespaces || {};
+document.namespaces;
 
 /**
  * Global Object for Namespace

@@ -100,7 +100,6 @@ function openlayers_test_openlayers_presets() {
         'fillOpacity' => 0.75,
       ),
     ),
-    'styleContextCallback' => 'OL.Testing.StyleContextCallback', // Needs testing,
     'layers' => array(
       'style_vector' => array(
         'id' => 'style_vector',
@@ -140,7 +139,6 @@ function openlayers_test_openlayers_presets() {
         ),
       ),
     ),
-
   );
 
   // Create full preset array
@@ -148,6 +146,128 @@ function openlayers_test_openlayers_presets() {
     'preset_name' => 'style_test',
     'preset_title' => t('Style Test'),
     'preset_description' => t('This is a style test.'),
+    'preset_data' => $style_test,
+  );
+  
+  // Context styleing map
+  $style_test = array(
+    'projection' => '4326',
+    'width' => 'auto',
+    'default_layer' => 'openlayers_default_wms',
+    'height' => '300px',
+    'center' => array(
+      'lat' => '0',
+      'lon' => '0',
+      'zoom' => '2',
+    ),
+    'options' => array(
+      'displayProjection' => '4326',
+    ),
+    'controls' => array(
+      'LayerSwitcher' => TRUE,
+      'Navigation' => TRUE,
+      'PanZoomBar' => TRUE,
+      'MousePosition' => TRUE,
+    ),
+    'styles' => array(
+      'default' => array(
+        'pointRadius' => '${getRadius}',
+        'fillColor' => '${getColor}',
+        'strokeColor' => '${getColor}',
+        'strokeWidth' => 1,
+        'fillOpacity' => 0.95,
+      ),
+    ),
+    'styleContextCallback' => 'OLTest.Testing.StyleContextCallback',
+    'layers' => array(
+      'style_vector' => array(
+        'id' => 'style_vector',
+        'type' => 'Vector',
+        'name' => t('Style Test Vector'),
+      ),
+    ),
+  );
+
+  // Add points to work with style context
+  $features = array();
+  for ($i = 0; $i < 30; $i++) {
+    $x = 2 + rand(-30, 30);
+    $y = 2 + rand(-30, 30);
+    $features['feature_' . $i . $j] = array(
+      'wkt' => 'POINT(' . $x . ' ' . $y . ')',
+      'projection' => '4326',
+    );
+  }
+  $style_test['layers']['style_vector']['features'] = $features;
+
+  // Create full preset array
+  $presets['context_style_test'] = array(
+    'preset_name' => 'context_style_test',
+    'preset_title' => t('Context Style Test'),
+    'preset_description' => t('This is a context style test.'),
+    'preset_data' => $style_test,
+  );
+  
+  // Attribute replacement styleing map
+  $style_test = array(
+    'projection' => '4326',
+    'width' => 'auto',
+    'default_layer' => 'openlayers_default_wms',
+    'height' => '300px',
+    'center' => array(
+      'lat' => '0',
+      'lon' => '0',
+      'zoom' => '2',
+    ),
+    'options' => array(
+      'displayProjection' => '4326',
+    ),
+    'controls' => array(
+      'LayerSwitcher' => TRUE,
+      'Navigation' => TRUE,
+      'PanZoomBar' => TRUE,
+      'MousePosition' => TRUE,
+    ),
+    'styles' => array(
+      'default' => array(
+        'pointRadius' => '${radius}',
+        'fillColor' => '${color}',
+        'strokeColor' => '${color}',
+        'strokeWidth' => 4,
+        'fillOpacity' => 0.95,
+      ),
+    ),
+    'layers' => array(
+      'style_vector' => array(
+        'id' => 'style_vector',
+        'type' => 'Vector',
+        'name' => t('Style Test Vector'),
+      ),
+    ),
+  );
+
+  // Add points to work with style context
+  $features = array();
+  $colors = array('red', 'blue', 'yellow', 'purple');
+  for ($i = 0; $i < 30; $i++) {
+    $x = 2 + rand(-30, 30);
+    $y = 2 + rand(-30, 30);
+    $features['feature_' . $i . $j] = array(
+      'wkt' => 'POINT(' . $x . ' ' . $y . ')',
+      'projection' => '4326',
+      'attributes' => array(
+        'radius' => rand(7, 12),
+        'color' => $colors[rand(0, count($colors) - 1)],
+      ),
+    );
+  }
+  $style_test['layers']['style_vector']['features'] = $features;
+
+  // Create full preset array
+  $presets['attribute_style_test'] = array(
+    'preset_name' => 'attribute_style_test',
+    'preset_title' => t('Attribute Replacement Style Test'),
+    'preset_description' => t('This is a attribute replacement style test.'),
     'preset_data' => $style_test,
   );
 
@@ -226,7 +346,7 @@ function openlayers_test_page() {
   $output = '';
 
   // Add some extra testing JS
-  drupal_add_js(drupal_get_path('module', 'openlayers_test') . 'js/openlayers_test.js');
+  drupal_add_js(drupal_get_path('module', 'openlayers_test') . '/js/openlayers_test.js');
 
   // Render all maps
   $presets = openlayers_get_presets();
@@ -234,7 +354,7 @@ function openlayers_test_page() {
     $rendered = openlayers_render_map($name);
     if ($rendered['themed']) {
       $output .= '
-        <h3> ' . $name . '</h3>
+        <h3> ' . $title . '</h3>
         ' . $rendered['themed'] . '
       ';
     }

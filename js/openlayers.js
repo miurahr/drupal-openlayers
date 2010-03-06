@@ -430,14 +430,18 @@ OL.parseRel = function(rel) {
  *   Object
  */
 OL.getObject = function(string) {
-  var parts = string.split('.');
-  var i = 0;
-  var object = window;
-  while (i < parts.length){
-    object = object[parts[i]];
-    i++;
+  if (typeof(string) == 'string') {
+    var parts = string.split('.');
+    var i = 0;
+    var object = window;
+    for (var i in parts) {
+      if (OL.isSet(parts[i])) {
+        object = object[parts[i]];
+      }
+    }
+    return object;
   }
-  return object;
+  return {};
 };
 
 /**

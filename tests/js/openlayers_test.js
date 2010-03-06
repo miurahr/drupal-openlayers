@@ -8,13 +8,20 @@
 /**
  * Global object for OL Tests
  */
-var OL = OL || {};
-OL.Testing = OL.Testing || {};
+var OLTest = OLTest || {};
+OLTest.Testing = OLTest.Testing || {};
 
 /**
  * Test Callback for Style Context
  */
-OL.Testing.StyleContextCallback = function(mapid, layerid, render_intent) {
-  alert(mapid);
-  return {};
+OLTest.Testing.StyleContextCallback = function(mapid, layerid, render_intent) {
+  return {
+    'getColor': function(feature) {
+      var colors = ["red", "green", "blue"];
+      return colors[Math.floor(Math.random() * 4)];
+    },
+    'getRadius': function(feature) {
+      return Math.floor(Math.random() * 8) + 4;
+    }
+  };
 }

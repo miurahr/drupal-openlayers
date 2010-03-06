@@ -10,9 +10,7 @@
 /**
  * Global Object for Namespace
  */
-var OL = OL || {};
-OL.Behaviors = OL.Behaviors || {};
-
+var OL = OL || {'Layers': {}, 'EventHandlers': {} ,'Behaviors': {}, 'maps': []};
 
 /**
  * OL Cluster Behavior
@@ -22,7 +20,7 @@ OL.Behaviors = OL.Behaviors || {};
  */
 OL.Behaviors.cluster = function(event) {
   // This is just a placeholder for now.  Cluster requires no at-map-ready processing as it stands.
-}
+};
 
 /**
  * OL Popup Behavior
@@ -38,7 +36,7 @@ OL.Behaviors.popup = function(event) {
   var layers = Array();
 
   // Set up the hover triggers
-  for (layer in OL.maps[mapid].map.layers) {
+  for (var layer in OL.maps[mapid].map.layers) {
     if (OL.maps[mapid].map.layers[layer].drupalData.type == 'Vector') {
       OL.maps[mapid].map.layers[layer].drupalData.popupAttribute = behavior.attribute;
       OL.maps[mapid].map.layers[layer].drupalData.popupId = behavior.id;
@@ -57,7 +55,7 @@ OL.Behaviors.popup = function(event) {
   OL.maps[mapid].controls[behavior.id] = new OpenLayers.Control.SelectFeature(layers, selectControlOptions);
   map.addControl(OL.maps[mapid].controls[behavior.id]);
   OL.maps[mapid].controls[behavior.id].activate();
-}
+};
 
 /**
  * OL Popup Behavior - Feature Clicked Handler
@@ -74,11 +72,11 @@ OL.Behaviors.popupFeatureSelected = function(feature) {
     if (!OL.mapDefs[mapid].behaviors['openlayers_views_cluster_' + feature.layer.drupalId].cluster_popup) {
       return;
     }
-    var mapid = feature.layer.map.mapid;
+    mapid = feature.layer.map.mapid;
 
     // If we have a callback defined (in the style plugin interface) to generate cluster popups, use it
     if (OL.mapDefs[mapid].behaviors['openlayers_views_cluster_' + feature.layer.drupalId].cluster_popup_callback) {
-      popupText = eval(OL.mapDefs[mapid].behaviors['openlayers_views_cluster_' + feature.layer.drupalId].cluster_popup_callback)(feature);
+      popupText = OL.getObject(OL.mapDefs[mapid].behaviors['openlayers_views_cluster_' + feature.layer.drupalId].cluster_popup_callback)(feature);
     }
     else {
       // Otherwise, act as though popups aren't enabled
@@ -97,7 +95,7 @@ OL.Behaviors.popupFeatureSelected = function(feature) {
     "<div class='openlayers-popup'>" + popupText + "</div>",
     null,
     true,
-    function () {
+    function() {
       var mapid = feature.layer.map.mapid;
       OL.maps[mapid].controls[feature.layer.drupalData.popupId].unselect(feature);
     }
@@ -109,7 +107,7 @@ OL.Behaviors.popupFeatureSelected = function(feature) {
   
   // Run all Drupal behaviors on freshly generated popup content. 
   Drupal.attachBehaviors();
-}
+};
 
 /**
  * OL Popup Behavior - Feature Unselected
@@ -121,7 +119,7 @@ OL.Behaviors.popupFeatureUnselected = function(feature) {
   feature.layer.map.removePopup(feature.popup);
   feature.popup.destroy();
   feature.popup = null;
-}
+};
 
 /**
  * OL Tooltip Behavior
@@ -155,7 +153,7 @@ OL.Behaviors.tooltip = function(event) {
 
   // Set up the HTML div from themed container
   $("#" + mapid).after(behavior.container);
-}
+};
 
 /**
  * OL Tooltip Behavior - Hover Over Handler
@@ -168,6 +166,8 @@ OL.Behaviors.tooltipOver = function(event) {
   var behavior = feature.layer.drupalData.tooltipData;
   var tooltipText = feature.attributes[behavior.attribute];
   var $textContainer = $('#' + behavior.attribute_id);
+  var offset_top = 0;
+  var offset_left = 0;
 
   // Put text into tooltip
   $textContainer.html(tooltipText);
@@ -187,36 +187,30 @@ OL.Behaviors.tooltipOver = function(event) {
   if (behavior.offset_top !== undefined) {
     if (isNaN(behavior.offset_top)) {
       if (behavior.offset_top == 'height') {
-        var offset_top = $tooltipContainer.height();
+        offset_top = $tooltipContainer.height();
       }
       if (behavior.offset_top == 'width') {
-        var offset_top = $tooltipContainer.width();
+        offset_top = $tooltipContainer.width();
       }
     }
     else {
-      var offset_top = behavior.offset_top
+      offset_top = behavior.offset_top;
     }
-  }
-  else {
-    offset_top = 0;
   }
 
   // How much should we offset the tooltip from the left. Valid options are numeric or 'height' or 'width'.
   if (behavior.offset_left !== undefined) {
     if (isNaN(behavior.offset_left)) {
       if (behavior.offset_left == 'height') {
-        var offset_left = $tooltipContainer.height();
+        offset_left = $tooltipContainer.height();
       }
       if (behavior.offset_left == 'width') {
-        var offset_left = $tooltipContainer.width();
+        offset_left = $tooltipContainer.width();
       }
     }
     else {
-      var offset_left = behavior.offset_left
+      offset_left = behavior.offset_left;
     }
-  }
-  else {
-    var offset_left = 0;
   }
   
   var absoluteTop = centroidPixel.y + mapDivOffset.top - scrollTop - offset_top;
@@ -227,7 +221,7 @@ OL.Behaviors.tooltipOver = function(event) {
   
   // Run all Drupal behaviors on freshly generated tooltip content. 
   Drupal.attachBehaviors();
-}
+};
 
 /**
  * OL Tooltip Behavior - Hover Out Handler
@@ -238,7 +232,7 @@ OL.Behaviors.tooltipOver = function(event) {
 OL.Behaviors.tooltipOut = function(event) {
   var behavior = event.feature.layer.drupalData.tooltipData;
   $('#' + behavior.container_id).css('display','none');
-}
+};
 
 /**
  * OL Tooltip Behavior - Get Centroid for Tooltip
@@ -249,39 +243,50 @@ OL.Behaviors.tooltipOut = function(event) {
  *   Event Object
  */
 OL.Behaviors.tooltipGetCentroid = function(geometry) {
+  var baseCentroid = {};
+  var vertices = [];
+  var distance = 0;
+    
+  // Check type of feature
   if (geometry.CLASS_NAME == 'OpenLayers.Geometry.Polygon') {
     var firstCentroid = geometry.getCentroid();
+    var minDistance = 0;
+    var closestVertices = {};
+    
     if (geometry.containsPoint(firstCentroid)) {
       // The polygon contains it's centroid, easy!
-      var baseCentroid = firstCentroid;
+      baseCentroid = firstCentroid;
     }
     else {
       // The polygon is a funny shape and does not contain
       // it's own centroid. Find the closest vertex to the centroid.
-      var vertices = geometry.getVertices();
-      var minDistance;
+      vertices = geometry.getVertices();
       for (var v in vertices) {
-        var distance = vertices[v].distanceTo(firstCentroid);
-        if (distance < minDistance || v == 0) {
-          minDistance = distance;
-          var closestVertices = vertices[v];
+        if (OL.isSet(vertices[v])) {
+          distance = vertices[v].distanceTo(firstCentroid);
+          if (distance < minDistance || v === 0) {
+            minDistance = distance;
+            closestVertices = vertices[v];
+          }
         }
       }
-      var baseCentroid = closestVertices;
+      baseCentroid = closestVertices;
     }
   }
   else if (geometry.CLASS_NAME == 'OpenLayers.Geometry.LineString') {
     // Simply use the middle vertices as the centroid. One day
     // we may want to take into account the lengths of the different segments
-    var vertices = geometry.getVertices();
+    vertices = geometry.getVertices();
     var midVerticesIndex = Math.round((vertices.length -1) / 2);
-    var baseCentroid = vertices[midVerticesIndex];
+    baseCentroid = vertices[midVerticesIndex];
   }
   else if (geometry.CLASS_NAME == 'OpenLayers.Geometry.Point') {
-    var baseCentroid = geometry.getCentroid();
+    baseCentroid = geometry.getCentroid();
   }
+  
+  // Return LatLon object
   return new OpenLayers.LonLat(baseCentroid.x, baseCentroid.y);
-}
+};
 
 /**
  * OL Zoom to Layer Behavior
@@ -296,22 +301,29 @@ OL.Behaviors.zoomToLayer = function(event) {
   var behavior = event.behavior;
   var featureCount = 0;
   var extentToZoom = new OpenLayers.Bounds();
+  var layers = [];
+  var layer = {};
+  var feature = {};
 
   // Determine layers
   if (typeof(behavior.layer) == 'string') {
-    var layers = [behavior.layer];
+    layers = [behavior.layer];
   }
   else {
-    var layers = behavior.layer;
+    layers = behavior.layer;
   }
 
   // Go through layers
   for (var l in layers) {
-    var layer = OL.maps[mapid].layers[layers[l]];
-    for (var f in layer.features) {
-      var feature = layer.features[f];
-      extentToZoom.extend(feature.geometry.getBounds());
-      featureCount++;
+    if (OL.isSet(layers[l])) {
+      layer = OL.maps[mapid].layers[layers[l]];
+      for (var f in layer.features) {
+        if (OL.isSet(layer.features[f])) {
+          feature = layer.features[f];
+          extentToZoom.extend(feature.geometry.getBounds());
+          featureCount++;
+        }
+      }
     }
   }
 
@@ -326,11 +338,11 @@ OL.Behaviors.zoomToLayer = function(event) {
       map.setCenter(center);
     }
   }
-  else if (featureCount != 0){
+  else if (featureCount !== 0) {
     // Zoom the map to the bounds of the layer(s)
     map.zoomToExtent(extentToZoom);
   }
-}
+};
 
 /**
  * OL Zoom to Feature Behavior
@@ -346,28 +358,33 @@ OL.Behaviors.zoomToFeature = function(event) {
   var featureCount = 0;
   var extentToZoom = new OpenLayers.Bounds();
   var layer = OL.maps[mapid].layers[behavior.layer];
+  var features = [];
+  var center = {};
 
   // Check what type of variable feature is
   if (typeof(behavior.feature) == 'string') {
-    var features = [behavior.feature];
+    features = [behavior.feature];
   }
   else {
-    var features = behavior.feature;
+    features = behavior.feature;
   }
 
   // Go through features
   for (var f in layer.features) {
-    feature = layer.features[f];
-    for (var bf in features) {
-      if (feature.fid == features[bf]) {
-        extentToZoom.extend(feature.geometry.getBounds());
-        featureCount++;
+    if (OL.isSet(layer.features[f])) {
+      feature = layer.features[f];
+      for (var bf in features) {
+        if (feature.fid == features[bf]) {
+          extentToZoom.extend(feature.geometry.getBounds());
+          featureCount++;
+        }
       }
     }
   }
+
   // Check to see if we are dealing with just a single point.
   if (featureCount == 1 && feature.geometry.CLASS_NAME == 'OpenLayers.Geometry.Point') {
-    var center = new OpenLayers.LonLat(feature.geometry.x, feature.geometry.y);
+    center = new OpenLayers.LonLat(feature.geometry.x, feature.geometry.y);
     // If pointZoom has been set, then center and zoom, else just center and don't zoom
     if (OL.isSet(behavior.pointzoom)) {
       map.setCenter(center, behavior.pointzoom);
@@ -381,17 +398,17 @@ OL.Behaviors.zoomToFeature = function(event) {
       }
     }
   }
-  else if (featureCount != 0){
+  else if (featureCount !== 0) {
+    // Check if zoom is set
     if (OL.isSet(behavior.zoom)) {
       if (behavior.zoom < 0) {
         // A negative value implies a relative zoom.
         map.zoomToExtent(extentToZoom);
-        var newZoom = map.getZoom() + behavior.zoom;
-        map.zoomTo(newZoom);
+        map.zoomTo(map.getZoom() + behavior.zoom);
       }
       else {
         // A positive value implies an absolute zoom.
-        var center = extentToZoom.getCenterLonLat();
+        center = extentToZoom.getCenterLonLat();
         map.setCenter(center, behavior.zoom);
       }
     }
@@ -400,7 +417,7 @@ OL.Behaviors.zoomToFeature = function(event) {
       map.zoomToExtent(extentToZoom);
     }
   }
-}
+};
 
 /**
  * Process Draw Features.
@@ -420,19 +437,21 @@ OL.Behaviors.drawFeatures = function(event) {
   var mapid = mapDef.id;
   var behavior = event.behavior;
   var layer = OL.maps[mapid].layers[behavior.layer];
+  var handler = {};
+  var ev;
 
   // Determine what handler we need to use.
   switch (behavior.feature_type) {
     case 'point':
-      var handler = OpenLayers.Handler.Point;
+      handler = OpenLayers.Handler.Point;
       break;
 
     case 'path':
-      var handler = OpenLayers.Handler.Path;
+      handler = OpenLayers.Handler.Path;
       break;
 
     case 'polygon':
-      var handler = OpenLayers.Handler.Polygon;
+      handler = OpenLayers.Handler.Polygon;
       break;
 
   }
@@ -464,19 +483,21 @@ OL.Behaviors.drawFeatures = function(event) {
 
   // Add special event handlers to controls
   if (behavior.featureadded_handler) {
-    for (var ev in behavior.featureadded_handler) {
-      createControl.events.register('featureadded', createControl, OL.getObject(behavior.featureadded_handler[ev]));
+    for (ev in behavior.featureadded_handler) {
+      if (OL.isSet(behavior.featureadded_handler[ev])) {
+        createControl.events.register('featureadded', createControl, OL.getObject(behavior.featureadded_handler[ev]));
+      }
     }
   }
   // Feature modified
   if (behavior.featuremodified_handler) {
-    for (var ev in behavior.featuremodified_handler) {
+    for (ev in behavior.featuremodified_handler) {
       layer.events.register('afterfeaturemodified', layer, OL.getObject(behavior.featuremodified_handler[ev]));
     }
   }
   // Feature moved
   if (behavior.featureremoved_handler) {
-    for (var ev in behavior.featureremoved_handler) {
+    for (ev in behavior.featureremoved_handler) {
       layer.events.register('beforefeatureremoved', layer, OL.getObject(behavior.featureremoved_handler[ev]));
     }
 
@@ -488,7 +509,7 @@ OL.Behaviors.drawFeatures = function(event) {
       // delete all selected features for the active map.
       if ((vKeyCode == 63272) || vKeyCode == 46) {
         for (var m in OL.maps) {
-          if (OL.maps[m].active == true) {
+          if (OL.maps[m].active === true) {
             for (var b in OL.mapDefs[m].behaviors) {
               var behavior = OL.mapDefs[m].behaviors[b];
               if (behavior.type == 'openlayers_behaviors_draw_features') {
@@ -507,7 +528,7 @@ OL.Behaviors.drawFeatures = function(event) {
   }
 
   // Add Base Pan button, if not already added
-  if ($('#openlayers-controls-pan-' + mapid).length == 0) {
+  if ($('#openlayers-controls-pan-' + mapid).length === 0) {
     $('<a href="#"></a>')
       .attr('id', 'openlayers-controls-pan-' + mapid)
       .attr('title', Drupal.t('Pan around map'))
@@ -530,7 +551,7 @@ OL.Behaviors.drawFeatures = function(event) {
     .data('mapid', mapid)
     .data('behaviorid', behavior.id)
     .appendTo('#openlayers-controls-' + mapid);
-}
+};
 
 /**
  * Draw Features Map Ready Event
@@ -545,7 +566,11 @@ OL.EventHandlers.drawFeaturesMapReady = function(event) {
     var $allControls = $('.openlayers-controls-draw-feature-link');
     var mapid = $thisLink.data('mapid');
     var controlType = $thisLink.data('type');
+    var behavior = {};
     var behaviorid = $thisLink.data('behaviorid');
+    var foundControl = false;
+    var event = {};
+    var triggerFunction = {};
 
     // Change the look of the action link
     $allControls.removeClass('openlayers-controls-draw-feature-link-on');
@@ -553,11 +578,9 @@ OL.EventHandlers.drawFeaturesMapReady = function(event) {
     $thisLink.addClass('openlayers-controls-draw-feature-link-on');
     $thisLink.removeClass('openlayers-controls-draw-feature-link-off');
 
-    var foundControl = false;
-
     // Cycle through the different possible types of controls (polygon, line, point, pan)
     for (var b in OL.mapDefs[mapid].behaviors) {
-      var behavior  = OL.mapDefs[mapid].behaviors[b];
+      behavior = OL.mapDefs[mapid].behaviors[b];
 
       // Check behavior type
       if (behavior.type == 'openlayers_behaviors_draw_features') {
@@ -577,8 +600,8 @@ OL.EventHandlers.drawFeaturesMapReady = function(event) {
           // Trigger optional startediting_handler
           if (OL.isSet(behavior.startediting_handler)) {
             for (var ev in behavior.startediting_handler) {
-              var triggerFunction = OL.getObject(behavior.startediting_handler[ev]);
-              var event = {'behavior': behavior};
+              triggerFunction = OL.getObject(behavior.startediting_handler[ev]);
+              event = {'behavior': behavior};
               triggerFunction(event);
             }
           }
@@ -586,12 +609,12 @@ OL.EventHandlers.drawFeaturesMapReady = function(event) {
       }
     }
 
-    if (foundControl == false) {
+    if (foundControl === false) {
       // Trigger optional stopediting_handler
       if (OL.isSet(behavior.stopediting_handler)) {
-        for (var ev in behavior.stopediting_handler) {
-        var triggerFunction = OL.getObject(behavior.stopediting_handler[ev]);
-        var event = {'behavior': behavior};
+        for (var evs in behavior.stopediting_handler) {
+          triggerFunction = OL.getObject(behavior.stopediting_handler[evs]);
+          event = {'behavior': behavior};
           triggerFunction(event);
         }
       }
@@ -600,7 +623,7 @@ OL.EventHandlers.drawFeaturesMapReady = function(event) {
     // Make sure the link doesn't go anywhere
     return false;
   });
-}
+};
 
 /**
  * Fullsceen Behavoir
@@ -670,10 +693,10 @@ OL.Behaviors.fullscreen = function(event) {
         // Restore styles, resizing the map.
         for (var ms in OL.Behaviors.fullscreenRegistry[mapid].mapstyle) {
           $('#' + mapid).css(ms,OL.Behaviors.fullscreenRegistry[mapid].mapstyle[ms]);
-        };
+        }
         for (var cs in OL.Behaviors.fullscreenRegistry[mapid].controlsstyle) {
           $('#openlayers-controls-' + mapid).css(cs,OL.Behaviors.fullscreenRegistry[mapid].controlsstyle[cs]);
-        };
+        }
 
         // Update classes
         $thisElement.removeClass('openlayers-controls-unfullscreen')
@@ -693,7 +716,7 @@ OL.Behaviors.fullscreen = function(event) {
       $('#openlayers-controls-fullscreen-' + mapid).click().hide();
     }
   }
-}
+};
 
 /**
  * De-clutter Behavoir
@@ -705,18 +728,25 @@ OL.Behaviors.fullscreen = function(event) {
  *   Event Object
  */
 OL.Behaviors.declutter = function(event) {
+  layer = {};
+  
+  // Find correct layer
   for (var l in event.map.layers) {
     if (event.map.layers[l].drupalId == event.behavior.layer) {
       var layer = event.map.layers[l];
     }
   }
-  for (var f in layer.features) {
-    if (layer.features[f].geometry.CLASS_NAME == 'OpenLayers.Geometry.Point') {
-      layer.features[f].originalGeometry = layer.features[f].geometry.clone();
+  
+  // Check for features
+  if (OL.isSet(layer.features)) {
+    for (var f in layer.features) {
+      if (layer.features[f].geometry.CLASS_NAME == 'OpenLayers.Geometry.Point') {
+        layer.features[f].originalGeometry = layer.features[f].geometry.clone();
+      }
     }
+    OL.Behaviors.declutterSortAndMove(layer,event.behavior);
   }
-  OL.Behaviors.declutterSortAndMove(layer,event.behavior);
-}
+};
 
 /**
  * De-Clutter Sort and Move
@@ -731,21 +761,17 @@ OL.Behaviors.declutter = function(event) {
 OL.Behaviors.declutterSortAndMove = function(layer,behavior) {
   // Set up our variables.
   var points = [];
+  var pixelAdjustment = 0;
+  var recursionLimit = 50;
 
   // Check adjustment
   if (OL.isSet(behavior.adjustment)) {
-    var pixelAdjustment = parseInt(behavior.adjustment);
-  }
-  else {
-    var pixelAdjustment = 0;
+    pixelAdjustment = parseInt(behavior.adjustment);
   }
 
   // Check limit
   if (OL.isSet(behavior.limit)) {
-    var recursionLimit = parseInt(behavior.limit);
-  }
-  else {
-    var recursionLimit = 50;
+    recursionLimit = parseInt(behavior.limit);
   }
 
   // Gather up our points. declutter currently only works with points.
@@ -765,7 +791,7 @@ OL.Behaviors.declutterSortAndMove = function(layer,behavior) {
       var graphicHeight   = parseInt(points[p].style.graphicHeight);
     }
     else {
-    // We are using the default layer style
+      // We are using the default layer style
       var pointRadius     = parseInt(layer.styleMap.styles['default'].defaultStyle.pointRadius);
       var strokeWidth     = parseInt(layer.styleMap.styles['default'].defaultStyle.strokeWidth);
       var externalGraphic = layer.styleMap.styles['default'].defaultStyle.externalGraphic;
@@ -811,8 +837,10 @@ OL.Behaviors.declutterSortAndMove = function(layer,behavior) {
       points[p].geometry.calculateBounds();
     }
   }
+  
+  // Redraw
   layer.redraw();
-}
+};
 
 /**
  * De-Clutter Find Free Space
@@ -858,7 +886,7 @@ OL.EventHandlers.declutterFindFreeSpace = function(testPoint, points, direction,
   else {
     return tempPoint;
   }
-}
+};
 
 /**
  * De-Clutter Collision
@@ -880,7 +908,7 @@ OL.EventHandlers.declutterCollision = function(testPoint, points) {
     }
   }
   return false;
-}
+};
 
 /**
  * De-Clutter Zoom End
@@ -913,4 +941,4 @@ OL.EventHandlers.declutterZoomEnd = function(event) {
       OL.Behaviors.declutterSortAndMove(layer,behavior);
     }
   }
-}
+};

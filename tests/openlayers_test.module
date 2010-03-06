@@ -35,36 +35,6 @@ function openlayers_test_menu() {
 function openlayers_test_openlayers_presets() {
   $presets = array();
 
-  // Create map array
-  $default_map = array(
-    'projection' => '4326',
-    'width' => 'auto',
-    'default_layer' => 'openlayers_default_wms',
-    'height' => '300px',
-    'center' => array(
-      'lat' => '0',
-      'lon' => '0',
-      'zoom' => '2',
-    ),
-    'options' => array(
-      'displayProjection' => '4326',
-    ),
-    'controls' => array(
-      'LayerSwitcher' => TRUE,
-      'Navigation' => TRUE,
-      'PanZoomBar' => TRUE,
-      'MousePosition' => TRUE,
-    ),
-  );
-
-  // Create full preset array
-  $presets['default_test'] = array(
-    'preset_name' => 'default_test',
-    'preset_title' => t('Default Test Map'),
-    'preset_description' => t('This is a test preset.'),
-    'preset_data' => $default_map,
-  );
-
   // Create style map array
   $style_test = array(
     'projection' => '4326',
@@ -144,8 +114,8 @@ function openlayers_test_openlayers_presets() {
   // Create full preset array
   $presets['style_test'] = array(
     'preset_name' => 'style_test',
-    'preset_title' => t('Style Test'),
-    'preset_description' => t('This is a style test.'),
+    'preset_title' => t('Test: Styles per Feature'),
+    'preset_description' => t('This is a test preset.'),
     'preset_data' => $style_test,
   );
   
@@ -203,8 +173,8 @@ function openlayers_test_openlayers_presets() {
   // Create full preset array
   $presets['context_style_test'] = array(
     'preset_name' => 'context_style_test',
-    'preset_title' => t('Context Style Test'),
-    'preset_description' => t('This is a context style test.'),
+    'preset_title' => t('Test: Context Styling'),
+    'preset_description' => t('This is a test preset.'),
     'preset_data' => $style_test,
   );
   
@@ -266,8 +236,8 @@ function openlayers_test_openlayers_presets() {
   // Create full preset array
   $presets['attribute_style_test'] = array(
     'preset_name' => 'attribute_style_test',
-    'preset_title' => t('Attribute Replacement Style Test'),
-    'preset_description' => t('This is a attribute replacement style test.'),
+    'preset_title' => t('Test: Attribute Replacement Styling'),
+    'preset_description' => t('This is a test preset.'),
     'preset_data' => $style_test,
   );
 
@@ -331,8 +301,138 @@ function openlayers_test_openlayers_presets() {
   // Create full preset array
   $presets['cluster_group_example'] = array(
     'preset_name' => 'cluster_group_example',
-    'preset_title' => t('Cluster Group Example'),
-    'preset_description' => t('Example to test clustering and grouping.'),
+    'preset_title' => t('Test: Cluster Group'),
+    'preset_description' => t('This is a test preset.'),
+    'preset_data' => $map,
+  );
+  
+  // Tooltip
+  $map = array(
+    'projection' => '4326',
+    'width' => 'auto',
+    'default_layer' => 'openlayers_default_wms',
+    'height' => '300px',
+    'center' => array(
+      'lat' => '0',
+      'lon' => '0',
+      'zoom' => '2',
+    ),
+    'options' => array(
+      'displayProjection' => '4326',
+    ),
+    'controls' => array(
+      'LayerSwitcher' => TRUE,
+      'Navigation' => TRUE,
+      'PanZoomBar' => TRUE,
+      'MousePosition' => TRUE,
+    ),
+    'styles' => array(
+      'default',
+    ),
+    'layers' => array(
+      'vector' => array(
+        'id' => 'vector',
+        'type' => 'Vector',
+        'name' => t('Test Vector'),
+      ),
+    ),
+    'behaviors' => array(
+      'openlayers_views_tooltip_vector' => array(
+        'id' => 'openlayers_views_tooltip_vector',
+        'type' => 'openlayers_behaviors_tooltip',
+        'layer' => 'vector',
+        'attribute' => 'openlayers_tooltip',
+      ),
+    ),
+  );
+
+  // Add points to work with style context
+  $features = array();
+  for ($i = 0; $i < 30; $i++) {
+    $x = 2 + rand(-30, 30);
+    $y = 2 + rand(-30, 30);
+    $features['feature_' . $i . $j] = array(
+      'wkt' => 'POINT(' . $x . ' ' . $y . ')',
+      'projection' => '4326',
+      'attributes' => array(
+        'openlayers_tooltip' => t('Feature') . ': ' . $i,
+      ),
+    );
+  }
+  $map['layers']['vector']['features'] = $features;
+
+  // Create full preset array
+  $presets['tooltip_test'] = array(
+    'preset_name' => 'tooltip_test',
+    'preset_title' => t('Test: Tooltips'),
+    'preset_description' => t('This is a test preset.'),
+    'preset_data' => $map,
+  );
+  
+  // Popups
+  $map = array(
+    'projection' => '4326',
+    'width' => 'auto',
+    'default_layer' => 'openlayers_default_wms',
+    'height' => '300px',
+    'center' => array(
+      'lat' => '0',
+      'lon' => '0',
+      'zoom' => '2',
+    ),
+    'options' => array(
+      'displayProjection' => '4326',
+    ),
+    'controls' => array(
+      'LayerSwitcher' => TRUE,
+      'Navigation' => TRUE,
+      'PanZoomBar' => TRUE,
+      'MousePosition' => TRUE,
+    ),
+    'styles' => array(
+      'default',
+    ),
+    'layers' => array(
+      'vector' => array(
+        'id' => 'vector',
+        'type' => 'Vector',
+        'name' => t('Test Vector'),
+      ),
+    ),
+    'behaviors' => array(
+      'openlayers_popups' => array(
+        'id' => 'openlayers_popups',
+        'type' => 'openlayers_behaviors_popup',
+        'attribute' => 'openlayers_popup',
+      ),
+      'openlayers_zoom_to_layer' => array(
+        'id' => 'openlayers_zoom_to_layer',
+        'type' => 'openlayers_behaviors_zoom_to_layer',
+        'layer' => 'vector',
+      ),
+    ),
+  );
+
+  // Add points to work with style context
+  $features = array();
+  for ($i = 0; $i < 30; $i++) {
+    $x = 2 + rand(-30, 30);
+    $y = 2 + rand(-30, 30);
+    $features['feature_' . $i . $j] = array(
+      'wkt' => 'POINT(' . $x . ' ' . $y . ')',
+      'projection' => '4326',
+      'attributes' => array(
+        'openlayers_popup' => t('Feature') . ': ' . $i,
+      ),
+    );
+  }
+  $map['layers']['vector']['features'] = $features;
+
+  // Create full preset array
+  $presets['popup_test'] = array(
+    'preset_name' => 'popup_test',
+    'preset_title' => t('Test: Popups and Zoom to Layer'),
+    'preset_description' => t('This is a test preset.'),
     'preset_data' => $map,
   );
 

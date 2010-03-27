@@ -200,7 +200,7 @@ function openlayers_presets_ui_presets_manage_add(&$form_state, $preset = array(
 
   // Make style options array
   foreach ($styles as $k_style => $style) {
-    $avilable_styles[$k_style] = $style['name'];
+    $available_styles[$k_style] = $style['name'];
   }
 
   // Centering map
@@ -351,21 +351,21 @@ function openlayers_presets_ui_presets_manage_add(&$form_state, $preset = array(
     '#type' => 'select',
     '#title' => t('Default Style'),
     '#description' => t('Default style for features in a vector.'),
-    '#options' => $avilable_styles,
+    '#options' => $available_styles,
     '#default_value' => $defaults['styles']['default'],
   );
   $form['styles']['select'] = array(
     '#type' => 'select',
     '#title' => t('Select Style'),
     '#description' => t('Default style for features in a vector that are selected.'),
-    '#options' => $avilable_styles,
+    '#options' => $available_styles,
     '#default_value' => $defaults['styles']['select'],
   );
   $form['styles']['temporary'] = array(
     '#type' => 'select',
     '#title' => t('Temporary Style'),
     '#description' => t('Default style for any temporary features in a vector.  This will also be used for rollovers for things like Tooltips.'),
-    '#options' => $avilable_styles,
+    '#options' => $available_styles,
     '#default_value' => $defaults['styles']['temporary'],
   );
 

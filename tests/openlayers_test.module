@@ -418,7 +418,7 @@ function openlayers_test_openlayers_presets() {
   for ($i = 0; $i < 30; $i++) {
     $x = 2 + rand(-30, 30);
     $y = 2 + rand(-30, 30);
-    $features['feature_' . $i . $j] = array(
+    $features['feature_' . $i] = array(
       'wkt' => 'POINT(' . $x . ' ' . $y . ')',
       'projection' => '4326',
       'attributes' => array(

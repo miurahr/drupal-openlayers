@@ -43,7 +43,7 @@ class OpenLayersPresetsHook extends DrupalWebTestCase {
     $this->assertResponse(200, t('Assert that user can reach and access preset list.'));
 
     // Ensure that the default test is listed
-    $this->assertText(t('Default Test Map'), t('Assert that the default test preset\'s title appears.'));
-    $this->assertText(t('This is a test preset.'), t('Assert that the default test preset\'s description appears.'));
+    $this->assertText(t('Default Map'), t('Assert that the default preset\'s title appears.'));
+    $this->assertText(t('This is the default map preset that comes with the OpenLayers module.'), t('Assert that the default preset\'s description appears.'));
   }
 }

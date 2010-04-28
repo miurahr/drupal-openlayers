@@ -272,6 +272,23 @@ class openlayers_views_style_map extends views_plugin_style {
         '#dependency_count' => 2,
         '#dependency' => array('edit-style-options-behaviors-cluster' => array('1'), 'edit-style-options-behaviors-cluster-popup' => array('1')),
       );
+      $form['behaviors']['cluster_tooltip'] = array(
+        '#type' => 'checkbox',
+        '#title' => t('Tooltips on clusters'),
+        '#description' => t('Should clustered features permit tooltips?'),
+        '#default_value' => $this->options['behaviors']['cluster_tooltip'],
+        '#process' => array('views_process_dependency'),
+        '#dependency' => array('edit-style-options-behaviors-cluster' => array('1')),
+      );
+      $form['behaviors']['cluster_tooltip_callback'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Callback for tooltip contents when clustering'),
+        '#description' => t('Enter the name of a JavaScript callback that returns the contents of tolltips (a string) attached to clustered features.  The callback takes one argument: \'feature\'.  <em>feature.cluster</em> contains the features being clustered together.'),
+        '#default_value' => $this->options['behaviors']['cluster_tooltip_callback'],
+        '#process' => array('views_process_dependency'),
+        '#dependency_count' => 2,
+        '#dependency' => array('edit-style-options-behaviors-cluster' => array('1'), 'edit-style-options-behaviors-cluster-tooltip' => array('1')),
+      );
     }
 
     // Grouping
@@ -574,6 +591,7 @@ class openlayers_views_style_map extends views_plugin_style {
             'layer' => $layer_id,
           );
 
+          // Add cluster values
           if ($this->options['behaviors']['cluster_distance'])
             $map['behaviors']['openlayers_views_cluster_' . $layer_id]['cluster_distance'] = $this->options['behaviors']['cluster_distance'];
           if ($this->options['behaviors']['cluster_threshold'])
@@ -582,6 +600,10 @@ class openlayers_views_style_map extends views_plugin_style {
             $map['behaviors']['openlayers_views_cluster_' . $layer_id]['cluster_popup'] = $this->options['behaviors']['cluster_popup'];
           if ($this->options['behaviors']['cluster_popup_callback'])
             $map['behaviors']['openlayers_views_cluster_' . $layer_id]['cluster_popup_callback'] = $this->options['behaviors']['cluster_popup_callback'];
+          if ($this->options['behaviors']['cluster_tooltip'])
+            $map['behaviors']['openlayers_views_cluster_' . $layer_id]['cluster_tooltip'] = $this->options['behaviors']['cluster_tooltip'];
+          if ($this->options['behaviors']['cluster_tooltip_callback'])
+            $map['behaviors']['openlayers_views_cluster_' . $layer_id]['cluster_tooltip_callback'] = $this->options['behaviors']['cluster_tooltip_callback'];
         }
       }
     } // end foreach views-group/layer

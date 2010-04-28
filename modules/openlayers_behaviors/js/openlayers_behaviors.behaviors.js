@@ -168,6 +168,24 @@ OL.Behaviors.tooltipOver = function(event) {
   var $textContainer = $('#' + behavior.attribute_id);
   var offset_top = 0;
   var offset_left = 0;
+  var mapid = feature.layer.map.mapid;
+
+  // Check for tooltip cluster
+  if (feature.cluster) {
+    // If tooltips aren't enabled for clusters, do nothing
+    if (!OL.mapDefs[mapid].behaviors['openlayers_views_cluster_' + feature.layer.drupalId].cluster_tooltip) {
+      return;
+    }
+
+    // If we have a callback defined (in the style plugin interface) to generate tooltips, use it
+    if (OL.mapDefs[mapid].behaviors['openlayers_views_cluster_' + feature.layer.drupalId].cluster_tooltip_callback) {
+      tooltipText = OL.getObject(OL.mapDefs[mapid].behaviors['openlayers_views_cluster_' + feature.layer.drupalId].cluster_tooltip_callback)(feature);
+    }
+    else {
+      // Otherwise, act as though tooltips aren't enabled
+      return;
+    }
+  }
 
   // Put text into tooltip
   $textContainer.html(tooltipText);

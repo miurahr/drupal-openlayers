@@ -1109,6 +1109,8 @@ function _openlayers_presets_ui_form_center_map($defaults = array()) {
     ),
     'options' => array(
       'displayProjection' => $defaults['projection'],
+      /* This seems to break the centering map.  Not sure why we are
+         defining this anyway.
       'maxResolution' => '1.40625',
       'maxExtent' => array(
         'top' => 90,
@@ -1116,6 +1118,7 @@ function _openlayers_presets_ui_form_center_map($defaults = array()) {
         'left' => -180,
         'right' => 180
       ),
+      */
     ),
     'events' => array(
       'moveend' => array('updateCenterFormValues'),

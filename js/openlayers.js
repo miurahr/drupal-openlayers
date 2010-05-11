@@ -162,6 +162,13 @@ OL.renderMap = function (map) {
   if (OL.isSet(map.center)) {
     var center = new OpenLayers.LonLat(map.center.lon, map.center.lat);
 	  var zoom = parseInt(map.center.zoom, 10);
+
+    // Check for proj and reproject if necessary
+    if (OL.isSet(map.center.proj)) {
+      var proj = new OpenLayers.Projection("EPSG:" + map.center.proj);
+      center.transform(proj, OL.maps[mapid].map.getProjectionObject());
+    }
+
     OL.maps[map.id].map.setCenter(center, zoom, false, false);
   }
 

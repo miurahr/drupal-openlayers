@@ -11,7 +11,7 @@
  * Drupal beahvior for OL UI form
  */
 Drupal.behaviors.OLUI = function(context) {
-  var $projectSelect = $("input[@name='projections[easy_projection]']:not(.projection-processed)");
+  var $projectSelect = $("input[name='projections[easy_projection]']:not(.projection-processed)");
   var $projectOther = $('#edit-projections-projection');
   var $projectOtherWrapper = $('#edit-projections-projection-wrapper');
   var $autoOptionsCheck = $('#edit-options-automatic-options');

@@ -175,7 +175,7 @@ Drupal.openlayers = {
         layer.visibility = !!(!map.layer_activated || map.layer_activated[name]);
 
         if (layer.isBaseLayer === false) {
-          layer.displayInLayerSwitcher = (!map.layer_switcher || map.layer_switcher[name]);
+          layer.displayInLayerSwitcher = !!(!map.layer_switcher || map.layer_switcher[name]);
         }
 
         if (map.center.wrapdateline === '1') {

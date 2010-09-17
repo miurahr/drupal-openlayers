@@ -20,6 +20,7 @@ class openlayers_layer_type_wms extends openlayers_layer_type {
         $this->data['params']['projection'] = $this->data['options']['srs']; 
         $this->data['params']['maxextent'] =  openlayers_get_extent($pts[1]);
       }
+      $this->data['params']['isBaseLayer'] = (bool) $this->data['params']['isBaseLayer'];
       $this->data['baselayer'] = $this->data['params']['isBaseLayer'];
       $this->data += $this->options_init();
     }

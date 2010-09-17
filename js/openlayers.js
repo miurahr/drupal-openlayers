@@ -176,6 +176,8 @@ Drupal.openlayers = {
 
         if (layer.isBaseLayer === false) {
           layer.displayInLayerSwitcher = !!(!map.layer_switcher || map.layer_switcher[name]);
+        } else {
+          layer.displayInLayerSwitcher = true;
         }
 
         if (map.center.wrapdateline === '1') {

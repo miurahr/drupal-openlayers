@@ -174,7 +174,7 @@ Drupal.openlayers = {
 
         layer.visibility = !!(!map.layer_activated || map.layer_activated[name]);
 
-        if (layer.isBaseLayer === false) {
+        if (layer.isBaseLayer == false) {
           layer.displayInLayerSwitcher = !!(!map.layer_switcher || map.layer_switcher[name]);
         } else {
           layer.displayInLayerSwitcher = true;

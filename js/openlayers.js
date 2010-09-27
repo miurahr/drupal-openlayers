@@ -226,11 +226,15 @@ Drupal.openlayers = {
         var newFeatureSet = [];
 
         // Check to see if it is a new feature, or an array of new features.
-        if (typeof(newFeatureObject[0]) === 'undefined'){
+        if ('geometry' in newFeatureObject){
           newFeatureSet[0] = newFeatureObject;
         }
-        else{
+        else {
           newFeatureSet = newFeatureObject;
+        }
+
+        if (newFeatureSet.length == 1 && newFeatureSet[0] == undefined) {
+          newFeatureSet = [];
         }
 
         // Go through new features
@@ -268,6 +272,7 @@ Drupal.openlayers = {
 
           // Push new features
           newFeatures.push(newFeature);
+          }
         }
       }
     }

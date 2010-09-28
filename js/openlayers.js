@@ -272,7 +272,6 @@ Drupal.openlayers = {
 
           // Push new features
           newFeatures.push(newFeature);
-          }
         }
       }
     }

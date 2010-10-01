@@ -68,7 +68,7 @@ function _openlayers_behaviors_render($behaviors = array(), &$map = array()) {
  * @param $map
  *   Map array
  * @return $processed
- *   Array of processed styles ( <style_name> => <style_array> )
+ *   Indexed array of processed styles ( <style_name> => <style_array> )
  */
 function _openlayers_styles_process($styles = array(), 
   $layer_styles = array(), &$map = array()) {

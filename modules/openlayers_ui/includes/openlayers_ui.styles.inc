@@ -140,8 +140,11 @@ function openlayers_ui_styles_form(&$form_state, $style = NULL, $edit = FALSE) {
     ),
     'graphicName' => array(
       'default' => '',
-      'desc' => t('Name of a type of symbol to be used 
-        for a point mark.'),
+      'desc' => t('Name of a type of symbol to be used  for a point mark. 
+      You can use the names "star", "cross", "x", "square", "triangle", 
+      and "circle". See <a href="!url">Graphic Name Examples</a>.', array(
+          '!url' => 'http://openlayers.org/dev/examples/graphic-name.html',
+      )),
     ),
     'rotation' => array(
       'default' => '',

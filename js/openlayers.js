@@ -284,14 +284,24 @@ Drupal.openlayers = {
   'getStyleMap': function(map, layername) {
     if (map.styles) {
       var stylesAdded = {};
+      var roles = ['default', 'delete', 'select', 'temporary'];
       // Grab and map base styles.
-      for (var style in map.styles) {
-        stylesAdded[style] = new OpenLayers.Style(map.styles[style]);
+      for (var i=0; i<roles.length; ++i) {
+        role = roles[i];
+        if ( map.styles[role] ) {
+          stylesAdded[role] = new OpenLayers.Style(map.styles[role]);
+        }
       }
-      // Implement layer-specific styles.
+      // Override with layer-specific styles.
       if (map.layer_styles !== undefined && map.layer_styles[layername]) {
-        var style = map.layer_styles[layername];
-        stylesAdded['default'] = new OpenLayers.Style(map.styles[style]);
+        var layer_styles = map.layer_styles[layername];
+        for (var i=0; i<roles.length; ++i) {
+          role = roles[i];
+          if ( layer_styles[role] ) {
+            var style = map.styles[layer_styles[role]]; // TODO: skip if undef
+            stylesAdded[role] = new OpenLayers.Style(style);
+          }
+        }
       }
       return new OpenLayers.StyleMap(stylesAdded);
     }

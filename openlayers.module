@@ -124,7 +124,8 @@ function openlayers_build_map($map = array()) {
       // per layer specified. Newer ones have them splitted by role
       if ( is_array($style) ) {
         $layer_styles[$layer] = $style;
-      } else {
+      }
+      else {
         $layer_styles[$layer] = array(
           'default' => $style,
           'select' => $style,

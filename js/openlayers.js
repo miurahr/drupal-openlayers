@@ -55,6 +55,7 @@ Drupal.behaviors.openlayers = function(context) {
           if (map.projection === '900913') {
             options.maxExtent = new OpenLayers.Bounds(
               -20037508.34, -20037508.34, 20037508.34, 20037508.34);
+             options.units = "m";
           }
           if (map.projection === '4326') {
             options.maxExtent = new OpenLayers.Bounds(-180, -90, 180, 90);

@@ -8,7 +8,7 @@
 /**
  * Style plugin context class
  */
-Drupal.openlayers.style_plugin.openlayers_test_rnd_factor = function (params) {
+Drupal.openlayers.style_plugin.openlayers_test_rnd_factor = function(params) {
   this.params = params;
 };
 

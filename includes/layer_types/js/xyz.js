@@ -16,7 +16,7 @@ Drupal.openlayers.layer.xyz = function(title, map, options) {
   options.projection = 'EPSG:' + options.projection;
   options.sphericalMercator = true;
 
-  var layer = new OpenLayers.Layer.XYZ(title, options.url, options);
+  var layer = new OpenLayers.Layer.XYZ(title, options.base_url, options);
   layer.styleMap = styleMap;
   return layer;
 };

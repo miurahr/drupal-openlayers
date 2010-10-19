@@ -144,6 +144,48 @@ function openlayers_ui_styles_get_properties() {
           '!url' => 'http://openlayers.org/dev/examples/graphic-name.html',
       )),
     ),
+    'graphicZIndex' => array(
+      'default' => '',
+      'desc' => t('Z index of the feature. This determines drawing order: 
+         elements with higher Z indexes are drawn on top of those with
+         lower Z indexes.'),
+      'type' => 'integer',
+    ),
+    'backgroundGraphic' => array(
+      'default' => '',
+      'desc' => t('The URL of an icon to display in addition to the main 
+        feature. Use backgroundGraphicZIndex and graphicZIndex to set its 
+        drawing order relative to main feature.'),
+    ),
+    'backgroundWidth' => array(
+      'default' => '',
+      'desc' => t('Width of a backgroundGraphic, in pixels.'),
+      'type' => 'integer',
+    ),
+    'backgroundHeight' => array(
+      'default' => '',
+      'desc' => t('Height of a backgroundGraphic, in pixels.'),
+      'type' => 'integer',
+    ),
+    'backgroundXOffset' => array(
+      'default' => '',
+      'desc' => t('Where the X value of the "center" of a 
+        backgroundGraphic should be.  This should be in pixels.'),
+      'type' => 'integer',
+    ),
+    'backgroundYOffset' => array(
+      'default' => '',
+      'desc' => t('Where the Y value of the "center" of a 
+        backgroundGraphic should be.  This should be in pixels.'),
+      'type' => 'integer',
+    ),
+    'backgroundGraphicZIndex' => array(
+      'default' => '',
+      'desc' => t('Z index of backgroundGraphic. This determines drawing 
+         order: elements with higher Z indexes are drawn on top of those 
+         with lower Z indexes.'),
+      'type' => 'integer',
+    ),
     'rotation' => array(
       'default' => '',
       'desc' => t('The rotation angle in degrees clockwise for 

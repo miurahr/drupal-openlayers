@@ -220,7 +220,7 @@ function _openlayers_openlayers_layers() {
     ),
     'projection' => array('4326'),
     'layer_type' => 'openlayers_layer_type_wms',
-    'url' => 'http://oam.hypercube.telascience.org/tiles',
+    'base_url' => 'http://oam.hypercube.telascience.org/tiles',
     'params' => array(
       'isBaseLayer' => FALSE,
       'layers' => 'osm-4326-hybrid',

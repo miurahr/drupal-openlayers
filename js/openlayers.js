@@ -263,6 +263,7 @@ Drupal.openlayers = {
             // we then add a 'drupalFID' parameter to the "pseudofeature".
             // NOTE: 'drupalFID' is only unique within a single layer.
             newFeature.attributes = feature.attributes;
+            // See http://drupal.org/node/949434 before wiping out
             //newFeature.data = feature.attributes;
             newFeature.drupalFID = key;
           }

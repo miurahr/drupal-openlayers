@@ -260,10 +260,10 @@ Drupal.openlayers = {
             // "pseudofeatures".
             //
             // In order to identify the real feature each geometry belongs to
-            // we then add a 'fid' parameter to the "pseudofeature".
+            // we then add a 'drupalFID' parameter to the "pseudofeature".
             // NOTE: 'drupalFID' is only unique within a single layer.
             newFeature.attributes = feature.attributes;
-            newFeature.data = feature.attributes;
+            //newFeature.data = feature.attributes;
             newFeature.drupalFID = key;
           }
 

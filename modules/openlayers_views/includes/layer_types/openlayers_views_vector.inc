@@ -42,7 +42,7 @@ class openlayers_layer_type_openlayers_views_vector extends openlayers_layer_typ
       // to pass on to our vector layer.
       $current_view = views_get_current_view();
       if (isset($current_view)) {
-        $args = $current_view->args;
+        $args = isset($current_view->args) ? $current_view->args : array();
         if (isset($current_view->exposed_input)) {
           $view->set_exposed_input($current_view->exposed_input);
         }

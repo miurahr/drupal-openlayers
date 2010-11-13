@@ -60,25 +60,27 @@ Drupal.behaviors.openlayers_behavior_drawfeatures = function(context) {
       var wktFormat = new OpenLayers.Format.WKT();
       var features = wktFormat.read(this.element.text());
 
-      if (features.constructor == Array) {
-        if (features.length == 1 && features[0] == undefined) {
-          features = [];
+      if (typeof features != 'undefined') {
+        if (features.constructor == Array) {
+          if (features.length == 1 && features[0] == undefined) {
+            features = [];
+          }
+          for (var i in features) {
+            features[i].geometry = features[i].geometry.transform(
+              new OpenLayers.Projection('EPSG:4326'),
+              data.openlayers.projection
+            );
+          }
         }
-        for (var i in features) {
-          features[i].geometry = features[i].geometry.transform(
+        else if (features.geometry) {
+          features.geometry = features.geometry.transform(
             new OpenLayers.Projection('EPSG:4326'),
             data.openlayers.projection
           );
+          features = [features];
         }
+        dataLayer.addFeatures(features);
       }
-      else {
-        features.geometry = features.geometry.transform(
-          new OpenLayers.Projection('EPSG:4326'),
-          data.openlayers.projection
-        );
-        features = [features];
-      }
-      dataLayer.addFeatures(features);
     }
 
     // registering events late, because adding data

@@ -6,8 +6,8 @@
 Drupal.behaviors.openlayers_zoomtolayer = function(context) {
   var layerextent, layers, data = $(context).data('openlayers');
   if (data && data.map.behaviors['openlayers_behavior_zoomtolayer']) {
-    map = data.openlayers;
-    layers = map.getLayersBy('drupalID', 
+    var map = data.openlayers,
+        layers = map.getLayersBy('drupalID', 
       data.map.behaviors['openlayers_behavior_zoomtolayer'].zoomtolayer);
     
     // Go through selected layers to get full extent.

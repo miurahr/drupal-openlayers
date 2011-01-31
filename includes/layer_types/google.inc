@@ -40,7 +40,10 @@ class openlayers_layer_type_google extends openlayers_layer_type {
     $google_layer_types = array(
       'hybrid' => 'Hybrid',
       'normal' => 'Normal',
-      'satellite' => 'Satellite');
+      'satellite' => 'Satellite',
+      'mapmaker-normal' => 'MapMaker Normal',
+      'mapmaker-hybrid' => 'MapMaker Hybrid',
+    );
     return array(
       'type' => array(
         '#title' => t('Google Layer Type'),

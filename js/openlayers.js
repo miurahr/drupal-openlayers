@@ -1,4 +1,3 @@
-// $Id$
 
 /*jslint white: false */
 /*global OpenLayers Drupal $ */

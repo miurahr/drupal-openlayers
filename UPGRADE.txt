@@ -1,4 +1,3 @@
-$Id$
 
 This file describes any steps for upgrading openlayers to 
 different versions.

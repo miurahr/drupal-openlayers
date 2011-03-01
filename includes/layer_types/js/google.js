@@ -18,7 +18,7 @@ Drupal.openlayers.layer.google = function(title, map, options) {
     'hybrid': G_HYBRID_MAP,
     'physical': G_PHYSICAL_MAP,
     'mapmaker-normal': G_MAPMAKER_NORMAL_MAP,
-    'mapmaker-hybrid': G_MAPMAKER_HYBRID_MAP,
+    'mapmaker-hybrid': G_MAPMAKER_HYBRID_MAP
   };
 
   options.sphericalMercator = true;

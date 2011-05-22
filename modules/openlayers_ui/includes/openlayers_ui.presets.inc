@@ -322,7 +322,7 @@ function openlayers_ui_presets_form(&$form_state, $preset = NULL, $edit = FALSE)
           // UPGRADE NOTE:
           // Presets up to 6.x-2.x-alpha10 always had a single style
           // per layer specified. Newer ones have them splitted by role
-          '#default_value' => is_array($defaults['layer_styles'][$id]) ?
+          '#default_value' => (!empty($defaults['layer_styles']) && is_array($defaults['layer_styles'][$id])) ?
             ( !empty($defaults['layer_styles'][$id][$role]) ?
               $defaults['layer_styles'][$id][$role] : '' )
             : 

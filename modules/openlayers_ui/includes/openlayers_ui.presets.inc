@@ -28,6 +28,7 @@ function openlayers_ui_presets_form(&$form_state, $preset = NULL, $edit = FALSE)
   drupal_add_css(drupal_get_path('module', 'openlayers_ui') . '/openlayers_ui.css');
 
   // If cloning or editing, attempt to get preset
+  $defaults = array();
   if (empty($preset)) {
     $default_preset = openlayers_preset_load(variable_get('openlayers_default_preset', 'default'));
     if ($default_preset) {

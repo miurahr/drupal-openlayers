@@ -132,26 +132,6 @@ Drupal.openlayers = {
       return basePath + path;
     }
   },
-  /*
-   * Redraw Vectors.
-   * This is necessary because various version of IE cannot draw vectors on
-   * $(document).ready()
-   */
-  'redrawVectors': function() {
-    $(window).load(
-      function() {
-        var map;
-        for (map in Drupal.settings.openlayers.maps) {
-          $.each($('#' + map).data('openlayers')
-            .openlayers.getLayersByClass('OpenLayers.Layer.Vector'),
-            function(i, layer) {
-              layer.redraw();
-            }
-          );
-        }
-      }
-    );
-  },
   /**
    * Add layers to the map
    *

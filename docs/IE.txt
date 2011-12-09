@@ -40,11 +40,8 @@ VML namespace. Therefore, the map breaks. You must aggregate your CSS.
 
 ### The Fix
 
-We can't move openlayers to document.load() because it is dependent on the
-Drupal behaviors stack, that runs on document.ready(). We need to just define
-document.namespaces before OpenLayers asks its VML renderer whether the current
-browser is capable of rendering VML (a task it tries to complete by calling
-!!(document.namespaces))
+Now that map behaviors, are not tied to Drupal.behaviors anymore, we wait for
+`$(window).load()` to render it.
 
 ### Other Fixes
 

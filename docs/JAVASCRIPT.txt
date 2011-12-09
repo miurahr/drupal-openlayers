@@ -1,5 +1,5 @@
 
-Current for 6.x-2.0-alpha3
+Current for 7.x-3.x
 
 The OpenLayers module aims to add minimal abstraction in Javascript to what is
 already provided by the [OpenLayers](http://openlayers.org/) Javascript library.
@@ -16,14 +16,11 @@ performance for displaying many points on maps.
 # Keeping Track of Maps
 
 The OpenLayers map object, which contains pointers to all layers, etc., is
-stored with the [jQuery data() method](http://api.jquery.com/jQuery.data/),
-which provides the phenomenal convenience of storing arbitrary data within the
-DOM itself. This means that the map object is attached to the openlayers-map-0,
-or so on, div element in your page. So, to access it, one could use a line like
+stored with the settings after rendering. To access it, one could use a line
+like
 
-    $('#openlayers-map-0').data('openlayers')
+    Drupal.settings.openlayers["map-random-id"][0]
 
-In FireBug, Safari, or Chrome.
 
 Note that the 2.x branch strives to not duplicate map information: it exists in
 the Drupal settings array and then is transformed into a map object, but after

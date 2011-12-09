@@ -29,7 +29,7 @@ Drupal.settings.openlayers.maps = {};
  */
 Drupal.behaviors.openlayers = {
   'attach': function(context, settings) {
-      $('.openlayers-map').once('openlayers', function() {
+      $(context).find('.openlayers-map').once('openlayers', function() {
         var map_id = $(this).attr('id');
         var map = Drupal.settings.openlayers.maps[map_id];
         var $that = $(this);
@@ -111,6 +111,29 @@ Drupal.behaviors.openlayers = {
           }
         }
       });
+  },
+  // Need to remove all event handlers to avoid leaking.
+  'detach': function (context, settings, trigger) {
+    // only on unload, not serialize
+    if (trigger === 'unload') {
+      // we destroy only processed maps in the relevant context
+      $(context).find('.openlayers-map').removeOnce('openlayers', function () {
+        var map_id = $(this).attr('id');
+        var map = Drupal.settings.openlayers.maps[map_id];
+        var $that = $(this);
+
+        // detach OL behaviors from the map
+        $.each(Drupal.openlayers.behaviors, function (name, behavior) {
+          if (map.behaviors[name] && $.isFunction(behavior.detach)) {
+            $that.removeOnce(name, function () {
+              behavior.detach($that, map, map.behaviors[name], map[0], trigger);
+            });
+          }
+        });
+        // clean up to avoid leaks
+        map[0].destroy();
+      });
+    }
   }
 };
 

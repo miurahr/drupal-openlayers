@@ -6,13 +6,14 @@
 /**
  * OpenLayers Cluster Behavior.
  */
-Drupal.openlayers.addBehavior('openlayers_behavior_cluster', function (data, options) {
-  var map = data.openlayers;
+Drupal.openlayers.behaviors.openlayers_behavior_cluster = {
+  attach: function (context, map, behavior, openlayers) {
+  var options = behavior;
   var distance = parseInt(options.distance, 10);
   var threshold = parseInt(options.threshold, 10);
   var layers = [];
   for (var i in options.clusterlayer) {
-    var selectedLayer = map.getLayersBy('drupalID', options.clusterlayer[i]);
+    var selectedLayer = openlayers.getLayersBy('drupalID', options.clusterlayer[i]);
     if (typeof selectedLayer[0] != 'undefined') {
       layers.push(selectedLayer[0]);
     }
@@ -31,7 +32,8 @@ Drupal.openlayers.addBehavior('openlayers_behavior_cluster', function (data, opt
       cluster.cluster();
     }
   }
-});
+  }
+};
 
 /**
  * Override of callback used by 'popup' behaviour to support clusters

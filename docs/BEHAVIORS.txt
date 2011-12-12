@@ -60,21 +60,21 @@ Here's what you'll write for this behavior:
         return array(
         );
       }
-    
+
       function options_form($defaults) {
         return array(
           'filteredlayer' => array(
             '#type' => 'select',
             '#options' => $this->map['layers'],
             '#description' => t('Select layer to filter'),
-            '#default_value' => isset($defaults['filteredlayer']) ? 
+            '#default_value' => isset($defaults['filteredlayer']) ?
               $defaults['filteredlayer'] : NULL
           ),
         );
       }
-    
+
       function render(&$map) {
-        drupal_add_js(drupal_get_path('module', 'mybehavior') 
+        drupal_add_js(drupal_get_path('module', 'mybehavior')
           .'/includes/behaviors/js/openlayers_behavior_mybehavior.js');
         return $this->options;
       }

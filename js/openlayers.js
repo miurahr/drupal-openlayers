@@ -286,16 +286,16 @@ Drupal.openlayers = {
       layer.addFeatures(newFeatures);
     }
   },
-  
+
   'getStyleMap': function(map, layername) {
     if (map.styles) {
       var stylesAdded = {};
-      
+
       // Grab and map base styles.
       for (var style in map.styles) {
         stylesAdded[style] = new OpenLayers.Style(map.styles[style]);
       }
-      
+
       // Implement layer-specific styles.  First default, then select.
       if (map.layer_styles !== undefined && map.layer_styles[layername]) {
         var style = map.layer_styles[layername];
@@ -305,7 +305,7 @@ Drupal.openlayers = {
         var style = map.layer_styles_select[layername];
         stylesAdded['select'] = new OpenLayers.Style(map.styles[style]);
       }
-      
+
       return new OpenLayers.StyleMap(stylesAdded);
     }
     else {
@@ -324,7 +324,7 @@ Drupal.openlayers = {
       });
     }
   },
-  
+
   'objectFromFeature': function(feature) {
     var wktFormat = new OpenLayers.Format.WKT();
     // Extract geometry either from wkt property or lon/lat properties
@@ -335,7 +335,7 @@ Drupal.openlayers = {
       return wktFormat.read('POINT(' + feature.lon + ' ' + feature.lat + ')');
     }
   },
-  
+
   /**
    * Add Behavior.
    *

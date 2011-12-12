@@ -106,7 +106,7 @@ function _openlayers_test_openlayers_maps() {
     ),
     'options' => NULL,
   );
-  
+
   // GeoJSON example
   $openlayers_maps = new stdClass;
   $openlayers_maps->disabled = FALSE;

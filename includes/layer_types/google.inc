@@ -115,10 +115,7 @@ class openlayers_layer_type_google extends openlayers_layer_type {
         '/includes/layer_types/js/google.js');
 
       // Create URL for google include
-      $url = '';
-      $url .= 'http://maps.google.com/maps?file=api';
-      $url .= '&sensor=false';
-      $url .= '&v=' . variable_get('openlayers_google_version', '2');
+      $url = '//maps.google.com/maps?file=api&sensor=false&v='. variable_get('openlayers_google_version', '2');
 
       $lang = variable_get('openlayers_layers_google_language', '');
       $url .= !empty($lang) ? '&hl=' . $lang : '';

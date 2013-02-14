@@ -51,7 +51,7 @@ class openlayers_behavior_layerswitcher extends openlayers_behavior {
         '#type' => 'select',
         '#title' => t('Sort Base Layers by Title'),
         '#description' => t('Display the layers in the layer switcher by title'),
-        '#default_value' => $defaults['sortBaseLayer'],
+        '#default_value' => isset($defaults['sortBaseLayer']) ? $defaults['sortBaseLayer'] : 0,
         '#options' => array('0' => t('- None -'), 'ASC' => t('ASC'), 'DESC' => 'DESC'),
       ),
       'roundedCorner' => array(

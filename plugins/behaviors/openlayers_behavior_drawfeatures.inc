@@ -51,8 +51,8 @@ class openlayers_behavior_drawfeatures extends openlayers_behavior {
    */
   function css() {
     return array(
-      drupal_add_css(drupal_get_path('module', 'openlayers')  .
-        '/plugins/behaviors/openlayers_behavior_drawfeatures.css')
+      drupal_get_path('module', 'openlayers')  .
+        '/plugins/behaviors/openlayers_behavior_drawfeatures.css'
     );
   }
 

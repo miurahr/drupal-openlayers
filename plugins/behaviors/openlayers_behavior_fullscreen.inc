@@ -50,8 +50,8 @@ class openlayers_behavior_fullscreen extends openlayers_behavior {
    */
   function css() {
     return array(
-      drupal_add_css(drupal_get_path('module', 'openlayers')  .
-        '/plugins/behaviors/openlayers_behavior_fullscreen.css')
+      drupal_get_path('module', 'openlayers')  .
+        '/plugins/behaviors/openlayers_behavior_fullscreen.css'
     );
   }
 

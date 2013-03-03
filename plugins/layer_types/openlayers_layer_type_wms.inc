@@ -136,11 +136,16 @@ class openlayers_layer_type_wms extends openlayers_layer_type {
     $form_state['data']['options']['layers'] = explode("\r\n", $form_state['data']['options']['layers']);
   }
 
+  function js() {
+    return array(
+      drupal_get_path('module', 'openlayers') .
+        '/plugins/layer_types/openlayers_layer_type_wms.js'
+    );
+  }
+
   /**
    * Render.
    */
   function render(&$map) {
-    drupal_add_js(drupal_get_path('module', 'openlayers') .
-      '/plugins/layer_types/openlayers_layer_type_wms.js');
   }
 }

@@ -38,6 +38,17 @@ class openlayers_behavior_layerswitcher extends openlayers_behavior {
     );
   }
 
+  /**
+   * Returns an array of JS files.
+   * @return array
+   */
+  function js() {
+    return array(
+      drupal_get_path('module', 'openlayers') .
+        '/plugins/behaviors/openlayers_behavior_layerswitcher.js'
+    );
+  }
+
   function js_dependency() {
     return array('OpenLayers.Control.LayerSwitcher');
   }
@@ -97,8 +108,6 @@ class openlayers_behavior_layerswitcher extends openlayers_behavior {
       }
     }
 
-    drupal_add_js(drupal_get_path('module', 'openlayers') .
-      '/plugins/behaviors/openlayers_behavior_layerswitcher.js');
     return $this->options;
   }
 }

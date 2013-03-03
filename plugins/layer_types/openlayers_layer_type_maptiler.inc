@@ -70,11 +70,16 @@ class openlayers_layer_type_maptiler extends openlayers_layer_type {
     );
   }
 
+  function js() {
+    return array(
+      drupal_get_path('module', 'openlayers') .
+        '/plugins/layer_types/openlayers_layer_type_maptiler.js'
+    );
+  }
+
   /**
    * Render.
    */
   function render(&$map) {
-    drupal_add_js(drupal_get_path('module', 'openlayers') .
-      '/plugins/layer_types/openlayers_layer_type_maptiler.js');
   }
 }

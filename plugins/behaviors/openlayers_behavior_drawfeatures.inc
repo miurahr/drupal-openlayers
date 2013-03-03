@@ -34,6 +34,28 @@ class openlayers_behavior_drawfeatures extends openlayers_behavior {
     );
   }
 
+  /**
+   * Returns an array of JS files.
+   * @return array
+   */
+  function js() {
+    return array(
+      drupal_get_path('module', 'openlayers') .
+        '/plugins/behaviors/openlayers_behavior_drawfeatures.js'
+    );
+  }
+
+  /**
+   * Returns an array of CSS files.
+   * @return array
+   */
+  function css() {
+    return array(
+      drupal_add_css(drupal_get_path('module', 'openlayers')  .
+        '/plugins/behaviors/openlayers_behavior_drawfeatures.css')
+    );
+  }
+
   function options_form($defaults = array()) {
     $features = array(
       'point' => t('Point'),
@@ -70,10 +92,6 @@ class openlayers_behavior_drawfeatures extends openlayers_behavior {
    * Render.
    */
   function render(&$map) {
-    drupal_add_css(drupal_get_path('module', 'openlayers')  .
-      '/plugins/behaviors/openlayers_behavior_drawfeatures.css');
-    drupal_add_js(drupal_get_path('module', 'openlayers') .
-      '/plugins/behaviors/openlayers_behavior_drawfeatures.js');
     return $this->options;
   }
 }

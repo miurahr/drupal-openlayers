@@ -89,10 +89,16 @@ class openlayers_layer_type_mapbox extends openlayers_layer_type {
     $form_state['data']['projection'] = array_values($form_state['data']['projection']);
   }
 
+  function js() {
+    return array(
+      drupal_get_path('module', 'openlayers') .
+        '/plugins/layer_types/openlayers_layer_type_mapbox.js'
+    );
+  }
+
   /**
    * Render.
    */
   function render(&$map) {
-    drupal_add_js(drupal_get_path('module', 'openlayers') . '/plugins/layer_types/openlayers_layer_type_mapbox.js');
   }
 }

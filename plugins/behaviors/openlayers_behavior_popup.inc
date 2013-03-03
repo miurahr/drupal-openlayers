@@ -36,6 +36,17 @@ class openlayers_behavior_popup extends openlayers_behavior {
   }
 
   /**
+   * Returns an array of JS files.
+   * @return array
+   */
+  function js() {
+    return array(
+      drupal_get_path('module', 'openlayers') .
+        '/plugins/behaviors/openlayers_behavior_popup.js'
+    );
+  }
+
+  /**
    * Form defintion for per map customizations.
    */
   function options_form($defaults = array()) {
@@ -76,10 +87,6 @@ class openlayers_behavior_popup extends openlayers_behavior {
    * Render.
    */
   function render(&$map) {
-    // Put weight on JS so that we know navigation is included already as this
-    // will affect touch devices.
-    drupal_add_js(drupal_get_path('module', 'openlayers') .
-      '/plugins/behaviors/openlayers_behavior_popup.js', array('weight' => 10));
     return $this->options;
   }
 }

@@ -77,16 +77,15 @@ class openlayers_layer_type_bing extends openlayers_layer_type {
 
   }
 
+  function js() {
+    return array(
+      drupal_get_path('module', 'openlayers') .
+        '/plugins/layer_types/openlayers_layer_type_bing.js'
+    );
+  }
+
   /**
    * Render.
    */
-  function render(&$map) {
-    static $bing_maps_included;
-
-    if (!isset($bing_maps_included)) {
-      drupal_add_js(drupal_get_path('module', 'openlayers') .
-      '/plugins/layer_types/openlayers_layer_type_bing.js');
-      $bing_maps_included = TRUE;
-    }
-  }
+  function render(&$map) {}
 }

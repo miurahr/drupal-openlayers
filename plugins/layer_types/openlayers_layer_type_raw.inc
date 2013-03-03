@@ -44,12 +44,17 @@ class openlayers_layer_type_raw extends openlayers_layer_type {
     return array();
   }
 
+  function js() {
+    return array(
+      drupal_get_path('module', 'openlayers') .
+        '/plugins/layer_types/openlayers_layer_type_raw.js'
+    );
+  }
+
   /**
    * Render.
    */
   function render(&$map) {
-    drupal_add_js(drupal_get_path('module', 'openlayers') .
-      '/plugins/layer_types/openlayers_layer_type_raw.js');
     // $features = ;
     // $this->data['features'] = $features;
   }

@@ -153,8 +153,6 @@ function openlayers_include() {
  *   Filled in map array.
  */
 function openlayers_build_map($map = array()) {
-  // Get the necessary parts
-  openlayers_include();
   module_load_include('inc', 'openlayers', 'includes/openlayers.render');
 
   // If no map is specified, use the default map.
@@ -180,9 +178,27 @@ function openlayers_build_map($map = array()) {
   $map['layer_styles_select'] = isset($map['layer_styles_select']) ? $map['layer_styles_select'] : array();
 
   // Process map parts.
-  $map['layers'] = _openlayers_layers_process($map['layers'], $map);
-  $map['behaviors'] = _openlayers_behaviors_render($map['behaviors'], $map);
+  $layers = _openlayers_layers_process($map['layers'], $map);
+  $map['layers'] = $layers['data'];
+  $behaviors = _openlayers_behaviors_render($map['behaviors'], $map);
+  $map['behaviors'] = $behaviors['data'];
   $map['styles'] = _openlayers_styles_process($map['styles'], $map['layer_styles'], $map['layer_styles_select'], $map);
+
+  openlayers_include();
+
+  foreach ($layers['js'] as $file) {
+    drupal_add_js($file);
+  }
+  foreach ($layers['css'] as $file) {
+    drupal_add_css($file);
+  }
+
+  foreach ($behaviors['js'] as $file) {
+    drupal_add_js($file);
+  }
+  foreach ($behaviors['css'] as $file) {
+    drupal_add_css($file);
+  }
 
   // Hook to alter map one last time.  Final modification to existing
   // styles, behaviors, layers can happen here, but adding new styles,
@@ -940,6 +956,22 @@ class openlayers_behavior {
     $this->map = $map;
   }
 
+  /**
+   * Returns an array of JS files.
+   * @return array
+   */
+  function js() {
+    return array();
+  }
+
+  /**
+   * Returns an array of CSS files.
+   * @return array
+   */
+  function css() {
+    return array();
+  }
+
   /*
    * @return array of JavaScript functions required to be defined
    * in order for this function to work
@@ -999,6 +1031,24 @@ class openlayers_layer_type {
     $this->data += $this->options_init();
 
     $this->map = $map;
+  }
+
+  /**
+   * Returns an array of CSS files.
+   *
+   * @return array
+   */
+  function css() {
+    return array();
+  }
+
+  /**
+   * Returns an array of JS files.
+   *
+   * @return array
+   */
+  function js() {
+    return array();
   }
 
   /**

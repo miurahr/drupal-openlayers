@@ -120,6 +120,13 @@ class openlayers_layer_type_google extends openlayers_layer_type {
     );
   }
 
+  function js() {
+    return array(
+      drupal_get_path('module', 'openlayers') .
+        '/plugins/layer_types/openlayers_layer_type_google.js'
+    );
+  }
+
   /**
    * Render.
    */
@@ -127,10 +134,6 @@ class openlayers_layer_type_google extends openlayers_layer_type {
     static $google_maps_included;
 
     if (!isset($google_maps_included)) {
-      // Include files.
-      drupal_add_js(drupal_get_path('module', 'openlayers') .
-        '/plugins/layer_types/openlayers_layer_type_google.js');
-
       $mapdomain = variable_get('openlayers_layers_google_mapdomain', 'maps.google.com');
       $version = variable_get('openlayers_google_version', '3.5');
 

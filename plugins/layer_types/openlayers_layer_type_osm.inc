@@ -78,12 +78,16 @@ class openlayers_layer_type_osm extends openlayers_layer_type {
     $form_state['data']['resolutions'] = array_map('floatval', array_values($form_state['data']['resolutions']));
   }
 
+  function js() {
+    return array(
+      drupal_get_path('module', 'openlayers') .
+        '/plugins/layer_types/openlayers_layer_type_osm.js'
+    );
+  }
 
   /**
    * Render.
    */
   function render(&$map) {
-    drupal_add_js(drupal_get_path('module', 'openlayers') .
-      '/plugins/layer_types/openlayers_layer_type_osm.js');
   }
 }

@@ -33,6 +33,17 @@ class openlayers_behavior_zoompanel extends openlayers_behavior {
     );
   }
 
+  /**
+   * Returns an array of JS files.
+   * @return array
+   */
+  function js() {
+    return array(
+      drupal_get_path('module', 'openlayers') .
+        '/plugins/behaviors/openlayers_behavior_zoompanel.js'
+    );
+  }
+
   function js_dependency() {
     return array(
       'OpenLayers.Control.ZoomPanel'
@@ -43,8 +54,6 @@ class openlayers_behavior_zoompanel extends openlayers_behavior {
    * Render.
    */
   function render(&$map) {
-    drupal_add_js(drupal_get_path('module', 'openlayers') .
-      '/plugins/behaviors/openlayers_behavior_zoompanel.js');
     return $this->options;
   }
 }

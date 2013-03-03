@@ -18,6 +18,8 @@
  */
 function _openlayers_layers_process($layers = array(), &$map = array()) {
   $layer_data = array();
+  $js_files = array();
+  $css_files = array();
 
   // Load Layers and assign weights
   foreach ($layers as $key => $layer){
@@ -35,8 +37,10 @@ function _openlayers_layers_process($layers = array(), &$map = array()) {
   usort($layers, '_openlayers_layers_process_sort');
 
   // Process into array-based layer data for the map
-  foreach ($layers as $type => $layer_object) {
+  foreach ($layers as $layer_object) {
     if (is_object($layer_object)) {
+      $js_files = array_merge($js_files, $layer_object->js());
+      $css_files = array_merge($css_files, $layer_object->css());
       $layer_object->render($map);
       $layer_object->data['title'] = $layer_object->title;
       $layer_object->data['weight'] = $layer_object->weight;
@@ -44,7 +48,7 @@ function _openlayers_layers_process($layers = array(), &$map = array()) {
     }
   }
 
-  return $layer_data;
+  return array('data' => $layer_data, 'js' => $js_files, 'css' => $css_files);
 }
 
 /**
@@ -73,15 +77,19 @@ function _openlayers_layers_process_sort($a, $b) {
  */
 function _openlayers_behaviors_render($behaviors = array(), &$map = array()) {
   $rendered = array();
+  $js_files = array();
+  $css_files = array();
 
   foreach (openlayers_behaviors() as $key => $plugin) {
     if (isset($behaviors[$key]) && $class = ctools_plugin_get_class($plugin, 'behavior')) {
       $behavior = new $class($behaviors[$key], $map);
+      $js_files = array_merge($js_files, $behavior->js());
+      $css_files = array_merge($css_files, $behavior->css());
       $rendered[$key] = $behavior->render($map);
     }
   }
 
-  return $rendered;
+  return array('data' => $rendered, 'js' => $js_files, 'css' => $css_files);
 }
 
 /**

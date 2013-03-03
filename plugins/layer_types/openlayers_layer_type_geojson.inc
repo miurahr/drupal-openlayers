@@ -95,6 +95,13 @@ class openlayers_layer_type_geojson extends openlayers_layer_type {
     );
   }
 
+  function js() {
+    return array(
+      drupal_get_path('module', 'openlayers') .
+        '/plugins/layer_types/openlayers_layer_type_geojson.js'
+    );
+  }
+
   /**
    * Render.
    */
@@ -106,8 +113,5 @@ class openlayers_layer_type_geojson extends openlayers_layer_type {
     }
 
     $this->data['url'] = !empty($this->data['url']) ? url($this->data['url']) : '';
-
-    drupal_add_js(drupal_get_path('module', 'openlayers')
-      . '/plugins/layer_types/openlayers_layer_type_geojson.js');
   }
 }

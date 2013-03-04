@@ -184,8 +184,8 @@ function openlayers_build_map($map = array()) {
   $behaviors = _openlayers_behaviors_render($map['behaviors'], $map);
   $map['behaviors'] = $behaviors['data'];
   $map['styles'] = _openlayers_styles_process($map['styles'], $map['layer_styles'], $map['layer_styles_select'], $map);
-  $map['#attach']['css'] = array_merge($behaviors['css'], $layers['css']);
-  $map['#attach']['js'] = array_merge($behaviors['js'], $layers['js']);
+  $map['#attached']['css'] = array_merge($behaviors['css'], $layers['css']);
+  $map['#attached']['js'] = array_merge($behaviors['js'], $layers['js']);
 
   // Hook to alter map one last time.  Final modification to existing
   // styles, behaviors, layers can happen here, but adding new styles,
@@ -214,7 +214,14 @@ function openlayers_build_map($map = array()) {
 function openlayers_render_map_data($map = array()) {
   // Run map through build process
   $map = openlayers_build_map($map);
-  $output = '';
+
+  if (!empty($map['errors'])) {
+    $output = array(
+      '#markup' => 'Error while building the map.'
+    );
+
+    return $output;
+  }
 
   // Given hide_empty_map flag, check if the map has any features
   // defined. If not, assume it is an empty map and shouldn't be displayed.
@@ -235,20 +242,26 @@ function openlayers_render_map_data($map = array()) {
     'js' => array(drupal_get_path('module', 'openlayers') . '/js/openlayers.js', libraries_get_path('openlayers') . '/OpenLayers.js')
   );
 
-  $attached = array_merge_recursive($attached, $map['#attach']);
-  unset($map['#attach']);
+  $attached = array_merge_recursive($attached, $map['#attached']);
 
-  // Return themed map if no errors found
-  if (empty($map['errors'])) {
-    $js = array('openlayers' => array('maps' => array($map['id'] => $map)));
-    drupal_add_js($js, 'setting');
+  $attached['js'][] = array(
+    'type' => 'setting',
+    'data' => array(
+      'openlayers' => array(
+        'maps' => array(
+          $map['id'] => $map
+        )
+      )
+    )
+  );
 
-    $output = array(
-      '#theme' => 'openlayers_map',
-      'map' => $map,
-      '#attached' => $attached
-    );
-  }
+  unset($map['#attached']);
+  $output = array(
+    '#theme' => 'openlayers_map',
+    '#attached' => $attached,
+    'map' => $map
+  );
+
   return $output;
 }
 

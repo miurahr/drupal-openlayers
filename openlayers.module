@@ -53,7 +53,8 @@ function openlayers_theme($existing, $type, $theme, $path) {
         'map' => array(),
       ),
       'file' => 'includes/openlayers.theme.inc',
-      'template' => '/templates/openlayers-map'
+      'template' => '/templates/openlayers-map',
+      'render element' => 'element'
     ),
     'openlayers_styles' => array(
       'arguments' => array(
@@ -183,22 +184,8 @@ function openlayers_build_map($map = array()) {
   $behaviors = _openlayers_behaviors_render($map['behaviors'], $map);
   $map['behaviors'] = $behaviors['data'];
   $map['styles'] = _openlayers_styles_process($map['styles'], $map['layer_styles'], $map['layer_styles_select'], $map);
-
-  openlayers_include();
-
-  foreach ($layers['js'] as $file) {
-    drupal_add_js($file);
-  }
-  foreach ($layers['css'] as $file) {
-    drupal_add_css($file);
-  }
-
-  foreach ($behaviors['js'] as $file) {
-    drupal_add_js($file);
-  }
-  foreach ($behaviors['css'] as $file) {
-    drupal_add_css($file);
-  }
+  $map['#attach']['css'] = array_merge($behaviors['css'], $layers['css']);
+  $map['#attach']['js'] = array_merge($behaviors['js'], $layers['js']);
 
   // Hook to alter map one last time.  Final modification to existing
   // styles, behaviors, layers can happen here, but adding new styles,
@@ -243,15 +230,24 @@ function openlayers_render_map_data($map = array()) {
     }
   }
 
+  $attached = array(
+    'css' => array(drupal_get_path('module', 'openlayers') . '/css/openlayers.css'),
+    'js' => array(drupal_get_path('module', 'openlayers') . '/js/openlayers.js', libraries_get_path('openlayers') . '/OpenLayers.js')
+  );
+
+  $attached = array_merge_recursive($attached, $map['#attach']);
+  unset($map['#attach']);
+
   // Return themed map if no errors found
   if (empty($map['errors'])) {
     $js = array('openlayers' => array('maps' => array($map['id'] => $map)));
     drupal_add_js($js, 'setting');
 
-    // Push map through theme function and return
-    $output = theme('openlayers_map', array(
+    $output = array(
+      '#theme' => 'openlayers_map',
       'map' => $map,
-    ));
+      '#attached' => $attached
+    );
   }
   return $output;
 }

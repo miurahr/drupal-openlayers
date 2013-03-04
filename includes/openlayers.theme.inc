@@ -11,7 +11,7 @@
  * Preprocess function for openlayers_map
  */
 function openlayers_preprocess_openlayers_map(&$variables, $hook) {
-  $map = $variables['map'];
+  $map = $variables['element']['map'];
 
   $map['map_name'] = isset($map['map_name']) ? $map['map_name'] : '';
   $css_map_name = drupal_clean_css_identifier($map['map_name']);

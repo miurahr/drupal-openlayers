@@ -18,8 +18,6 @@
  */
 function _openlayers_layers_process($layers = array(), &$map = array()) {
   $layer_data = array();
-  $js_files = array();
-  $css_files = array();
 
   // Load Layers and assign weights
   foreach ($layers as $key => $layer){
@@ -77,8 +75,6 @@ function _openlayers_layers_process_sort($a, $b) {
  */
 function _openlayers_behaviors_render($behaviors = array(), &$map = array()) {
   $rendered = array();
-  $js_files = array();
-  $css_files = array();
 
   foreach (openlayers_behaviors() as $key => $plugin) {
     if (isset($behaviors[$key]) && $class = ctools_plugin_get_class($plugin, 'class')) {

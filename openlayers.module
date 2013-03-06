@@ -184,8 +184,7 @@ function openlayers_build_map($map = array()) {
   $behaviors = _openlayers_behaviors_render($map['behaviors'], $map);
   $map['behaviors'] = $behaviors['data'];
   $map['styles'] = _openlayers_styles_process($map['styles'], $map['layer_styles'], $map['layer_styles_select'], $map);
-  $map['#attached']['library'][] = $behaviors['library'];
-  $map['#attached']['library'][] = $behaviors['library'];
+  $map['#attached']['library'] = array_merge(array_keys($map['behaviors']), array_keys($map['layers']));
 
   // Hook to alter map one last time.  Final modification to existing
   // styles, behaviors, layers can happen here, but adding new styles,
@@ -237,24 +236,6 @@ function openlayers_render_map_data($map = array()) {
     }
   }
 
-  // This is temporary, it will needs to use libraries hook to get those files.
-  /*
-  $attached = array(
-    'css' => array(drupal_get_path('module', 'openlayers') . '/css/openlayers.css'),
-    'js' => array(
-      array(
-        'type' => 'file',
-        'data' => libraries_get_path('openlayers') . '/OpenLayers.js',
-        'group' => JS_LIBRARY
-      ),
-      array(
-        'type' => 'file',
-        'data' => drupal_get_path('module', 'openlayers') . '/js/openlayers.js',
-        'group' => JS_LIBRARY
-      )
-    )
-  );
-  */
   $attached = $map['#attached'];
 
   $attached['js'][] = array(

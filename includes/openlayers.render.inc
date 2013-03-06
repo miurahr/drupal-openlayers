@@ -39,14 +39,15 @@ function _openlayers_layers_process($layers = array(), &$map = array()) {
   // Process into array-based layer data for the map
   foreach ($layers as $layer_object) {
     if (is_object($layer_object)) {
+      $library = get_class($layer_object);
       $layer_object->render($map);
       $layer_object->data['title'] = $layer_object->title;
       $layer_object->data['weight'] = $layer_object->weight;
-      $layer_data[$layer_object->name] = $layer_object->data;
+      $layer_data[$library] = $layer_object->data;
     }
   }
 
-  return array('data' => $layer_data, 'library' => get_class($layer_object));
+  return array('data' => $layer_data);
 }
 
 /**
@@ -81,11 +82,11 @@ function _openlayers_behaviors_render($behaviors = array(), &$map = array()) {
   foreach (openlayers_behaviors() as $key => $plugin) {
     if (isset($behaviors[$key]) && $class = ctools_plugin_get_class($plugin, 'behavior')) {
       $behavior = new $class($behaviors[$key], $map);
-      $rendered[$key] = $behavior->render($map);
+      $rendered[$class] = $behavior->render($map);
     }
   }
 
-  return array('data' => $rendered, 'library' => $class);
+  return array('data' => $rendered);
 }
 
 /**

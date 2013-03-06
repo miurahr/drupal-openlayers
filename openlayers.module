@@ -237,9 +237,21 @@ function openlayers_render_map_data($map = array()) {
     }
   }
 
+  // This is temporary, it will needs to use libraries hook to get those files.
   $attached = array(
     'css' => array(drupal_get_path('module', 'openlayers') . '/css/openlayers.css'),
-    'js' => array(drupal_get_path('module', 'openlayers') . '/js/openlayers.js', libraries_get_path('openlayers') . '/OpenLayers.js')
+    'js' => array(
+      array(
+        'type' => 'file',
+        'data' => libraries_get_path('openlayers') . '/OpenLayers.js',
+        'group' => JS_LIBRARY
+      ),
+      array(
+        'type' => 'file',
+        'data' => drupal_get_path('module', 'openlayers') . '/js/openlayers.js',
+        'group' => JS_LIBRARY
+      )
+    )
   );
 
   $attached = array_merge_recursive($attached, $map['#attached']);

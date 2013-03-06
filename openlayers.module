@@ -1234,6 +1234,42 @@ function openlayers_boxes_plugins() {
  * Implements hook_libraries_info().
  */
 function openlayers_libraries_info() {
+
+  ctools_include('export');
+
+  // This is just a test.
+  foreach (openlayers_behaviors() as $key => $plugin) {
+    if ($class = ctools_plugin_get_class($plugin, 'behavior')) {
+      $behavior = new $class();
+      $name = $plugin['behavior']['class'];
+      $libraries[$name] = array(
+        'name' => $plugin['title'],
+        'files' => array(
+          'js' => $behavior->js(),
+          'css' => $behavior->css()
+        ),
+        'path' => $plugin['path'],
+        'version' => '2.x'
+      );
+    }
+  }
+
+  // This is just a test.
+  $layers = ctools_export_load_object('openlayers_layers', 'all', array());
+  foreach ($layers as $key => $plugin) {
+    $layer = openlayers_get_layer_object($plugin);
+    $name = $plugin->data['layer_type'];
+    $libraries[$name] = array(
+      'name' => $plugin->title,
+      'files' => array(
+        'js' => $layer->js(),
+        'css' => $layer->css()
+      ),
+      'path' => $plugin->path,
+      'version' => '2.x'
+    );
+  }
+
   $libraries['openlayers'] = array(
     'name' => 'OpenLayers',
     'vendor url' => 'http://openlayers.org/',

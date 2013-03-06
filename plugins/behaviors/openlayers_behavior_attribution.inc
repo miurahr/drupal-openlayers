@@ -28,7 +28,7 @@ class openlayers_behavior_attribution extends openlayers_behavior {
    */
   function options_init() {
     return array(
-      'seperator' => '',
+      'separator' => '',
     );
   }
 
@@ -49,11 +49,11 @@ class openlayers_behavior_attribution extends openlayers_behavior {
 
   function options_form($defaults = array()) {
     return array(
-      'seperator' => array(
+      'separator' => array(
         '#type' => 'textfield',
-        '#title' => t('Seperator'),
+        '#title' => t('Separator'),
         '#description' => t('For multiple layers that need attribution, provide a separation string.'),
-        '#default_value' => (isset($defaults['seperator'])) ? $defaults['seperator'] : FALSE,
+        '#default_value' => (isset($defaults['separator'])) ? $defaults['separator'] : FALSE,
       ),
     );
   }

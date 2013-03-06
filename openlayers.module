@@ -1230,9 +1230,7 @@ function openlayers_libraries_info() {
       );
   }
 
-  $layer_types = openlayers_layer_types();
-
-  foreach ($layer_types as $key => $plugin) {
+  foreach (openlayers_layer_types() as $key => $plugin) {
     $class = $plugin['class'];
     $libraries[$class] = array(
       'name' => $class,

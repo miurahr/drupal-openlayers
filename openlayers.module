@@ -1254,11 +1254,10 @@ function openlayers_libraries_info() {
 
   $layer_types = openlayers_layer_types();
 
-  // This is just a test.
-  $layers = ctools_export_load_object('openlayers_layers', 'all', array());
-  foreach ($layers as $key => $plugin) {
-    $layer = openlayers_get_layer_object($plugin);
-    $name = $plugin->data['layer_type'];
+  foreach ($layer_types as $key => $plugin) {
+    $class = $plugin['layer_type']['class'];
+    $layer = new $class();
+
     $jss = array();
     foreach ($layer->js() as $file) {
       $jss[] = basename($file);
@@ -1267,13 +1266,13 @@ function openlayers_libraries_info() {
     foreach ($layer->css() as $file) {
       $csss[] = basename($file);
     }
-    $libraries[$name] = array(
-      'name' => $plugin->title,
+    $libraries[$class] = array(
+      'name' => $class,
       'files' => array(
         'js' => $jss,
         'css' => $csss
       ),
-      'library path' => $layer_types[$name]['path'],
+      'library path' => $plugin['path'],
       'version' => '2.x',
       'dependencies' => array(
         'openlayers'

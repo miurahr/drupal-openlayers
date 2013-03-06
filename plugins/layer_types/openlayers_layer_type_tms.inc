@@ -12,11 +12,12 @@ function openlayers_openlayers_layer_type_tms_openlayers_layer_types() {
     'title' => t('TMS'),
     'description' => t('<a href="!url">Tile Map Service</a>',
       array('!url' => 'http://en.wikipedia.org/wiki/Tile_Map_Service')),
-    'layer_type' => array(
-      'file' => 'openlayers_layer_type_tms.inc',
-      'class' => 'openlayers_layer_type_tms',
-      'parent' => 'openlayers_layer_type',
-    ),
+    'class' => 'openlayers_layer_type_tms',
+    'files' => array(
+      'js' => array(
+        'openlayers_layer_type_tms.js'
+      )
+    )
   );
 }
 
@@ -84,13 +85,6 @@ class openlayers_layer_type_tms extends openlayers_layer_type {
           $this->data['type'] : False,
         '#description' => t('Wrapping the dateline will cause the map to appear to repeat itself when going east or west.  This may not be supported by all tilesets.'),
       ),
-    );
-  }
-
-  function js() {
-    return array(
-      drupal_get_path('module', 'openlayers') .
-        '/plugins/layer_types/openlayers_layer_type_tms.js'
     );
   }
 

@@ -13,11 +13,12 @@ function openlayers_openlayers_layer_type_raw_openlayers_layer_types() {
     'description' => t('Layer type for raw data input -
     not meant to be added with the UI.'
     ),
-    'layer_type' => array(
-      'file' => 'openlayers_layer_type_raw.inc',
-      'class' => 'openlayers_layer_type_raw',
-      'parent' => 'openlayers_layer_type',
-    ),
+    'class' => 'openlayers_layer_type_raw',
+    'files' => array(
+      'js' => array(
+        'openlayers_layer_type_raw.js'
+      )
+    )
   );
 }
 
@@ -42,13 +43,6 @@ class openlayers_layer_type_raw extends openlayers_layer_type {
    */
   function options_form($defaults = array()) {
     return array();
-  }
-
-  function js() {
-    return array(
-      drupal_get_path('module', 'openlayers') .
-        '/plugins/layer_types/openlayers_layer_type_raw.js'
-    );
   }
 
   /**

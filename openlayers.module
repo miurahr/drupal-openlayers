@@ -181,10 +181,10 @@ function openlayers_build_map($map = array()) {
   // Process map parts.
   $layers = _openlayers_layers_process($map['layers'], $map);
   $map['layers'] = $layers['data'];
+
   $behaviors = _openlayers_behaviors_render($map['behaviors'], $map);
   $map['behaviors'] = $behaviors['data'];
   $map['styles'] = _openlayers_styles_process($map['styles'], $map['layer_styles'], $map['layer_styles_select'], $map);
-  $map['#attached']['library'] = array_merge(array_keys($map['behaviors']), array_keys($map['layers']));
 
   // Hook to alter map one last time.  Final modification to existing
   // styles, behaviors, layers can happen here, but adding new styles,
@@ -236,7 +236,11 @@ function openlayers_render_map_data($map = array()) {
     }
   }
 
-  $attached = $map['#attached'];
+  $attached = array(
+    'js' => array(),
+    'css' => array(),
+    'library' => array()
+  );
 
   $attached['js'][] = array(
     'type' => 'setting',
@@ -249,13 +253,12 @@ function openlayers_render_map_data($map = array()) {
     )
   );
 
-  $libs = array_unique($attached['library']);
+  $libs = array_merge(array_keys($map['behaviors']), array_keys($map['layers']));
 
   foreach ($libs as $lib) {
     libraries_load($lib);
   }
 
-  unset($map['#attached']);
   $output = array(
     '#theme' => 'openlayers_map',
     '#attached' => $attached,
@@ -320,7 +323,7 @@ function openlayers_get_layer_object($layer, $map = array()) {
   if (isset($layer_types[$layer->data['layer_type']]) &&
     $class = ctools_plugin_get_class(
       $layer_types[$layer->data['layer_type']],
-      'layer_type')
+      'class')
   ) {
     $layer_object = new $class($layer, $map);
     return $layer_object;
@@ -348,19 +351,10 @@ function openlayers_layer_load($name, $reset = FALSE) {
   if ($reset) ctools_export_load_object_reset('openlayers_layers');
   $layer = ctools_export_load_object('openlayers_layers', 'names', array($name));
 
+
   if (is_array($layer) && isset($layer[$name])) {
     $layer_object = openlayers_get_layer_object($layer[$name]);
     if (openlayers_layer_sanity_check($layer_object)) {
-      // Automatic layer load for layers.
-      /*
-      $definitions = ctools_get_plugins('openlayers', 'layer_types');
-      $type = get_class($layer_object);
-      $base = basename($definitions[$type]['file'], '.inc');
-      $js = $definitions[$type]['path'] . '/' . $base .'.js';
-      $css = $definitions[$type]['path'] . '/' . $base .'.css';
-      drupal_add_js($js);
-      drupal_add_css($css);
-      */
       return $layer_object;
     }
   }
@@ -404,9 +398,11 @@ function openlayers_layer_definition_check($definition) {
     array('description'),
     array('name'),
     array('path'),
+    /*
     array('layer_type', 'file'),
     array('layer_type', 'class'),
     array('layer_type', 'parent'),
+    */
   );
 
   foreach ($mandatory_fields as $field) {
@@ -439,9 +435,6 @@ function openlayers_behavior_definition_check($definition) {
     array('name'),
     array('path'),
     array('type'),
-    array('behavior', 'file'),
-    array('behavior', 'class'),
-    array('behavior', 'parent'),
   );
 
   foreach ($mandatory_fields as $field) {
@@ -1222,56 +1215,28 @@ function openlayers_boxes_plugins() {
  * Implements hook_libraries_info().
  */
 function openlayers_libraries_info() {
-  ctools_include('export');
 
   // This is just a test.
   foreach (openlayers_behaviors() as $key => $plugin) {
-    if ($class = ctools_plugin_get_class($plugin, 'behavior')) {
-      $behavior = new $class();
-      $name = $plugin['behavior']['class'];
-      $jss = array();
-      foreach ($behavior->js() as $file) {
-        $jss[] = basename($file);
-      }
-      $csss = array();
-      foreach ($behavior->css() as $file) {
-        $csss[] = basename($file);
-      }
-      $libraries[$name] = array(
-        'name' => $plugin['title'],
-        'files' => array(
-          'js' => $jss,
-          'css' => $csss
-        ),
+      $class = $plugin['class'];
+      $libraries[$class] = array(
+        'name' => $class,
+        'files' => $plugin['files'],
         'library path' => $plugin['path'],
         'version' => '2.x',
         'dependencies' => array(
           'openlayers'
         )
       );
-    }
   }
 
   $layer_types = openlayers_layer_types();
 
   foreach ($layer_types as $key => $plugin) {
-    $class = $plugin['layer_type']['class'];
-    $layer = new $class();
-
-    $jss = array();
-    foreach ($layer->js() as $file) {
-      $jss[] = basename($file);
-    }
-    $csss = array();
-    foreach ($layer->css() as $file) {
-      $csss[] = basename($file);
-    }
+    $class = $plugin['class'];
     $libraries[$class] = array(
       'name' => $class,
-      'files' => array(
-        'js' => $jss,
-        'css' => $csss
-      ),
+      'files' => $plugin['files'],
       'library path' => $plugin['path'],
       'version' => '2.x',
       'dependencies' => array(

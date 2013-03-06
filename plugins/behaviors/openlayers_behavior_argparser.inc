@@ -14,11 +14,12 @@ function openlayers_openlayers_behavior_argparser_openlayers_behaviors() {
     Permalink link to the map.  Permalink is usually similar to:
     ?zoom=1&lat=11&lon=11&layers=B0F'),
     'type' => 'layer',
-    'behavior' => array(
-      'file' => 'openlayers_behavior_argparser.inc',
-      'class' => 'openlayers_behavior_argparser',
-      'parent' => 'openlayers_behavior',
-    ),
+    'class' => 'openlayers_behavior_argparser',
+    'files' => array(
+      'js' => array(
+        'openlayers_behavior_argparser.js'
+      )
+    )
   );
 }
 
@@ -33,16 +34,6 @@ class openlayers_behavior_argparser extends openlayers_behavior {
     return array(
       'anchor' => FALSE,
     );
-  }
-
-  /**
-   * Returns an array of JS files.
-   * @return array
-   */
-  function js() {
-    return array(
-      drupal_get_path('module', 'openlayers') .
-        '/plugins/behaviors/openlayers_behavior_argparser.js');
   }
 
   function js_dependency() {

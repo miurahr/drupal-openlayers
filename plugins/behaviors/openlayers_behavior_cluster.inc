@@ -12,11 +12,12 @@ function openlayers_openlayers_behavior_cluster_openlayers_behaviors() {
     'title' => t('Cluster Features'),
     'description' => t('Provides vector layer features clustering by proximity.  This will not always respect the styles that assigned to the layer.'),
     'type' => 'layer',
-    'behavior' => array(
-      'file' => 'openlayers_behavior_cluster.inc',
-      'class' => 'openlayers_behavior_cluster',
-      'parent' => 'openlayers_behavior',
-    ),
+    'class' => 'openlayers_behavior_cluster',
+    'files' => array(
+      'js' => array(
+        'openlayers_behavior_cluster.js'
+      )
+    )
   );
 }
 

@@ -12,11 +12,12 @@ function openlayers_openlayers_layer_type_geojson_openlayers_layer_types() {
     'title' => t('GeoJSON'),
     'description' => t('Provides a vector layer based on <a href="!url">GeoJSON</a>.',
       array('!url' => 'http://geojson.org/')),
-    'layer_type' => array(
-      'file' => 'openlayers_layer_type_geojson.inc',
-      'class' => 'openlayers_layer_type_geojson',
-      'parent' => 'openlayers_layer_type',
-    ),
+    'class' => 'openlayers_layer_type_geojson',
+    'files' => array(
+      'js' => array(
+        'openlayers_layer_type_geojson.js'
+      )
+    )
   );
 }
 
@@ -92,13 +93,6 @@ class openlayers_layer_type_geojson extends openlayers_layer_type {
         '#description' => t('Paste raw GeoJSON data here.  It is better to use a URL.  This is provided for very simple use cases like one or two features.  If there is data here, it will override the URL above.'),
         '#default_value' => isset($this->data['geojson_data']) ? $this->data['geojson_data'] : '',
       ),
-    );
-  }
-
-  function js() {
-    return array(
-      drupal_get_path('module', 'openlayers') .
-        '/plugins/layer_types/openlayers_layer_type_geojson.js'
     );
   }
 

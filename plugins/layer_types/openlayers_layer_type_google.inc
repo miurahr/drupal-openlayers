@@ -11,11 +11,12 @@ function openlayers_openlayers_layer_type_google_openlayers_layer_types() {
   return array(
     'title' => t('Google'),
     'description' => t('Google Maps API Map'),
-    'layer_type' => array(
-      'file' => 'openlayers_layer_type_google.inc',
-      'class' => 'openlayers_layer_type_google',
-      'parent' => 'openlayers_layer_type',
-    ),
+    'class' => 'openlayers_layer_type_google',
+    'files' => array(
+      'js' => array(
+        'openlayers_layer_type_google.js'
+      )
+    )
   );
 }
 
@@ -117,13 +118,6 @@ class openlayers_layer_type_google extends openlayers_layer_type {
         ),
         '#default_value' => variable_get('openlayers_layers_google_language', ''),
       ),
-    );
-  }
-
-  function js() {
-    return array(
-      drupal_get_path('module', 'openlayers') .
-        '/plugins/layer_types/openlayers_layer_type_google.js'
     );
   }
 

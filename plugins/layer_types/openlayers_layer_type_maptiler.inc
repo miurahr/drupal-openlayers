@@ -12,11 +12,12 @@ function openlayers_openlayers_layer_type_maptiler_openlayers_layer_types() {
     'title' => t('MapTiler'),
     'description' => t('<a href="!url">MapTiler</a> or GDAL2Tiles',
       array('!url' => 'http://www.maptiler.org/')),
-    'layer_type' => array(
-      'file' => 'openlayers_layer_type_maptiler.inc',
-      'class' => 'openlayers_layer_type_maptiler',
-      'parent' => 'openlayers_layer_type',
-    ),
+    'class' => 'openlayers_layer_type_maptiler',
+    'files' => array(
+      'js' => array(
+        'openlayers_layer_type_maptiler.js'
+      )
+    )
   );
 }
 
@@ -67,13 +68,6 @@ class openlayers_layer_type_maptiler extends openlayers_layer_type {
           $this->data['resolutions'] :
           array_map('strval', openlayers_get_resolutions('EPSG:900913'))
       ),
-    );
-  }
-
-  function js() {
-    return array(
-      drupal_get_path('module', 'openlayers') .
-        '/plugins/layer_types/openlayers_layer_type_maptiler.js'
     );
   }
 

@@ -12,11 +12,12 @@ function openlayers_openlayers_behavior_geolocate_openlayers_behaviors() {
     'title' => t('Geolocate Client'),
     'description' => t('Provides the geolcoation control that simply zooms to users location on map load.  Based on HTML5 geolocation, so this will not be supported in all browsers.'),
     'type' => 'map',
-    'behavior' => array(
-      'file' => 'openlayers_behavior_geolocate.inc',
-      'class' => 'openlayers_behavior_geolocate',
-      'parent' => 'openlayers_behavior',
-    ),
+    'class' => 'openlayers_behavior_geolocate',
+    'files' => array(
+      'js' => array(
+        'openlayers_behavior_geolocate.js'
+      )
+    )
   );
 }
 

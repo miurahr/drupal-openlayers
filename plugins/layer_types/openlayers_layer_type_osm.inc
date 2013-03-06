@@ -12,11 +12,12 @@ function openlayers_openlayers_layer_type_osm_openlayers_layer_types() {
   return array(
     'title' => t('OSM'),
     'description' => t('OpenStreetMap Standard'),
-    'layer_type' => array(
-      'file' => 'openlayers_layer_type_osm.inc',
-      'class' => 'openlayers_layer_type_osm',
-      'parent' => 'openlayers_layer_type',
-    ),
+    'class' => 'openlayers_layer_type_osm',
+    'files' => array(
+      'js' => array(
+        'openlayers_layer_type_osm.js'
+      )
+    )
   );
 }
 
@@ -76,13 +77,6 @@ class openlayers_layer_type_osm extends openlayers_layer_type {
     $form_state['data']['url'] = explode("\n", $form_state['data']['url']);
     $form_state['data']['serverResolutions'] = array_map('floatval', array_values($form_state['data']['serverResolutions']));
     $form_state['data']['resolutions'] = array_map('floatval', array_values($form_state['data']['resolutions']));
-  }
-
-  function js() {
-    return array(
-      drupal_get_path('module', 'openlayers') .
-        '/plugins/layer_types/openlayers_layer_type_osm.js'
-    );
   }
 
   /**

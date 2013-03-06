@@ -11,11 +11,12 @@
 $plugin = array(
   'title' => t('Bing'),
   'description' => t('Microsoft Bing'),
-  'layer_type' => array(
-    'file' => 'openlayers_layer_type_bing.inc',
-    'class' => 'openlayers_layer_type_bing',
-    'parent' => 'openlayers_layer_type',
-  ),
+  'class' => 'openlayers_layer_type_bing',
+  'files' => array(
+    'js' => array(
+      'openlayers_layer_type_bing.js'
+    )
+  )
 );
 
 /**
@@ -75,13 +76,6 @@ class openlayers_layer_type_bing extends openlayers_layer_type {
       )
     );
 
-  }
-
-  function js() {
-    return array(
-      drupal_get_path('module', 'openlayers') .
-        '/plugins/layer_types/openlayers_layer_type_bing.js'
-    );
   }
 
   /**

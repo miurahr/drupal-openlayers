@@ -80,7 +80,7 @@ function _openlayers_behaviors_render($behaviors = array(), &$map = array()) {
   $css_files = array();
 
   foreach (openlayers_behaviors() as $key => $plugin) {
-    if (isset($behaviors[$key]) && $class = ctools_plugin_get_class($plugin, 'behavior')) {
+    if (isset($behaviors[$key]) && $class = ctools_plugin_get_class($plugin, 'class')) {
       $behavior = new $class($behaviors[$key], $map);
       $rendered[$class] = $behavior->render($map);
     }

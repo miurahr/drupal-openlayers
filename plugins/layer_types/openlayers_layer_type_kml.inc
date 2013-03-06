@@ -12,11 +12,12 @@ function openlayers_openlayers_layer_type_kml_openlayers_layer_types() {
     'title' => t('KML'),
     'description' => t('<a href="!url">KML</a> overlay.',
       array('!url' => 'http://en.wikipedia.org/wiki/Keyhole_Markup_Language')),
-    'layer_type' => array(
-      'file' => 'openlayers_layer_type_kml.inc',
-      'class' => 'openlayers_layer_type_kml',
-      'parent' => 'openlayers_layer_type',
-    ),
+    'class' => 'openlayers_layer_type_kml',
+    'files' => array(
+      'js' => array(
+        'openlayers_layer_type_kml.js'
+      )
+    )
   );
 }
 
@@ -179,13 +180,6 @@ class openlayers_layer_type_kml extends openlayers_layer_type {
       $file = file_load($item->data['file']);
       file_delete($file);
     }
-  }
-
-  function js() {
-    return array(
-      drupal_get_path('module', 'openlayers') .
-        '/plugins/layer_types/openlayers_layer_type_kml.js'
-    );
   }
 
   /**

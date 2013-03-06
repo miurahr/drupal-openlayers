@@ -12,11 +12,12 @@ function openlayers_openlayers_layer_type_wms_openlayers_layer_types() {
     'title' => t('WMS'),
     'description' => t('<a href="!url">Web Map Service</a>',
       array('!url' => 'http://en.wikipedia.org/wiki/Web_Map_Service')),
-    'layer_type' => array(
-      'file' => 'openlayers_layer_type_wms.inc',
-      'class' => 'openlayers_layer_type_wms',
-      'parent' => 'openlayers_layer_type',
-    ),
+    'class' => 'openlayers_layer_type_wms',
+    'files' => array(
+      'js' => array(
+        'openlayers_layer_type_wms.js'
+      )
+    )
   );
 }
 
@@ -134,13 +135,6 @@ class openlayers_layer_type_wms extends openlayers_layer_type {
    */
   function options_form_validate($form, &$form_state) {
     $form_state['data']['options']['layers'] = explode("\r\n", $form_state['data']['options']['layers']);
-  }
-
-  function js() {
-    return array(
-      drupal_get_path('module', 'openlayers') .
-        '/plugins/layer_types/openlayers_layer_type_wms.js'
-    );
   }
 
   /**

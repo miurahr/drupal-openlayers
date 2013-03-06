@@ -12,11 +12,12 @@ function openlayers_openlayers_layer_type_xyz_openlayers_layer_types() {
   return array(
     'title' => t('XYZ'),
     'description' => t('XYZ layer type.  These are tiles sets usually in the form of {z}/{x}/{y}.png.'),
-    'layer_type' => array(
-      'file' => 'openlayers_layer_type_xyz.inc',
-      'class' => 'openlayers_layer_type_xyz',
-      'parent' => 'openlayers_layer_type',
-    ),
+    'class' => 'openlayers_layer_type_xyz',
+    'files' => array(
+      'js' => array(
+        'openlayers_layer_type_xyz.js'
+      )
+    )
   );
 }
 
@@ -97,13 +98,6 @@ class openlayers_layer_type_xyz extends openlayers_layer_type {
     $form_state['data']['projection'] = array_values($form_state['data']['projection']);
     $form_state['data']['resolutions'] = array_map('floatval', array_values($form_state['data']['resolutions']));
     $form_state['data']['zoomOffset'] = (int) $form_state['data']['zoomOffset'];
-  }
-
-  function js() {
-    return array(
-      drupal_get_path('module', 'openlayers') .
-        '/plugins/layer_types/openlayers_layer_type_xyz.js'
-    );
   }
 
   /**

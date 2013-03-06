@@ -8,11 +8,12 @@ function openlayers_openlayers_layer_type_mapbox_openlayers_layer_types() {
     'title' => t('MapBox'),
     'description' => t('<a href="!url">MapBox</a> Custom Map',
       array('!url' => 'http://mapbox.com/')),
-    'layer_type' => array(
-      'file' => 'openlayers_layer_type_mapbox.inc',
-      'class' => 'openlayers_layer_type_mapbox',
-      'parent' => 'openlayers_layer_type',
-    ),
+    'class' => 'openlayers_layer_type_mapbox',
+    'files' => array(
+      'js' => array(
+        'openlayers_layer_type_mapbox.js'
+      )
+    )
   );
 }
 
@@ -87,13 +88,6 @@ class openlayers_layer_type_mapbox extends openlayers_layer_type {
     $form_state['data']['url'] = explode("\n", $form_state['data']['url']);
     $form_state['data']['resolutions'] = array_map('floatval', array_values($form_state['data']['resolutions']));
     $form_state['data']['projection'] = array_values($form_state['data']['projection']);
-  }
-
-  function js() {
-    return array(
-      drupal_get_path('module', 'openlayers') .
-        '/plugins/layer_types/openlayers_layer_type_mapbox.js'
-    );
   }
 
   /**

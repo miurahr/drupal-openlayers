@@ -12,11 +12,12 @@ function openlayers_openlayers_behavior_layerswitcher_openlayers_behaviors() {
     'title' => t('Layer Switcher'),
     'description' => t('Provides the ability to switch layers in the map interface.  This provides an expandable box on the map to enable and disable layers.'),
     'type' => 'map',
-    'behavior' => array(
-      'file' => 'openlayers_behavior_layerswitcher.inc',
-      'class' => 'openlayers_behavior_layerswitcher',
-      'parent' => 'openlayers_behavior',
-    ),
+    'class' => 'openlayers_behavior_layerswitcher',
+    'files' => array(
+      'js' => array(
+        'openlayers_behavior_layerswitcher.js'
+      )
+    )
   );
 }
 

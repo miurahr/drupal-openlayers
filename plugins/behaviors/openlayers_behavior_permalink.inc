@@ -12,11 +12,12 @@ function openlayers_openlayers_behavior_permalink_openlayers_behaviors() {
     'title' => t('Permalink'),
     'description' =>  t('Provides a link that will create an URL that will link to a specific map position.  Permalink is usually similar to: ?zoom=1&lat=11&lon=11&layers=B0F'),
     'type' => 'map',
-    'behavior' => array(
-      'file' => 'openlayers_behavior_permalink.inc',
-      'class' => 'openlayers_behavior_permalink',
-      'parent' => 'openlayers_behavior',
-    ),
+    'class' => 'openlayers_behavior_permalink',
+    'files' => array(
+      'js' => array(
+        'openlayers_behavior_permalink.js'
+      )
+    )
   );
 }
 

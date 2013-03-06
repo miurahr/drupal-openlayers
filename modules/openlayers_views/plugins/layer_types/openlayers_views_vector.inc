@@ -11,11 +11,12 @@ function openlayers_views_openlayers_views_vector_openlayers_layer_types() {
   return array(
     'title' => t('OpenLayers Views'),
     'description' => t('OpenLayers Views Vector'),
-    'layer_type' => array(
-      'file' => 'openlayers_views_vector.inc',
-      'class' => 'openlayers_layer_type_openlayers_views_vector',
-      'parent' => 'openlayers_layer_type',
-    ),
+    'class' => 'openlayers_layer_type_openlayers_views_vector',
+    'files' => array(
+      'js' => array(
+        'openlayers_views_vector.js'
+      )
+    )
   );
 }
 
@@ -126,8 +127,6 @@ class openlayers_layer_type_openlayers_views_vector
    * Render.
    */
   function render(&$map) {
-    drupal_add_js(drupal_get_path('module', 'openlayers_views') .
-      '/plugins/layer_types/openlayers_views_vector.js');
     $this->get_features();
   }
 }

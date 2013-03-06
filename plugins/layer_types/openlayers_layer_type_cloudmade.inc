@@ -14,11 +14,12 @@ function openlayers_openlayers_layer_type_cloudmade_openlayers_layer_types() {
     'title' => t('CloudMade'),
     'description' => t('<a href="!url">CloudMade</a> Custom Map',
       array('!url' => 'http://cloudmade.com/')),
-    'layer_type' => array(
-      'file' => 'openlayers_layer_type_cloudmade.inc',
-      'class' => 'openlayers_layer_type_cloudmade',
-      'parent' => 'openlayers_layer_type',
-    ),
+    'class' => 'openlayers_layer_type_cloudmade',
+    'files' => array(
+      'js' => array(
+        'openlayers_layer_type_cloudmade.js'
+      )
+    )
   );
 }
 
@@ -81,13 +82,6 @@ class openlayers_layer_type_cloudmade extends openlayers_layer_type {
           '<a href="@url">Cloudmade OpenLayers Javascript library</a>',
           array('@url' => 'http://developers.cloudmade.com/projects/show/openlayers-api')),
       ),
-    );
-  }
-
-  function js() {
-    return array(
-      drupal_get_path('module', 'openlayers') .
-        '/plugins/layer_types/openlayers_layer_type_cloudmade.js'
     );
   }
 

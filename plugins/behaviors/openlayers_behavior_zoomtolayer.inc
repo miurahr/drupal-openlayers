@@ -12,11 +12,12 @@ function openlayers_openlayers_behavior_zoomtolayer_openlayers_behaviors() {
     'title' => t('Zoom to Layer'),
     'description' => t('Zooms to the extent of a given layer(s) on map loading. If multiple layers are chosen, zooms to the extent that includes all chosen layers.'),
     'type' => 'layer',
-    'behavior' => array(
-      'file' => 'openlayers_behavior_zoomtolayer.inc',
-      'class' => 'openlayers_behavior_zoomtolayer',
-      'parent' => 'openlayers_behavior',
-    ),
+    'class' => 'openlayers_behavior_zoomtolayer',
+    'files' => array(
+      'js' => array(
+        'openlayers_behavior_zoomtolayer.js'
+      )
+    )
   );
 }
 

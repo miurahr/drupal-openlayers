@@ -12,11 +12,12 @@ function openlayers_openlayers_behavior_zoompanel_openlayers_behaviors() {
     'title' => t('Zoom Control'),
     'description' => t('Provides a control that can Zoom In, Zoom Out, and Zoom to Max Extent Button.  Do not use with Pan Zoom Bar Control or Pan Zoom Control.'),
     'type' => 'map',
-    'behavior' => array(
-      'file' => 'openlayers_behavior_zoompanel.inc',
-      'class' => 'openlayers_behavior_zoompanel',
-      'parent' => 'openlayers_behavior',
-    ),
+    'class' => 'openlayers_behavior_zoompanel',
+    'files' => array(
+      'js' => array(
+        'openlayers_behavior_zoompanel.js'
+      )
+    )
   );
 }
 

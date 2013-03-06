@@ -958,22 +958,6 @@ class openlayers_behavior {
     $this->map = $map;
   }
 
-  /**
-   * Returns an array of JS files.
-   * @return array
-   */
-  function js() {
-    return array();
-  }
-
-  /**
-   * Returns an array of CSS files.
-   * @return array
-   */
-  function css() {
-    return array();
-  }
-
   /*
    * @return array of JavaScript functions required to be defined
    * in order for this function to work
@@ -1033,24 +1017,6 @@ class openlayers_layer_type {
     $this->data += $this->options_init();
 
     $this->map = $map;
-  }
-
-  /**
-   * Returns an array of CSS files.
-   *
-   * @return array
-   */
-  function css() {
-    return array();
-  }
-
-  /**
-   * Returns an array of JS files.
-   *
-   * @return array
-   */
-  function js() {
-    return array();
   }
 
   /**

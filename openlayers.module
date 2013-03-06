@@ -181,7 +181,6 @@ function openlayers_build_map($map = array()) {
   // Process map parts.
   $layers = _openlayers_layers_process($map['layers'], $map);
   $map['layers'] = $layers['data'];
-
   $behaviors = _openlayers_behaviors_render($map['behaviors'], $map);
   $map['behaviors'] = $behaviors['data'];
   $map['styles'] = _openlayers_styles_process($map['styles'], $map['layer_styles'], $map['layer_styles_select'], $map);
@@ -236,13 +235,7 @@ function openlayers_render_map_data($map = array()) {
     }
   }
 
-  $attached = array(
-    'js' => array(),
-    'css' => array(),
-    'library' => array()
-  );
-
-  $attached['js'][] = array(
+  $settings = array(
     'type' => 'setting',
     'data' => array(
       'openlayers' => array(
@@ -253,15 +246,26 @@ function openlayers_render_map_data($map = array()) {
     )
   );
 
-  $libs = array_merge(array_keys($map['behaviors']), array_keys($map['layers']));
+  $libs = array_keys($map['behaviors']);
 
+  // Get class from layer name.
+  foreach($map['layers'] as $name => $data) {
+    $libs[] = $data['class'];
+  }
+
+  $libraries_load = array();
   foreach ($libs as $lib) {
-    libraries_load($lib);
+    $libraries_load[] = array($lib);
   }
 
   $output = array(
     '#theme' => 'openlayers_map',
-    '#attached' => $attached,
+    '#attached' => array(
+      'libraries_load' => $libraries_load,
+      'js' => array(
+        $settings
+      )
+    ),
     'map' => $map
   );
 

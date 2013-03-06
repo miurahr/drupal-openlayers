@@ -39,11 +39,12 @@ function _openlayers_layers_process($layers = array(), &$map = array()) {
   // Process into array-based layer data for the map
   foreach ($layers as $layer_object) {
     if (is_object($layer_object)) {
-      $library = get_class($layer_object);
+      $class = get_class($layer_object);
       $layer_object->render($map);
+      $layer_object->data['class'] = $class;
       $layer_object->data['title'] = $layer_object->title;
       $layer_object->data['weight'] = $layer_object->weight;
-      $layer_data[$library] = $layer_object->data;
+      $layer_data[$layer_object->name] = $layer_object->data;
     }
   }
 

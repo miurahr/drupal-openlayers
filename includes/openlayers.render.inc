@@ -39,8 +39,6 @@ function _openlayers_layers_process($layers = array(), &$map = array()) {
   // Process into array-based layer data for the map
   foreach ($layers as $layer_object) {
     if (is_object($layer_object)) {
-      $js_files = array_merge($js_files, $layer_object->js());
-      $css_files = array_merge($css_files, $layer_object->css());
       $layer_object->render($map);
       $layer_object->data['title'] = $layer_object->title;
       $layer_object->data['weight'] = $layer_object->weight;
@@ -48,7 +46,7 @@ function _openlayers_layers_process($layers = array(), &$map = array()) {
     }
   }
 
-  return array('data' => $layer_data, 'js' => $js_files, 'css' => $css_files);
+  return array('data' => $layer_data, 'library' => get_class($layer_object));
 }
 
 /**
@@ -83,13 +81,11 @@ function _openlayers_behaviors_render($behaviors = array(), &$map = array()) {
   foreach (openlayers_behaviors() as $key => $plugin) {
     if (isset($behaviors[$key]) && $class = ctools_plugin_get_class($plugin, 'behavior')) {
       $behavior = new $class($behaviors[$key], $map);
-      $js_files = array_merge($js_files, $behavior->js());
-      $css_files = array_merge($css_files, $behavior->css());
       $rendered[$key] = $behavior->render($map);
     }
   }
 
-  return array('data' => $rendered, 'js' => $js_files, 'css' => $css_files);
+  return array('data' => $rendered, 'library' => $class);
 }
 
 /**

@@ -398,6 +398,7 @@ function openlayers_layer_definition_check($definition) {
     array('description'),
     array('name'),
     array('path'),
+    array('class')
     /*
     array('layer_type', 'file'),
     array('layer_type', 'class'),
@@ -435,6 +436,7 @@ function openlayers_behavior_definition_check($definition) {
     array('name'),
     array('path'),
     array('type'),
+    array('class')
   );
 
   foreach ($mandatory_fields as $field) {

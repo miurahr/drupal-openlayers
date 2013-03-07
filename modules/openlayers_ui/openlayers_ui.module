@@ -39,7 +39,6 @@ function openlayers_ui_init() {
       drupal_add_library('system', 'drupal.ajax');
       drupal_add_library('system', 'jquery.form');
       // Ensure that the library is included
-      openlayers_include();
       // Add custom client JS
       drupal_add_js(drupal_get_path('module', 'openlayers_ui') . '/js/openlayers_ui.admin.js');
       // We shouldn't, but we are just gonna put a message up there
@@ -311,7 +310,6 @@ function openlayers_ui_style_preview($style, $crosshairs = FALSE) {
   drupal_add_js(drupal_get_path('module', 'openlayers_ui') . '/js/openlayers_ui.styles.js');
   drupal_add_css(drupal_get_path('module', 'openlayers_ui') . '/openlayers_ui.css');
   module_load_include('inc', 'openlayers', 'includes/openlayers.render');
-  openlayers_include();
 
   // Render style data
   $style->data = openlayers_render_style($style->data);

@@ -13,11 +13,6 @@ function openlayers_openlayers_layer_type_kml_openlayers_layer_types() {
     'description' => t('<a href="!url">KML</a> overlay.',
       array('!url' => 'http://en.wikipedia.org/wiki/Keyhole_Markup_Language')),
     'class' => 'openlayers_layer_type_kml',
-    'files' => array(
-      'js' => array(
-        'openlayers_layer_type_kml.js'
-      )
-    )
   );
 }
 

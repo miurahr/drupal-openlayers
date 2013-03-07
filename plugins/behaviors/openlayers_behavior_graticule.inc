@@ -13,11 +13,6 @@ function openlayers_openlayers_behavior_graticule_openlayers_behaviors() {
     'description' => t('Adds a graticule control to the map to display a grid of latitude and longitude.'),
     'type' => 'layer',
     'class' => 'openlayers_behavior_graticule',
-    'files' => array(
-      'js' => array(
-        'openlayers_behavior_graticule.js'
-      )
-    )
   );
 }
 /**

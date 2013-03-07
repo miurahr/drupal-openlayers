@@ -14,11 +14,6 @@ function openlayers_openlayers_behavior_layerzoom_openlayers_behaviors() {
    'description' => t('Enables restriction of layer display based on zoom level.'),
    'type' => 'layer',
    'class' => 'openlayers_behavior_layerzoom',
-   'files' => array(
-     'js' => array(
-       'openlayers_behavior_layerzoom.js'
-     )
-   )
  );
 }
 

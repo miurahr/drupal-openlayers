@@ -13,11 +13,6 @@ function openlayers_openlayers_layer_type_geojson_openlayers_layer_types() {
     'description' => t('Provides a vector layer based on <a href="!url">GeoJSON</a>.',
       array('!url' => 'http://geojson.org/')),
     'class' => 'openlayers_layer_type_geojson',
-    'files' => array(
-      'js' => array(
-        'openlayers_layer_type_geojson.js'
-      )
-    )
   );
 }
 

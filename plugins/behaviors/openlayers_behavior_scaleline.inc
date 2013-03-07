@@ -13,11 +13,6 @@ function openlayers_openlayers_behavior_scaleline_openlayers_behaviors() {
     'description' => t('Provides a line of scale in the map interface.'),
     'type' => 'map',
     'class' => 'openlayers_behavior_scaleline',
-    'files' => array(
-      'js' => array(
-        'openlayers_behavior_scaleline.js'
-      )
-    )
   );
 }
 

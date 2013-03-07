@@ -15,11 +15,6 @@ function openlayers_openlayers_behavior_argparser_openlayers_behaviors() {
     ?zoom=1&lat=11&lon=11&layers=B0F'),
     'type' => 'layer',
     'class' => 'openlayers_behavior_argparser',
-    'files' => array(
-      'js' => array(
-        'openlayers_behavior_argparser.js'
-      )
-    )
   );
 }
 

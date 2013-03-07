@@ -13,11 +13,6 @@ function openlayers_openlayers_layer_type_osm_openlayers_layer_types() {
     'title' => t('OSM'),
     'description' => t('OpenStreetMap Standard'),
     'class' => 'openlayers_layer_type_osm',
-    'files' => array(
-      'js' => array(
-        'openlayers_layer_type_osm.js'
-      )
-    )
   );
 }
 

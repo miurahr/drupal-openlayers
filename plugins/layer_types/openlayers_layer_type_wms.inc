@@ -13,11 +13,6 @@ function openlayers_openlayers_layer_type_wms_openlayers_layer_types() {
     'description' => t('<a href="!url">Web Map Service</a>',
       array('!url' => 'http://en.wikipedia.org/wiki/Web_Map_Service')),
     'class' => 'openlayers_layer_type_wms',
-    'files' => array(
-      'js' => array(
-        'openlayers_layer_type_wms.js'
-      )
-    )
   );
 }
 

@@ -13,11 +13,6 @@ function openlayers_openlayers_layer_type_xyz_openlayers_layer_types() {
     'title' => t('XYZ'),
     'description' => t('XYZ layer type.  These are tiles sets usually in the form of {z}/{x}/{y}.png.'),
     'class' => 'openlayers_layer_type_xyz',
-    'files' => array(
-      'js' => array(
-        'openlayers_layer_type_xyz.js'
-      )
-    )
   );
 }
 

@@ -13,11 +13,6 @@ function openlayers_openlayers_behavior_dragpan_openlayers_behaviors() {
     'description' => t('Provides the ability to pan in the map interface with the mouse.  The Navigation Control includes this control.  You should only use this behavior if you want fine control over what interactions you want on your map.'),
     'type' => 'map',
     'class' => 'openlayers_behavior_dragpan',
-    'files' => array(
-      'js' => array(
-        'openlayers_behavior_dragpan.js'
-      )
-    )
   );
 }
 

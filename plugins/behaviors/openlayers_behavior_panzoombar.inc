@@ -13,11 +13,6 @@ function openlayers_openlayers_behavior_panzoombar_openlayers_behaviors() {
     'description' => t('Gives user ability to pan and zoom, with a full zoom bar in the map interface.  Do not use with Pan Zoom Contols or Zoom Panel Controls.'),
     'type' => 'map',
     'class' => 'openlayers_behavior_panzoombar',
-    'files' => array(
-      'js' => array(
-        'openlayers_behavior_panzoombar.js'
-      )
-    )
   );
 }
 

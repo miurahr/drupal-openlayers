@@ -13,11 +13,6 @@ function openlayers_openlayers_behavior_mouseposition_openlayers_behaviors() {
     'description' => t('Provides a visual indication of the mouse position to the user.'),
     'type' => 'map',
     'class' => 'openlayers_behavior_mouseposition',
-    'files' => array(
-      'js' => array(
-        'openlayers_behavior_mouseposition.js'
-      )
-    )
   );
 }
 

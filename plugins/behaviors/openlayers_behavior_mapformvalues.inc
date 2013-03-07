@@ -14,11 +14,6 @@ function openlayers_openlayers_behavior_mapformvalues_openlayers_behaviors() {
     'type' => 'map',
     'ui_visibility' => FALSE,
     'class' => 'openlayers_behavior_mapformvalues',
-    'files' => array(
-      'js' => array(
-        'openlayers_behavior_mapformvalues.js'
-      )
-    )
   );
 }
 

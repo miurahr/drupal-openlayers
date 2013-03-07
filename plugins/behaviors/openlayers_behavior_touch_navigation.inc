@@ -13,11 +13,6 @@ function openlayers_openlayers_behavior_touch_navigation_openlayers_behaviors() 
     'description' => t('Provides specific navigation controls for touch enabled devices only.  <strong>This is included with the Navigation behavior</strong>.  Only enable this if you are targeting only touch enabled devices.'),
     'type' => 'map',
     'class' => 'openlayers_behavior_touch_navigation',
-    'files' => array(
-      'js' => array(
-        'openlayers_behavior_touch_navigation.js'
-      )
-    )
   );
 }
 

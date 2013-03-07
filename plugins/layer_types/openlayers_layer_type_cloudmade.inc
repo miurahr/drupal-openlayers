@@ -15,11 +15,6 @@ function openlayers_openlayers_layer_type_cloudmade_openlayers_layer_types() {
     'description' => t('<a href="!url">CloudMade</a> Custom Map',
       array('!url' => 'http://cloudmade.com/')),
     'class' => 'openlayers_layer_type_cloudmade',
-    'files' => array(
-      'js' => array(
-        'openlayers_layer_type_cloudmade.js'
-      )
-    )
   );
 }
 

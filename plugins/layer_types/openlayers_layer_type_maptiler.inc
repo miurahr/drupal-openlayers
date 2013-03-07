@@ -13,11 +13,6 @@ function openlayers_openlayers_layer_type_maptiler_openlayers_layer_types() {
     'description' => t('<a href="!url">MapTiler</a> or GDAL2Tiles',
       array('!url' => 'http://www.maptiler.org/')),
     'class' => 'openlayers_layer_type_maptiler',
-    'files' => array(
-      'js' => array(
-        'openlayers_layer_type_maptiler.js'
-      )
-    )
   );
 }
 

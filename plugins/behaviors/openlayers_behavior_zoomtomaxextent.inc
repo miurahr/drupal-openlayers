@@ -13,11 +13,6 @@ function openlayers_openlayers_behavior_zoomtomaxextent_openlayers_behaviors() {
     'description' => t('Provides button to zoom to the maximum extent of the map.'),
     'type' => 'map',
     'class' => 'openlayers_behavior_zoomtomaxextent',
-    'files' => array(
-      'js' => array(
-        'openlayers_behavior_zoomtomaxextent.js'
-      )
-    )
   );
 }
 

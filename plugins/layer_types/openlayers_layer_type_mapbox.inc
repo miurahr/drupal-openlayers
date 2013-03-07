@@ -9,11 +9,6 @@ function openlayers_openlayers_layer_type_mapbox_openlayers_layer_types() {
     'description' => t('<a href="!url">MapBox</a> Custom Map',
       array('!url' => 'http://mapbox.com/')),
     'class' => 'openlayers_layer_type_mapbox',
-    'files' => array(
-      'js' => array(
-        'openlayers_layer_type_mapbox.js'
-      )
-    )
   );
 }
 

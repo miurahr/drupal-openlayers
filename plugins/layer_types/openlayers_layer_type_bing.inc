@@ -12,11 +12,6 @@ $plugin = array(
   'title' => t('Bing'),
   'description' => t('Microsoft Bing'),
   'class' => 'openlayers_layer_type_bing',
-  'files' => array(
-    'js' => array(
-      'openlayers_layer_type_bing.js'
-    )
-  )
 );
 
 /**

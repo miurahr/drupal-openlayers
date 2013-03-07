@@ -1186,25 +1186,27 @@ function openlayers_boxes_plugins() {
  */
 function openlayers_libraries_info() {
 
-  // This is just a test.
-  foreach (openlayers_behaviors() as $key => $plugin) {
-      $class = $plugin['class'];
-      $libraries[$class] = array(
-        'name' => $class,
-        'files' => $plugin['files'],
-        'library path' => $plugin['path'],
-        'version' => '2.x',
-        'dependencies' => array(
-          'openlayers'
-        )
-      );
-  }
+  $ctools_object = array_merge(openlayers_behaviors(), openlayers_layer_types());
 
-  foreach (openlayers_layer_types() as $key => $plugin) {
+  // This is just a test.
+  foreach ($ctools_object as $key => $plugin) {
     $class = $plugin['class'];
+
+    $plugin['files'] = !empty($plugin['files']) ? (array) $plugin['files'] : array();
+    $files = array();
+    $extensions = array('css', 'js');
+    foreach ($extensions as $ext) {
+      $file = $plugin['path'] . '/' . $class . '.' . $ext;
+      if (file_exists($file)) {
+        $files[$ext][] = $class . '.' . $ext;
+      }
+    }
+
+    $files += $plugin['files'];
+
     $libraries[$class] = array(
       'name' => $class,
-      'files' => $plugin['files'],
+      'files' => $files,
       'library path' => $plugin['path'],
       'version' => '2.x',
       'dependencies' => array(

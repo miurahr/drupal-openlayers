@@ -12,11 +12,6 @@ function openlayers_openlayers_layer_type_google_openlayers_layer_types() {
     'title' => t('Google'),
     'description' => t('Google Maps API Map'),
     'class' => 'openlayers_layer_type_google',
-    'files' => array(
-      'js' => array(
-        'openlayers_layer_type_google.js'
-      )
-    )
   );
 }
 

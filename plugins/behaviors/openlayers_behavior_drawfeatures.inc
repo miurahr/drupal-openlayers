@@ -13,14 +13,6 @@ function openlayers_openlayers_behavior_drawfeatures_openlayers_behaviors() {
     'description' => t('Provides functionality for adding features to a map.'),
     'type' => 'layer',
     'class' => 'openlayers_behavior_drawfeatures',
-    'files' => array(
-      'js' => array(
-        'openlayers_behavior_drawfeatures.js'
-      ),
-      'css' => array(
-        'openlayers_behavior_drawfeatures.css'
-      )
-    )
   );
 }
 /**

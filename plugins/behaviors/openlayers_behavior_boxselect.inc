@@ -14,11 +14,6 @@ function openlayers_openlayers_behavior_boxselect_openlayers_behaviors() {
     'type' => 'map',
     'ui_visibility' => FALSE,
     'class' => 'openlayers_behavior_boxselect',
-    'files' => array(
-      'js' => array(
-        'openlayers_behavior_boxselect.js'
-      )
-    )
   );
 }
 /**

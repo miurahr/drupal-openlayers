@@ -14,11 +14,6 @@ function openlayers_openlayers_layer_type_raw_openlayers_layer_types() {
     not meant to be added with the UI.'
     ),
     'class' => 'openlayers_layer_type_raw',
-    'files' => array(
-      'js' => array(
-        'openlayers_layer_type_raw.js'
-      )
-    )
   );
 }
 

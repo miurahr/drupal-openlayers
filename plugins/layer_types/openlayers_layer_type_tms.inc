@@ -28,7 +28,7 @@ class openlayers_layer_type_tms extends openlayers_layer_type {
     return array(
       'layer_handler' => 'tms',
       'type' => 'png',
-      'wrapDateLine' => false,
+      'wrapDateLine' => FALSE,
     ) + parent::options_init();
   }
 

@@ -1276,6 +1276,31 @@ function openlayers_libraries_info() {
   return $libraries;
 }
 
+function openlayers_element_info() {
+  return array(
+    'openlayers' => array(
+      '#pre_render' => array('openlayers_element_pre_render'),
+      '#theme' => array('openlayers_map'),
+      '#theme_wrappers' => array('form_element')
+    )
+  );
+}
+
+function openlayers_element_pre_render($element) {
+  if (is_string($element['#map'])) {
+    $map = openlayers_map_load($element['#map']);
+    $map = openlayers_render_map_data($map->data);
+    $element['#attached'] = $map['#attached'];
+    $element['map'] = $map['map'];
+  }
+
+  if (is_array($element['#map'])) {
+    $element['map'] = $element['#map'];
+  }
+
+  return $element;
+}
+
 /**
  * Alias Functions
  *

@@ -56,8 +56,9 @@ class openlayers_maps_ui extends ctools_export_ui {
             )
         ),
       );
-      $form['preview']['map']['#markup'] = render(
-        openlayers_render_map_data($map_preview->data)
+      $form['preview']['map'] = array(
+        '#type' => 'openlayers',
+        '#map' => $map->name
       );
     } else {
       $form['preview'] = array();
@@ -206,10 +207,15 @@ class openlayers_maps_ui extends ctools_export_ui {
       '#type' => 'fieldset',
       '#group' => 'ui'
     );
+
+    $ol = openlayers_ui_maps_form_center_map($defaults);
+
     $form['center']['helpmap'] = array(
-      '#markup' => '<div class="form-item openlayers-center-helpmap"
-      style="display:block">' .
-        render(openlayers_ui_maps_form_center_map($defaults)) . '</div>'
+      '#prefix' => '<div class="form-item openlayers-center-helpmap" style="display:block">',
+      '#suffix' => '</div>',
+      '#type' => 'openlayers',
+      '#map' => $ol['map'],
+      '#attached' => $ol['#attached']
     );
     $form['center']['initial'] = array(
       '#type' => 'fieldset',

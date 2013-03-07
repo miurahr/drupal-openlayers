@@ -153,7 +153,7 @@ function openlayers_ui_get_behavior_options($type, $defaults) {
       'openlayers',
       'behaviors',
       $key,
-      'behavior');
+      'class');
     if (!empty($class)) {
       $options = isset($defaults['behaviors'][$key]) ?
         $defaults['behaviors'][$key] : array();

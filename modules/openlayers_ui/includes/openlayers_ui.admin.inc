@@ -33,8 +33,7 @@ function openlayers_ui_admin_settings() {
     );
 
   $options = array('external' => 'External');
-  if (module_exists('libraries') &&
-    ($library = libraries_detect('openlayers')) && !empty($library['installed'])) {
+  if ( ($library = libraries_detect('openlayers')) && !empty($library['installed'])) {
     $options += array('internal' => 'Internal');
   }
 
@@ -47,9 +46,7 @@ function openlayers_ui_admin_settings() {
         <li>Select internal to load the OpenLayers library from your drupal installation.
           <br/>You can use the drush command <em>dl-openlayers</em> to download the library and place it at the right place automatically.</li>
         <li>Select external to load it from Internet.</li>
-      </ul>
-      <p>You should use the <a href="!libraries">libraries module</a> to enable the internal loading of the library.</p>
-      ', array('!libraries' => 'http://drupal.org/project/libraries')),
+      </ul>'),
     '#default_value' => variable_get('openlayers_source_type', 'external')
   );
 

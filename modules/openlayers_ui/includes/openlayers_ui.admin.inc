@@ -86,6 +86,20 @@ function openlayers_ui_admin_settings() {
       the default when creating new maps.'),
     '#options' => openlayers_map_options(),
     '#default_value' => variable_get('openlayers_default_map', 'default'),
+    '#ajax' => array(
+      'callback' => '_ajax_reload_default_map',
+      'method' => 'replace',
+      'wrapper' => 'default_map_ajax',
+      'effect' => 'fade'
+    ),
+  );
+
+  $form['default_map'] = array(
+    '#prefix' => '<div id="default_map_ajax">',
+    '#suffix' => '</div>',
+    '#type' => 'openlayers',
+    '#description' => t('This is the map set as default.'),
+    '#map' => variable_get('openlayers_default_map', 'default')
   );
 
   $form['openlayers_ui_preview_map'] = array(
@@ -107,4 +121,17 @@ function openlayers_ui_admin_settings() {
  */
 function openlayers_ui_admin_settings_submit() {
   drupal_flush_all_caches();
+}
+
+/**
+ * Ajax callback for the default map element in the form.
+ *
+ * @param $form
+ * @param $form_state
+ * @return mixed
+ */
+function _ajax_reload_default_map($form, &$form_state) {
+  $output = $form['default_map'];
+  $output['#map'] = $form_state['values']['openlayers_default_map'];
+  return $output;
 }

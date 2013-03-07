@@ -1182,19 +1182,18 @@ function openlayers_boxes_plugins() {
  */
 function openlayers_libraries_info() {
 
-  $ctools_object = array_merge(openlayers_behaviors(), openlayers_layer_types());
+  $ctools_objects = array_merge(openlayers_behaviors(), openlayers_layer_types());
   $dependencies = array();
 
   if (variable_get('openlayers_source_type', 'external') == 'internal') {
     $ol_variant = variable_get('openlayers_source_internal_variant', '');
+    $dependencies = array('openlayers');
     if ($ol_variant != 'original') {
       $dependencies = array('openlayers' => $ol_variant);
-    } else {
-      $dependencies = array('openlayers');
     }
   }
 
-  foreach ($ctools_object as $key => $plugin) {
+  foreach ($ctools_objects as $key => $plugin) {
     $class = $plugin['class'];
     $plugin['files'] = !empty($plugin['files']) ? (array) $plugin['files'] : array();
 

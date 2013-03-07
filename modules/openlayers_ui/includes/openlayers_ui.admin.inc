@@ -108,8 +108,17 @@ function openlayers_ui_admin_settings() {
     '#value' => '',
   );
 
+  $form['#submit'][] = 'openlayers_ui_admin_settings_submit';
+
   // Make a system setting form and return
   return system_settings_form($form);
+}
+
+/**
+ * Submit handler of the form.
+ */
+function openlayers_ui_admin_settings_submit() {
+  drupal_flush_all_caches();
 }
 
 /**

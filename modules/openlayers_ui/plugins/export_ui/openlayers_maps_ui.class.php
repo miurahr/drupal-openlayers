@@ -15,7 +15,6 @@ class openlayers_maps_ui extends ctools_export_ui {
 
     module_load_include('inc', 'openlayers_ui', 'includes/openlayers_ui.maps');
 
-    openlayers_include();
     ctools_include('dependent');
     drupal_add_js(drupal_get_path('module', 'openlayers_ui') .
       '/js/openlayers_ui.maps.js');

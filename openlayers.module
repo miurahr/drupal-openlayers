@@ -1188,22 +1188,23 @@ function openlayers_libraries_info() {
 
   $ctools_object = array_merge(openlayers_behaviors(), openlayers_layer_types());
 
-  // This is just a test.
   foreach ($ctools_object as $key => $plugin) {
     $class = $plugin['class'];
-
     $plugin['files'] = !empty($plugin['files']) ? (array) $plugin['files'] : array();
+
+    // Autodetect if any CSS or JS files.
     $files = array();
-    $extensions = array('css', 'js');
-    foreach ($extensions as $ext) {
+    foreach (array('css', 'js') as $ext) {
       $file = $plugin['path'] . '/' . $class . '.' . $ext;
       if (file_exists($file)) {
         $files[$ext][] = $class . '.' . $ext;
       }
     }
 
+    // Add files from the ctools plugin definition if any.
     $files += $plugin['files'];
 
+    // Build the library.
     $libraries[$class] = array(
       'name' => $class,
       'files' => $files,

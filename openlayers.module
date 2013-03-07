@@ -104,40 +104,32 @@ function openlayers_ctools_plugin_type() {
  * @ingroup openlayers_api
  */
 function openlayers_include() {
+  // Use a static variable to prevent running URL check code repeatedly.
+  static $once;
+  if (!isset($once)) {
+    $once = TRUE;
 
-  if ('internal' == variable_get('openlayers_source_type', 'external')) {
-    $variant = variable_get('openlayers_source_internal_variant', NULL);
-    if ($variant == 'original') $variant = NULL;
-    libraries_load('openlayers', $variant);
-  } else {
-    // Use a static variable to prevent running URL check code repeatedly.
-    static $once;
-    if (!isset($once)) {
-      $once = TRUE;
+    $path = check_plain(variable_get('openlayers_source', OPENLAYERS_DEFAULT_LIBRARY));
 
-      $path = check_plain(variable_get('openlayers_source', OPENLAYERS_DEFAULT_LIBRARY));
-
-      // Correctly handle URLs beginning with a double backslash, see RFC 1808 Section 4
-      if (substr($path, 0, 2) == '//') {
-        $http_protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? 'https' : 'http';
-        $path = $http_protocol .':'. $path;
-      }
-
-      // Check for full URL and include it manually if external.
-      if (valid_url($path, TRUE)) {
-        drupal_add_js($path, 'external');
-      }
-      else {
-        drupal_add_js($path);
-      }
-
-      drupal_add_css(drupal_get_path('module', 'openlayers') .
-        '/css/openlayers.css', 'file');
-      drupal_add_js(drupal_get_path('module', 'openlayers') .
-        '/js/openlayers.js', 'file');
+    // Correctly handle URLs beginning with a double backslash, see RFC 1808 Section 4
+    if (substr($path, 0, 2) == '//') {
+      $http_protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? 'https' : 'http';
+      $path = $http_protocol .':'. $path;
     }
-  }
 
+    // Check for full URL and include it manually if external.
+    if (valid_url($path, TRUE)) {
+      drupal_add_js($path, 'external');
+    }
+    else {
+      drupal_add_js($path);
+    }
+
+    drupal_add_css(drupal_get_path('module', 'openlayers') .
+      '/css/openlayers.css', 'file');
+    drupal_add_js(drupal_get_path('module', 'openlayers') .
+      '/js/openlayers.js', 'file');
+  }
 }
 
 /**

@@ -129,17 +129,8 @@ function openlayers_ctools_plugin_api($module, $api) {
  * Implements hook_libraries_info().
  */
 function openlayers_libraries_info() {
-
   $ctools_objects = array_merge(openlayers_behaviors(), openlayers_layer_types());
-  $dependencies = array();
-
-  if (variable_get('openlayers_source_type', 'external') == 'internal') {
-    $ol_variant = variable_get('openlayers_source_internal_variant', '');
-    $dependencies = array('openlayers');
-    if ($ol_variant != 'original') {
-      $dependencies = array('openlayers' => $ol_variant);
-    }
-  }
+  $ol_variant = variable_get('openlayers_source_internal_variant', 'original');
 
   foreach ($ctools_objects as $key => $plugin) {
     $class = $plugin['class'];
@@ -163,7 +154,13 @@ function openlayers_libraries_info() {
       'files' => $files,
       'library path' => $plugin['path'],
       'version' => '2.x',
-      'dependencies' => $dependencies
+      'dependencies' => array('openlayers'),
+      'dependency variants' => array($ol_variant),
+      'callbacks' => array(
+        'pre-dependencies-load' => array(
+          'openlayers_load_library_dependency_variants_callback'
+        )
+      )
     );
   }
 
@@ -225,6 +222,21 @@ function openlayers_libraries_info() {
   );
 
   return $libraries;
+}
+
+/**
+ * Pre-dependencies-load callback.
+ *
+ * @param $library
+ */
+function openlayers_load_library_dependency_variants_callback($library) {
+  foreach ($library['dependencies'] as $i => $name) {
+    if ($library['dependency variants'][$i] != 'original') {
+      libraries_load($name, $library['dependency variants'][$i]);
+    } else {
+      libraries_load($name);
+    }
+  }
 }
 
 /**

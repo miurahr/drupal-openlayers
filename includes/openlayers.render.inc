@@ -46,7 +46,7 @@ function _openlayers_layers_process($layers = array(), &$map = array()) {
     }
   }
 
-  return array('data' => $layer_data);
+  return $layer_data;
 }
 
 /**
@@ -83,7 +83,7 @@ function _openlayers_behaviors_render($behaviors = array(), &$map = array()) {
     }
   }
 
-  return array('data' => $rendered);
+  return $rendered;
 }
 
 /**

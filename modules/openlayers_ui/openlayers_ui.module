@@ -6,6 +6,12 @@
  * @ingroup openlayers
  */
 
+module_load_include('inc', 'openlayers','includes/openlayers.tools');
+module_load_include('inc', 'openlayers','includes/openlayers.behaviors');
+module_load_include('inc', 'openlayers','includes/openlayers.layers');
+module_load_include('inc', 'openlayers','includes/openlayers.styles');
+module_load_include('inc', 'openlayers','includes/openlayers.maps');
+
 /**
  * Implements hook_help
  */

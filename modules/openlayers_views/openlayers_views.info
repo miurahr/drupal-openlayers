@@ -14,3 +14,5 @@ files[] = views/openlayers_views_plugin_display_openlayers.inc
 files[] = views/openlayers_views_plugin_row_point.inc
 files[] = views/openlayers_views_plugin_row_bounding_box.inc
 files[] = views/openlayers_views_plugin_row_geometry.inc
+files[] = ../../includes/openlayers_behavior.class.inc
+files[] = ../../includes/openlayers_layer_type.class.inc

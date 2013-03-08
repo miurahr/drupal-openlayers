@@ -6,3 +6,5 @@ dependencies[] = "openlayers"
 
 configure = admin/structure/openlayers
 files[] = openlayers_ui.module
+files[] = ../../includes/openlayers_behavior.class.inc
+files[] = ../../includes/openlayers_layer_type.class.inc

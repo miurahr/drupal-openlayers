@@ -317,7 +317,7 @@ function _openlayers_openlayers_maps() {
     'center' => array(
       'initial' => array(
         'centerpoint' => '0,0',
-        'zoom' => '0'
+        'zoom' => '3'
       )
     ),
     'image_path' => drupal_get_path('module', 'openlayers') . '/themes/default_dark/img/',

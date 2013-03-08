@@ -1,8 +1,240 @@
 <?php
 
 /**
- * @file
+ * Menu loader for layers. (%openlayers_layer)
+ * @ingroup openlayers_api
  *
+ * @param $name
+ *   Layer name
+ * @return array
+ *   Layer export
+ */
+function openlayers_layer_load($name, $reset = FALSE) {
+  ctools_include('export');
+  if ($reset) ctools_export_load_object_reset('openlayers_layers');
+  $layer = ctools_export_load_object('openlayers_layers', 'names', array($name));
+
+
+  if (is_array($layer) && isset($layer[$name])) {
+    $layer_object = openlayers_get_layer_object($layer[$name]);
+    if (openlayers_layer_sanity_check($layer_object)) {
+      return $layer_object;
+    }
+  }
+  else {
+    return FALSE;
+  }
+}
+
+/**
+ * Get all openlayers layers as objects.
+ * @ingroup openlayers_api
+ *
+ * @param $reset
+ *   Boolean whether to reset cache or not
+ * @return array
+ *   array of layer info
+ */
+function openlayers_layers_load($reset = FALSE) {
+  ctools_include('export');
+  $layer_objects = array();
+  if ($reset) ctools_export_load_object_reset('openlayers_layers');
+  $layers = ctools_export_load_object('openlayers_layers', 'all', array());
+  foreach ($layers as $layer) {
+    $layer_objects[$layer->name] = openlayers_get_layer_object($layer);
+  }
+
+  return array_filter($layer_objects, 'openlayers_layer_sanity_check');
+}
+
+/**
+ * Menu loader for layer types.
+ *
+ * @ingroup openlayers_api
+ *
+ * @param $name
+ *   String identifier of layer type.
+ * @param $reset
+ *   Boolean whether to reset cache or not.
+ * @return
+ *   An instantiated layer type object or FALSE if not found.
+ */
+function openlayers_layer_type_load($name, $reset = FALSE) {
+  ctools_include('plugins');
+
+  if ($layer_type_class = ctools_plugin_load_class(
+    'openlayers',
+    'layer_types',
+    $name,
+    'layer_type')) {
+    $layer_type = new $layer_type_class();
+    return $layer_type;
+  }
+  return FALSE;
+}
+
+/**
+ * Get all layer types.
+ *
+ * @ingroup openlayers_api
+ *
+ * @param $reset
+ *   Boolean whether to reset cache or not.
+ * @return
+ *   Array of layer type info.
+ */
+function openlayers_layer_types($reset = FALSE) {
+  ctools_include('plugins');
+  $layers = ctools_get_plugins('openlayers', 'layer_types');
+
+  return array_filter($layers, '_openlayers_layer_definition_check');
+}
+
+/**
+ * Get layer object
+ *
+ * @ingroup openlayers_api
+ * @param $reset
+ *   Boolean whether to reset cache or not
+ * @return array
+ *   array of layer info
+ */
+function openlayers_get_layer_object($layer, $map = array()) {
+  // Static cache because this function will possibly be called in big loops
+  static $layer_types;
+  if (!isset($layer_types)) {
+    $layer_types = openlayers_layer_types();
+  }
+
+  $layer->title = t($layer->title);
+  $layer->description = t($layer->description);
+
+  // Attempt to get ctool class
+  if (isset($layer_types[$layer->data['layer_type']]) &&
+    $class = ctools_plugin_get_class(
+      $layer_types[$layer->data['layer_type']],
+      'class')
+  ) {
+    $layer_object = new $class($layer, $map);
+    return $layer_object;
+  }
+  else {
+    watchdog('openlayers', 'Layer !layer_name is unavailable because its
+      layer type or the module that provides its layer type is missing',
+      array('!layer_name' => $layer->title),
+      WATCHDOG_ERROR);
+    return FALSE;
+  }
+}
+
+
+/**
+ * Check layer to determine whether it has all the
+ * necessary attributes to be rendered. This is necessary
+ * because of API changes, and is a consolidation from other
+ * layer-error-checking in this module
+ *
+ * @param $layer
+ *  Layer object
+ * @param $projection
+ *  Projection number (EPSG) to check compatibility with
+ * @param $strict
+ *  reject invalid layers
+ * @return boolean
+ *  layer validity if strict is set, otherwise always true
+ */
+function openlayers_layer_sanity_check($layer, $projection = FALSE, $strict = FALSE) {
+  // Handle layers after they've been rendered for a map
+  $layer = (is_array($layer)) ? (object) $layer : $layer;
+
+  if (!isset($layer->name)) {
+    return !$strict;
+  }
+
+  if (!isset($layer->data['projection']) || !is_array($layer->data['projection'])) {
+    watchdog('openlayers', 'Layer %name does not have a projection set.',
+      array('%name' => $layer->name));
+    drupal_set_message(
+      t('OpenLayers layers failed the sanity check. See the
+      <a href="@drupallog">Drupal log</a> for details',
+        array('@drupallog' => url('admin/reports/dblog')))
+    );
+    return !$strict;
+  }
+
+  if (!isset($layer->data['layer_type'])) {
+    watchdog('openlayers', 'Layer %name does not have its layer_type set.',
+      array('%name' => $layer->name));
+    drupal_set_message(
+      t('OpenLayers layers failed the sanity check. See the
+      <a href="@drupallog">Drupal log</a> for details',
+        array('@drupallog' => url('admin/reports/dblog')))
+    );
+    return !$strict;
+  }
+
+  if ($projection && empty($layer->data['vector']) &&
+    (!in_array($projection, $layer->data['projection']))) {
+    watchdog('openlayers',
+      'The layer %layer_name cannot be reprojected to the map projection: EPSG: %map_proj',
+      array(
+        '%layer_name' => $layer->name,
+        // TODO: $map is not defined.
+        '%map_proj' => $map['projection'],
+      )
+    );
+    return !$strict;
+  }
+
+  return TRUE;
+}
+
+/**
+ * Check the plugin definition of a layer.
+ * Some field *MUST* be there to work correctly with OL.
+ *
+ * @ingroup openlayers_api
+ * @param $definition
+ * @return bool
+ */
+function _openlayers_layer_definition_check($definition) {
+  $mandatory_fields = array(
+    array('title'),
+    array('description'),
+    array('name'),
+    array('path'),
+    array('class')
+    /*
+    array('layer_type', 'file'),
+    array('layer_type', 'class'),
+    array('layer_type', 'parent'),
+    */
+  );
+
+  foreach ($mandatory_fields as $field) {
+    $missing = drupal_array_nested_key_exists($definition, $field);
+    if (!$missing) {
+      drupal_set_message(t("There's a problem in the plugin definition of the layer type <em>!type</em>. The layer will be disabled.", array('!type' => $definition['name'])), 'warning');
+      watchdog('openlayers', 'Layer !layer is unavailable because its
+                                plugin definition is incomplete.',
+        array('!layer' => $definition['name']),
+        WATCHDOG_ERROR);
+      return FALSE;
+    }
+  }
+
+  return TRUE;
+}
+
+/**
+ * Implements hook_openlayers_layers().
+ */
+function openlayers_openlayers_layers() {
+  module_load_include('inc', 'openlayers', 'includes/openlayers.layers');
+  return _openlayers_openlayers_layers();
+}
+
+/**
  * OpenLayers default packaged layers
  */
 function _openlayers_openlayers_layers() {

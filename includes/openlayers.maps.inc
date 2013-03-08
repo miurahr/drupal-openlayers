@@ -8,6 +8,291 @@
  */
 
 /**
+ * Implements hook_openlayers_maps().
+ */
+function openlayers_openlayers_maps() {
+  module_load_include('inc', 'openlayers', 'includes/openlayers.maps');
+  return _openlayers_openlayers_maps();
+}
+
+/**
+ * Get maps from DB or code, via cache.
+ *
+ * @ingroup openlayers_api
+ *
+ * @param $reset
+ *   Boolean whether to reset or not.
+ * @return
+ *   Return array of maps.
+ */
+function openlayers_maps($reset = FALSE) {
+  ctools_include('export');
+  if ($reset) {
+    ctools_export_load_object_reset('openlayers_maps');
+  }
+
+  $maps = ctools_export_load_object(
+    'openlayers_maps', 'all', array());
+  return $maps;
+}
+
+/**
+ * Given a map name, get full map object.
+ *
+ * This function can also be used as a
+ * menu loader for a style.
+ *
+ * @ingroup openlayers_api
+ *
+ * @param $name
+ *   String identifier of the map.
+ * @param $reset
+ *   Boolean whether to reset cache.
+ * @return
+ *   map object or FALSE if not found.
+ */
+function openlayers_map_load($name = '', $reset = FALSE) {
+  ctools_include('export');
+  if ($reset) {
+    ctools_export_load_object_reset('openlayers_maps');
+  }
+
+  $maps = ctools_export_load_object('openlayers_maps', 'names', array($name));
+
+  if (empty($maps[$name])) {
+    return FALSE;
+  } else {
+    $map = $maps[$name];
+    $map->data['map_name'] = $name;
+    return clone $map;
+  }
+}
+
+/**
+ * Get map options in an array suitable for a FormAPI element.
+ *
+ * @ingroup openlayers_api
+ *
+ * @param $reset
+ *   Boolean whether to reset or not.
+ * @return
+ *   Return array of formatted data.
+ */
+function openlayers_map_options($reset = FALSE) {
+  $maps = openlayers_maps($reset);
+  $options = array();
+  foreach ($maps as $map) {
+    $options[$map->name] = $map->title;
+  }
+  return $options;
+}
+
+/**
+ * Checks map array for incompatibilities or errors.
+ *
+ * @ingroup openlayers_api
+ *
+ * @param $map
+ *   Map array
+ * @param $log_errors
+ *   Boolean whether to log errors.
+ * @return
+ *   FALSE if passed. Array of descriptive errors if fail.
+ */
+function openlayers_error_check_map($map, $log_errors = TRUE) {
+  $errors = array();
+
+  // Check for layers
+  if (!is_array($map['layers'])) {
+    $errors[] = t('Map contains no renderable layers.');
+  }
+  else {
+    // Check layer projections
+    foreach ($map['layers'] as $layer) {
+      openlayers_layer_sanity_check(
+        array('data' => $layer),
+        $map['projection'],
+        TRUE);
+    }
+  }
+
+  // Check if any errors found to log
+  if (count($errors) > 0 && $log_errors) {
+    // Log the Error(s)
+    watchdog('openlayers', implode(', ', $errors), array(), WATCHDOG_ERROR);
+  }
+
+  // Check if errors and return
+  return (count($errors) > 0) ? $errors : FALSE;
+}
+
+/**
+ * Prepare a map for rendering.
+ *
+ * Takes a map array and builds up the data given the
+ * reference to objects like styles, layers, and behaviors.
+ *
+ * @ingroup openlayers_api
+ *
+ * @param $map
+ *   Array of map settings
+ * @return
+ *   Filled in map array.
+ */
+function openlayers_build_map($map = array()) {
+  module_load_include('inc', 'openlayers', 'includes/openlayers.render');
+
+  // If no map is specified, use the default map.
+  if (empty($map)) {
+    if ($loaded_map = openlayers_map_load(
+      variable_get('openlayers_default_map', 'default'))) {
+      $map = $loaded_map->data;
+    }
+  }
+
+  // Create ID for map as this will help with alters.
+  $map['id'] = !isset($map['id']) ?
+    _openlayers_create_map_id() : $map['id'];
+
+  // Hook to alter map before main processing.  Styles, behaviors,
+  // layers may all be added here.
+  // hook_openlayers_map_preprocess_alter($map)
+  drupal_alter('openlayers_map_preprocess', $map);
+
+  // Styles and layer styles are not required parameters
+  $map['styles'] = isset($map['styles']) ? $map['styles'] : array();
+  $map['layer_styles'] = isset($map['layer_styles']) ? $map['layer_styles'] : array();
+  $map['layer_styles_select'] = isset($map['layer_styles_select']) ? $map['layer_styles_select'] : array();
+
+  // Process map parts.
+  $map['layers'] = _openlayers_layers_process($map['layers'], $map);
+  $map['behaviors'] = _openlayers_behaviors_render($map['behaviors'], $map);
+  $map['styles'] = _openlayers_styles_process($map['styles'], $map['layer_styles'], $map['layer_styles_select'], $map);
+
+  // Hook to alter map one last time.  Final modification to existing
+  // styles, behaviors, layers can happen here, but adding new styles,
+  // behaviors will not get rendered.
+  // hook_openlayers_map_alter($map)
+  drupal_alter('openlayers_map', $map);
+
+  // Check map for errors
+  $map['errors'] = openlayers_error_check_map($map);
+  return $map;
+}
+
+/**
+ * Render map array
+ *
+ * Given a map array, render into HTML to display
+ * a map.
+ *
+ * @ingroup openlayers_api
+ *
+ * @param $map
+ *   Associative array of map paramters.
+ * @return
+ *   Map HTML.
+ */
+function openlayers_render_map_data($map = array()) {
+  // Run map through build process
+  $map = openlayers_build_map($map);
+
+  if (!empty($map['errors'])) {
+    $output = array(
+      '#markup' => 'Error while building the map.'
+    );
+
+    return $output;
+  }
+
+  // Given hide_empty_map flag, check if the map has any features
+  // defined. If not, assume it is an empty map and shouldn't be displayed.
+  if (isset($map['hide_empty_map']) && $map['hide_empty_map'] == TRUE) {
+    $empty = TRUE;
+    foreach ($map['layers'] as $layer) {
+      if (isset($layer['features']) && count($layer['features'])) {
+        $empty = FALSE;
+      }
+    }
+    if ($empty) {
+      return '';
+    }
+  }
+
+  if (variable_get('openlayers_source_type', 'external') == 'external') {
+    openlayers_include();
+  }
+
+  $settings = array(
+    'type' => 'setting',
+    'data' => array(
+      'openlayers' => array(
+        'maps' => array(
+          $map['id'] => $map
+        )
+      )
+    )
+  );
+
+  $libs = array_keys($map['behaviors']);
+
+  // Get class from layer name.
+  foreach($map['layers'] as $name => $data) {
+    $libs[] = $data['class'];
+  }
+
+  $libraries_load = array();
+  foreach ($libs as $lib) {
+    $libraries_load[] = array($lib);
+  }
+
+  $output = array(
+    '#theme' => 'openlayers_map',
+    '#attached' => array(
+      'libraries_load' => $libraries_load,
+      'js' => array(
+        $settings
+      )
+    ),
+    'map' => $map
+  );
+
+  return $output;
+}
+
+/**
+ * Render a map by name
+ *
+ * Given a map name render it into a full map object.
+ *
+ * @ingroup openlayers_api
+ *
+ * @param $map
+ *   Name of the map
+ * @return
+ *   Map HTML.
+ */
+function openlayers_render_map($map = '') {
+
+  // If it's an array, then we have been passed the map data array
+  if (is_array($map)) {
+    return openlayers_render_map_data($map);
+  }
+
+  // If it's a string, then we are passing a map name instead of the whole map object
+  // so we need to load the object
+  if (!$map || is_string($map)) {
+    $map_name = $map;
+    if (!$map_name) {
+      $map_name = variable_get('openlayers_default_map', 'default');
+    }
+    $map = openlayers_map_load($map_name);
+  }
+
+  return openlayers_render_map_data($map->data);
+}
+
+/**
  * Map definitions
  *
  * Internal callback for openlayers map implementation.

@@ -8,6 +8,54 @@
  */
 
 /**
+ * Implements hook_openlayers_styles().
+ */
+function openlayers_openlayers_styles() {
+  module_load_include('inc', 'openlayers', 'includes/openlayers.styles');
+  return _openlayers_openlayers_styles();
+}
+
+/**
+ * Get all openlayers styles.
+ *
+ * @ingroup openlayers_api
+ *
+ * @param $reset
+ *   Boolean whether to reset cache or not.
+ * @return
+ *   Array of all available styles.
+ */
+function openlayers_styles($reset = FALSE) {
+  ctools_include('export');
+  if ($reset) {
+    ctools_export_load_object_reset('openlayers_styles');
+  }
+
+  $styles = ctools_export_load_object('openlayers_styles', 'all', array());
+  return $styles;
+}
+
+/**
+ * Load a style object by name.
+ *
+ * This function can also be used as a
+ * menu loader for a style.
+ *
+ * @ingroup openlayers_api
+ *
+ * @param $name
+ *   The string identifier of the style.
+ * @param $reset
+ *   Boolean whether to reset the cache or not.
+ * @return
+ *   A style object or FALSE if not found.
+ */
+function openlayers_style_load($name, $reset = FALSE) {
+  $styles = openlayers_styles($reset);
+  return !empty($styles[$name]) ? $styles[$name] : FALSE;
+}
+
+/**
  * Style Implementation
  *
  * Internal callback for openlayers style implementation.

@@ -8,6 +8,9 @@
  * @param $definition
  * @return bool
  */
+
+module_load_include('inc', 'openlayers','includes/openlayers_behavior.class.inc');
+
 function _openlayers_behavior_definition_check($definition) {
   $mandatory_fields = array(
     array('title'),

@@ -1,5 +1,7 @@
 <?php
 
+module_load_include('inc', 'openlayers','includes/openlayers_layer_type.class.inc');
+
 /**
  * Menu loader for layers. (%openlayers_layer)
  * @ingroup openlayers_api

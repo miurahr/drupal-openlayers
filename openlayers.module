@@ -31,8 +31,8 @@ define('OPENLAYERS_SUGGESTED_LIBRARY', 2.12);
  */
 define('OPENLAYERS_HOSTED_API_LIBRARY', 2.12);
 
-module_load_include('inc', 'openlayers','includes/openlayers_layer_type.class.inc');
-module_load_include('inc', 'openlayers','includes/openlayers_behavior.class.inc');
+require_once 'includes/openlayers_behavior.class.inc';
+require_once 'includes/openlayers_layer_type.class.inc';
 module_load_include('inc', 'openlayers','includes/openlayers.tools');
 module_load_include('inc', 'openlayers','includes/openlayers.behaviors');
 module_load_include('inc', 'openlayers','includes/openlayers.layers');

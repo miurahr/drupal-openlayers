@@ -8,9 +8,6 @@
  * @ingroup openlayers
  */
 
-module_load_include('inc', 'openlayers','includes/openlayers_behavior.class.inc');
-module_load_include('inc', 'openlayers','includes/openlayers_layer_type.class.inc');
-
 /**
  * Implements hook_install().
  */

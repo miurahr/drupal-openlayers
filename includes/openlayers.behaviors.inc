@@ -52,5 +52,4 @@ function openlayers_behaviors($reset = FALSE) {
   ctools_include('plugins');
   $behaviors = ctools_get_plugins('openlayers', 'behaviors');
   return array_filter($behaviors, '_openlayers_behavior_definition_check');
-
 }

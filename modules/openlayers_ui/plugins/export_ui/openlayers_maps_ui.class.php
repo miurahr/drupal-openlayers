@@ -16,10 +16,6 @@ class openlayers_maps_ui extends ctools_export_ui {
     module_load_include('inc', 'openlayers_ui', 'includes/openlayers_ui.maps');
 
     ctools_include('dependent');
-    drupal_add_js(drupal_get_path('module', 'openlayers_ui') .
-      '/js/openlayers_ui.maps.js');
-    drupal_add_css(drupal_get_path('module', 'openlayers_ui') .
-      '/openlayers_ui.css');
 
     // If cloning or editing, attempt to get map.
     $defaults = array();
@@ -561,6 +557,17 @@ class openlayers_maps_ui extends ctools_export_ui {
       '#type' => 'button',
       '#value' => t('Preview'),
       '#weight' => 30
+    );
+
+    $form['#attached'] = array(
+      'js' => array(
+        drupal_get_path('module', 'openlayers_ui') .
+          '/js/openlayers_ui.maps.js'
+      ),
+      'css' => array(
+        drupal_get_path('module', 'openlayers_ui') .
+          '/openlayers_ui.css'
+      )
     );
   }
 

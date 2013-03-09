@@ -41,8 +41,6 @@ class openlayers_maps_ui extends ctools_export_ui {
       && ($form_state['clicked_button']['#id'] == 'edit-buttons-preview'))
       || (variable_get('openlayers_ui_preview_map', TRUE)))  {
 
-      $map_preview = isset($form_state['values']) ? openlayers_ui_maps_form_process($form_state['values']) : $map;
-
       $form['preview'] = array(
         '#tree' => FALSE,
         '#type' => 'fieldset',
@@ -55,10 +53,18 @@ class openlayers_maps_ui extends ctools_export_ui {
             )
         ),
       );
-      $form['preview']['map'] = array(
-        '#type' => 'openlayers',
-        '#map' => $map->name
-      );
+
+      $map_preview = isset($form_state['values']) ? openlayers_ui_maps_form_process($form_state['values']) : $map->data;
+
+      if (isset($map_preview)) {
+        $map_output = openlayers_render_map_data($map_preview);
+        $form['preview']['map'] = array(
+          '#type' => 'openlayers',
+          '#map' => $map_output['map'],
+          '#attached' => $map_output['#attached']
+        );
+      }
+
     } else {
       $form['preview'] = array();
       $form['preview']['map'] = array(

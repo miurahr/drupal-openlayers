@@ -232,12 +232,7 @@ class openlayers_styles_ui extends ctools_export_ui {
       $preview_style->description = $form_state['input']['description'];
       $preview_style->data = $form_state['input']['data'];
 
-      $form['info']['preview_style_container'] = array(
-        '#type' => 'item',
-        '#title' => t('Preview'),
-        '#markup' => openlayers_ui_style_preview($preview_style, TRUE),
-        '#description' => t('If you are using attribute replacement, the style may not show properly.  The crosshairs point out where the feature is centered.'),
-      );
+      $form['info']['preview_style_container'] = openlayers_ui_style_preview($preview_style, TRUE);
     }
 
     $form['info']['title'] = array(
@@ -351,7 +346,7 @@ class openlayers_styles_ui extends ctools_export_ui {
     $this->rows[$name]['data'] = array();
     $this->rows[$name]['class'] = !empty($item->disabled) ? array('ctools-export-ui-disabled') : array('ctools-export-ui-enabled');
 
-    $this->rows[$name]['data'][] = array('data' => openlayers_ui_style_preview($item), 'class' => array('ctools-export-ui-preview'));
+    $this->rows[$name]['data'][] = array('data' => openlayers_ui_style_preview($item, TRUE), 'class' => array('ctools-export-ui-preview'));
 
     // If we have an admin title, make it the first row.
     if (!empty($this->plugin['export']['admin_title'])) {

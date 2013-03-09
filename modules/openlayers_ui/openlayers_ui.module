@@ -264,24 +264,36 @@ function openlayers_dependency_widget($dependencies) {
  * Create a style preview given style object.
  */
 function openlayers_ui_style_preview($style, $crosshairs = FALSE) {
-  drupal_add_js(drupal_get_path('module', 'openlayers_ui') . '/js/openlayers_ui.styles.js');
-  drupal_add_css(drupal_get_path('module', 'openlayers_ui') . '/openlayers_ui.css');
   module_load_include('inc', 'openlayers', 'includes/openlayers.render');
 
   // Render style data
   $style->data = openlayers_render_style($style->data);
 
-  // Let's make a tiny map for a preview
-  drupal_add_js(array('openlayers_ui' =>
-    array(
-      'style_preview' => array(
-        $style->name => $style,
-        $style->name . '_crosshairs' => $crosshairs,
+  return array(
+    '#attached' => array(
+      'libraries_load' => array(
+        array('openlayers')
       ),
+      'js' => array(
+        drupal_get_path('module', 'openlayers_ui') . '/js/openlayers_ui.styles.js',
+        array(
+          'type' => 'setting',
+          'data' => array(
+            'openlayers_ui' => array(
+              'style_preview' => array(
+                $style->name => $style,
+                $style->name . '_crosshairs' => $crosshairs,
+              ),
+            ),
+          )
+        )
+      ),
+      'css' => array(
+        drupal_get_path('module', 'openlayers_ui') . '/openlayers_ui.css'
+      )
     ),
-  ), 'setting');
-
-  return theme('openlayers_ui_styles_preview', array('style' => $style));
+    '#markup' => '<div id="'.$style->name.'" class="openlayers-ui-style-preview"></div>',
+  );
 }
 
 /**

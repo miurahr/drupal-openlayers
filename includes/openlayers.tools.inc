@@ -43,20 +43,18 @@ function openlayers_include() {
  *
  * @ingroup openlayers_api
  *
+ * @param $authority
+ *   String Organization code, such as EPSG.
  * @param $projection
- *   String of the projection value.  Currently
- *   supports 900913, 4326.
+ *   String of the projection value, such as 4326.
  * @return
  *   Array of maxExtent in OpenLayers toArray() format.
  */
-function openlayers_get_extent($projection) {
-  switch ($projection) {
-    case 'EPSG:900913':
-      return array(-20037508, -20037508, 20037508, 20037508);
-    case 'EPSG:4326':
-      return array(-180, -90, 180, 90);
-  }
+function openlayers_get_extent($authority, $projection) {
+  // Use projected extend from openlayers_projection instead but keep this function for now as it's marked as API
+  return openlayers_get_projection($authority, $projection)->getProjectedExtent();
 }
+
 
 /**
  * Get resolution given projection

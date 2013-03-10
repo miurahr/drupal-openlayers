@@ -253,7 +253,7 @@ function _openlayers_openlayers_layers() {
   $layer->data = array(
     'isBaseLayer' => TRUE,
     'type' => 'satellite',
-    'projection' => array('EPSG:900913'),
+    'projection' => array('EPSG:3857'),
     'layer_type' => 'openlayers_layer_type_google',
   );
   $layers[$layer->name] = $layer;
@@ -266,7 +266,7 @@ function _openlayers_openlayers_layers() {
   $layer->data = array(
     'isBaseLayer' => TRUE,
     'type' => 'hybrid',
-    'projection' => array('EPSG:900913'),
+    'projection' => array('EPSG:3857'),
     'layer_type' => 'openlayers_layer_type_google',
   );
   $layers[$layer->name] = $layer;
@@ -279,7 +279,7 @@ function _openlayers_openlayers_layers() {
   $layer->data = array(
     'isBaseLayer' => TRUE,
     'type' => 'normal',
-    'projection' => array('EPSG:900913'),
+    'projection' => array('EPSG:3857'),
     'layer_type' => 'openlayers_layer_type_google',
   );
   $layers[$layer->name] = $layer;
@@ -292,7 +292,7 @@ function _openlayers_openlayers_layers() {
   $layer->data = array(
     'isBaseLayer' => TRUE,
     'type' => 'physical',
-    'projection' => array('EPSG:900913'),
+    'projection' => array('EPSG:3857'),
     'layer_type' => 'openlayers_layer_type_google',
   );
   $layers[$layer->name] = $layer;
@@ -311,7 +311,7 @@ function _openlayers_openlayers_layers() {
         '@ccbysa' => 'http://creativecommons.org/licenses/by-sa/2.0/',
       )
     ) . '. '. t('Tiles Courtesy of <a href="http://www.mapquest.com/">MapQuest</a>.'),
-    'projection' => array('EPSG:900913'),
+    'projection' => array('EPSG:3857', 'EPSG:900913'),
     'layer_type' => 'openlayers_layer_type_xyz',
     'url' => array(
       '//otile1' . $mapquest_host . '/tiles/1.0.0/osm/${z}/${x}/${y}.png',
@@ -319,7 +319,7 @@ function _openlayers_openlayers_layers() {
       '//otile3' . $mapquest_host . '/tiles/1.0.0/osm/${z}/${x}/${y}.png',
       '//otile4' . $mapquest_host . '/tiles/1.0.0/osm/${z}/${x}/${y}.png',
     ),
-    'wrapDateLine' => FALSE,
+    'wrapDateLine' => TRUE,
     'resolutions' => openlayers_get_resolutions('EPSG:900913', 0, 19)
   );
   $layers[$layer->name] = $layer;
@@ -333,7 +333,7 @@ function _openlayers_openlayers_layers() {
     'isBaseLayer' => TRUE,
     'attribution' => t('Portions Courtesy NASA/JPL-Caltech and U.S. Depart. of Agriculture, Farm Service Agency.')
       . ' '. t('Tiles Courtesy of <a href="http://www.mapquest.com/">MapQuest</a>.'),
-    'projection' => array('EPSG:900913'),
+    'projection' => array('EPSG:3857', 'EPSG:900913'),
     'layer_type' => 'openlayers_layer_type_xyz',
     'url' => array(
       '//oatile1' . $mapquest_host . '/tiles/1.0.0/sat/${z}/${x}/${y}.png',
@@ -355,7 +355,7 @@ function _openlayers_openlayers_layers() {
     'name' => 'Bing Road',
     'isBaseLayer' => TRUE,
     'type' => 'Road',
-    'projection' => array('EPSG:900913'),
+    'projection' => array('EPSG:3857'),
     'layer_type' => 'openlayers_layer_type_bing',
   );
   $layers[$layer->name] = $layer;
@@ -370,7 +370,7 @@ function _openlayers_openlayers_layers() {
     'name' => 'Bing Aerial',
     'isBaseLayer' => TRUE,
     'type' => 'Aerial',
-    'projection' => array('EPSG:900913'),
+    'projection' => array('EPSG:3857'),
     'layer_type' => 'openlayers_layer_type_bing',
   );
   $layers[$layer->name] = $layer;
@@ -385,7 +385,7 @@ function _openlayers_openlayers_layers() {
     'name' => 'Bing Hybrid',
     'isBaseLayer' => TRUE,
     'type' => 'AerialWithLabels',
-    'projection' => array('EPSG:900913'),
+    'projection' => array('EPSG:3857'),
     'layer_type' => 'openlayers_layer_type_bing',
   );
   $layers[$layer->name] = $layer;
@@ -405,7 +405,7 @@ function _openlayers_openlayers_layers() {
         '@ccbysa' => 'http://creativecommons.org/licenses/by-sa/2.0/',
       )
     ),
-    'projection' => array('EPSG:900913'),
+    'projection' => array('EPSG:3857'),
     'layer_type' => 'openlayers_layer_type_xyz',
     'url' => '//tile.openstreetmap.org/${z}/${x}/${y}.png',
     'wrapDateLine' => TRUE,
@@ -427,7 +427,7 @@ function _openlayers_openlayers_layers() {
         '@ccbysa' => 'http://creativecommons.org/licenses/by-sa/2.0/',
       )
     ),
-    'projection' => array('EPSG:900913'),
+    'projection' => array('EPSG:3857'),
     'layer_type' => 'openlayers_layer_type_xyz',
     'url' => '//a.tile.opencyclemap.org/cycle/${z}/${x}/${y}.png',
     'wrapDateLine' => TRUE,
@@ -504,7 +504,7 @@ function _openlayers_openlayers_layers() {
     ),
     'options' => array(
       'layers' => array('basic'),
-      'maxExtent' => openlayers_get_extent('EPSG:4326'),
+      'maxExtent' => openlayers_get_extent('EPSG', '4326'),
     ),
   );
   $layers[$layer->name] = $layer;
@@ -516,7 +516,7 @@ function _openlayers_openlayers_layers() {
   $layer->title = t('Example GeoJSON, "Picture This"');
   $layer->description = t('Example that puts GeoJSON directly in layer without Views.');
   $layer->data = array(
-    'resolutions' => openlayers_get_resolutions('EPSG:900913'),
+    'resolutions' => openlayers_get_resolutions('EPSG:3857'),
     'serverResolutions' => openlayers_get_resolutions('EPSG:4326'),
     'layer_type' => 'openlayers_layer_type_geojson',
     'layer_handler' => 'geojson',
@@ -552,7 +552,6 @@ function _openlayers_openlayers_layers() {
   $resolutions = openlayers_get_resolutions('EPSG:900913');
   $resolutions = array_combine(range(0, count($resolutions)-1), $resolutions);
 
-
   foreach ($info as $key => $item) {
     $openlayers_layers = new stdClass;
     $openlayers_layers->disabled = FALSE; /* Edit this to true to make a default openlayers_layers disabled initially */
@@ -573,7 +572,7 @@ function _openlayers_openlayers_layers() {
       'isBaseLayer' => TRUE,
       'type' => 'png',
       'resolutions' => array_intersect_key($resolutions, array_flip(range($item['minzoom'], $item['maxzoom']))),
-      'projection' => array('EPSG:900913'),
+      'projection' => array('EPSG:3857'),
     );
     $layers[$key] = $openlayers_layers;
   }

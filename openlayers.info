@@ -7,6 +7,7 @@ dependencies[] = ctools
 dependencies[] = libraries
 
 ; Core files
+files[] = includes/openlayers_projection.class.inc
 files[] = includes/openlayers_behavior.class.inc
 files[] = includes/openlayers_layer_type.class.inc
 files[] = includes/openlayers.tools.inc

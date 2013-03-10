@@ -40,6 +40,10 @@ Drupal.behaviors.openlayers = {
         if (Drupal.settings.openlayers.maps[map_id] && Drupal.settings.openlayers.maps[map_id].stop_render != true) {
           var map = Drupal.settings.openlayers.maps[map_id];
 
+          if(map.default_layer===null){
+            console.error("Map configuration is invalid as it lacks a base layer.");
+          }
+
           // Use try..catch for error handling.
           try {
             // Set OpenLayers language based on document language,
@@ -51,15 +55,8 @@ Drupal.behaviors.openlayers = {
             options.projection = new OpenLayers.Projection(map.projection);
             options.displayProjection = new OpenLayers.Projection(map.displayProjection);
 
-            // TODO: work around this scary code
-            if (map.projection === 'EPSG:900913') {
-              options.maxExtent = new OpenLayers.Bounds(
-                -20037508.34, -20037508.34, 20037508.34, 20037508.34);
-                options.units = "m";
-            }
-            if (map.projection === 'EPSG:4326') {
-              options.maxExtent = new OpenLayers.Bounds(-180, -90, 180, 90);
-            }
+            // Restrict map to its projection extent (data outwith cannot be represented)
+            options.maxExtent = new OpenLayers.Bounds(map.maxExtent[0], map.maxExtent[1], map.maxExtent[2], map.maxExtent[3]);
 
             options.maxResolution = 'auto'; // 1.40625;
             options.controls = [];
@@ -79,10 +76,15 @@ Drupal.behaviors.openlayers = {
             }
 
             // Initialize openlayers map
-            var openlayers = new OpenLayers.Map(options);
+            var openlayers = new OpenLayers.Map(map_id, options);
 
             // Run the layer addition first
             Drupal.openlayers.addLayers(map, openlayers);
+
+            // Ensure redraw as maps stays blank until first zoom otherwise (observed with EPSG:2056)
+            openlayers.moveTo(openlayers.getCenter(), openlayers.getZoom(), {
+              forceZoomChange: true
+            });
 
             // Attach data to map DOM object
             $(this).data('openlayers', {'map': map, 'openlayers': openlayers});
@@ -175,7 +177,7 @@ Drupal.openlayers = {
       // Ensure that the layer handler is available
       if (options.layer_handler !== undefined &&
         Drupal.openlayers.layer[options.layer_handler] !== undefined) {
-        var layer = Drupal.openlayers.layer[options.layer_handler](map.layers[name].title, map, options);
+        layer = Drupal.openlayers.layer[options.layer_handler](map.layers[name].title, map, options);
 
         layer.visibility = !!(!map.layer_activated || map.layer_activated[name]);
 
@@ -197,8 +199,20 @@ Drupal.openlayers = {
     // Set the restricted extent if wanted.
     // Prevents the map from being panned outside of a specfic bounding box.
     if (typeof map.center.restrict !== 'undefined' && map.center.restrict.restrictextent) {
-      openlayers.restrictedExtent = OpenLayers.Bounds.fromString(
-          map.center.restrict.restrictedExtent);
+      var desiredRestriction = OpenLayers.Bounds.fromString(
+        map.center.restrict.restrictedExtent
+      ).transform(new OpenLayers.Projection('EPSG:3857'), openlayers.projection);
+
+      if(desiredRestriction.left>=openlayers.maxExtent.left && desiredRestriction.right<=openlayers.maxExtent.right
+        && desiredRestriction.top<=openlayers.maxExtent.top && desiredRestriction.bottom>=openlayers.maxExtent.bottom){
+
+        openlayers.restrictedExtent = desiredRestriction;
+      } else {
+        // Given the map to set the restricted extent is not dependent on the map projection
+        // it does allow to set an extent outwith the valid bound of the map projection. As a
+        // result no valid data could be requested and thus the wrong extent needs to be ignored.
+        console.error("Restricted bounds ignored as not within projection bounds.");
+      }
     }
 
     // Zoom & center

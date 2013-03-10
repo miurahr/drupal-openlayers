@@ -120,7 +120,7 @@ function openlayers_ui_theme($existing, $type, $theme, $path) {
     ),
     'openlayers_ui_form_projection_description' => array(
       'variables' => array(
-        'projection_title' => '',
+        'projection' => '',
         'available_layers' => array(),
         'layers' => array(),
       ),
@@ -157,10 +157,8 @@ function openlayers_ui_theme($existing, $type, $theme, $path) {
 function openlayers_ui_get_projection_options() {
   $options = array();
   foreach (openlayers_layers_load() as $key => $layer) {
-    if ($layer->data['projection']) {
-      foreach ($layer->data['projection'] as $projection) {
-        $options[$projection] = $projection;
-      }
+    foreach ($layer->getProjections() as $projection) {
+      $options[$projection->identifier] = $projection;
     }
   }
   return $options;
@@ -190,9 +188,12 @@ function openlayers_ui_get_layer_options($type = 'baselayer',
     $variables = array();
     if (
       !isset($projection) ||
-      in_array($projection, $layer->data['projection']) ||
+      in_array($projection, $layer->getProjections()) ||
       !empty($layer->data['vector'])
     ) {
+      if (!array_key_exists('isBaseLayer', $layer->data)) {
+        throw new Exception("Layer definition $key lacks isBaseLayer attribute");
+      }
 
       if ($layer->data['isBaseLayer'] == TRUE && $type == 'baselayer') {
         $variables = array(

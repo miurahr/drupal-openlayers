@@ -31,7 +31,6 @@ Drupal.openlayers.layer.xyz = function(title, map, options) {
   }
 
   options.projection = new OpenLayers.Projection(options.projection);
-
   var layer = new OpenLayers.Layer.XYZ(title, options.url, options);
   layer.styleMap = styleMap;
   return layer;

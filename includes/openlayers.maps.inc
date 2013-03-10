@@ -7,6 +7,8 @@
  * @ingroup openlayers
  */
 
+require_once 'openlayers.projections.inc';
+
 /**
  * Implements hook_openlayers_maps().
  */
@@ -197,6 +199,9 @@ function openlayers_render_map_data($map = array()) {
   // Run map through build process
   $map = openlayers_build_map($map);
 
+  $projection = openlayers_get_projection_by_identifier($map['projection']);
+  $map['maxExtent'] = $projection->getProjectedExtent();
+
   if (!empty($map['errors'])) {
     $output = array(
       '#markup' => 'Error while building the map.'
@@ -204,6 +209,28 @@ function openlayers_render_map_data($map = array()) {
 
     return $output;
   }
+
+  // In case the layer offers the same projection as the map, use this and do not provide
+  // projection definition to client. Otherwise rely on the client to reproject on the fly.
+  foreach ($map['layers'] as $layer_name => $layer) {
+    if(in_array($map['projection'], $map['layers'][$layer_name]['projection'])){
+      $map['layers'][$layer_name]['projection'] = $map['projection'];
+    } else {
+      // Client is able to reproject any possible projection because their definitions need to be
+      // known to be able to set up a layer with a certain projection. Thus choice does not matter.
+      $layerProjectionIdentifier = $map['layers'][$layer_name]['projection'][0];
+      $map['layers'][$layer_name]['projection'] = $layerProjectionIdentifier;
+      // Provide client with projection definition so that it can reproject
+      openlayers_add_js_projection_definition(
+        openlayers_get_projection_by_identifier($layerProjectionIdentifier)
+      );
+    }
+  }
+
+  // Ensure projections in use are known to the client (loads Proj4js if required)
+  openlayers_add_js_projection_definition($projection);
+  $display_projection = openlayers_get_projection_by_identifier($map['displayProjection']);
+  openlayers_add_js_projection_definition($display_projection);
 
   // Given hide_empty_map flag, check if the map has any features
   // defined. If not, assume it is an empty map and shouldn't be displayed.
@@ -322,7 +349,7 @@ function _openlayers_openlayers_maps() {
   $default->title = t('Default Map');
   $default->description = t('This is the default map that will be the basis for all maps, unless you have changed the !settings.  This is also a good example of a basic map.', array('!settings' => l(t('OpenLayers main settings'), 'admin/structure/openlayers')));
   $default->data = array(
-    'projection' => 'EPSG:900913',
+    'projection' => 'EPSG:3857',
     'width' => 'auto',
     'height' => '400px',
     'default_layer' => 'mapquest_osm',
@@ -335,7 +362,7 @@ function _openlayers_openlayers_maps() {
     'image_path' => drupal_get_path('module', 'openlayers') . '/themes/default_dark/img/',
     'css_path' => drupal_get_path('module', 'openlayers') . '/themes/default_dark/style.css',
     'displayProjection' => 'EPSG:4326',
-    'maxExtent' => openlayers_get_extent('EPSG:4326'),
+    'maxExtent' => openlayers_get_extent('EPSG', '4326'),
     'behaviors' => array(
       'openlayers_behavior_panzoombar' => array(),
       'openlayers_behavior_layerswitcher' => array(),
@@ -404,7 +431,7 @@ function _openlayers_openlayers_maps() {
       'google_normal' => 'google_normal',
       'google_physical' => 'google_physical',
     ),
-    'projection' => 'EPSG:900913',
+    'projection' => 'EPSG:3857',
     'displayProjection' => 'EPSG:4326',
     'styles' => array(
       'default' => 'default',
@@ -480,7 +507,7 @@ function _openlayers_openlayers_maps() {
     'layer_activated' => array(
       'openlayers_geojson_picture_this' => 'openlayers_geojson_picture_this',
     ),
-    'projection' => 'EPSG:900913',
+    'projection' => 'EPSG:3857',
     'displayProjection' => 'EPSG:4326',
     'styles' => array(
       'default' => 'default',
@@ -558,7 +585,7 @@ function _openlayers_openlayers_maps() {
     'layer_activated' => array(
       'openlayers_kml_example' => 'openlayers_kml_example',
     ),
-    'projection' => 'EPSG:900913',
+    'projection' => 'EPSG:3857',
     'displayProjection' => 'EPSG:4326',
     'styles' => array(
       'default' => 'default',
@@ -618,7 +645,7 @@ function _openlayers_openlayers_maps() {
       'bing_hybrid' => 'bing_hybrid',
       'bing_aerial' => 'bing_aerial',
     ),
-    'projection' => 'EPSG:900913',
+    'projection' => 'EPSG:3857',
     'displayProjection' => 'EPSG:4326',
     'styles' => array(
       'default' => 'default',
@@ -676,7 +703,7 @@ function _openlayers_openlayers_maps() {
       'osm_mapnik' => 'osm_mapnik',
       'osm_cycle' => 'osm_cycle',
     ),
-    'projection' => 'EPSG:900913',
+    'projection' => 'EPSG:3857',
     'displayProjection' => 'EPSG:4326',
     'styles' => array(
       'default' => 'default',

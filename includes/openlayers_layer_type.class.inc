@@ -43,6 +43,21 @@ class openlayers_layer_type {
   }
 
   /**
+   * @return array<openlayers_projection>
+   *   List of all projections that are supported by the layer.
+   */
+  public function getProjections() {
+    $projections = array();
+    // TODO Ignore incomplete data until cause is fixed (projection for every layer set during migration)
+    if (isset($this->data['projection'])) {
+      foreach ($this->data['projection'] as $projection) {
+        $projections[] = openlayers_get_projection_by_identifier($projection);
+      }
+    }
+    return $projections;
+  }
+
+  /**
    * Provides the default options for the layer.
    *
    * @return
@@ -54,7 +69,7 @@ class openlayers_layer_type {
       'isBaseLayer' => TRUE,
       'projection' => array('EPSG:900913'),
       'serverResolutions' => openlayers_get_resolutions('EPSG:900913'),
-      'maxExtent' => openlayers_get_extent('EPSG:900913'),
+      'maxExtent' => openlayers_get_extent('EPSG', '900913'),
       'resolutions' => openlayers_get_resolutions('EPSG:900913'),
       'base_url' => NULL,
       'transitionEffect' => 'resize',
@@ -69,18 +84,19 @@ class openlayers_layer_type {
    *   Array with form elements.
    */
   function options_form($default = array()) {
+    $allProjectionOptions = array();
+    foreach (openlayers_get_all_projections() as $projection) {
+      $allProjectionOptions[$projection->identifier] = $projection->getLocalizedMessage();
+    }
     return array(
       'projection' => array(
         '#type' => 'select',
         '#title' => t('Projection'),
         '#multiple' => TRUE,
-        '#options' => array(
-          'EPSG:900913' => 'EPSG:900913',
-          'EPSG:4326' => 'EPSG:4326'
-        ),
+        '#options' => $allProjectionOptions,
         '#default_value' => isset($default->data['projection']) ?
           $default->data['projection'] :
-          'EPSG:900913'
+          openlayers_get_projection('EPSG', '3857')->identifier
       ),
       'isBaseLayer' => array(
         '#type' => 'checkbox',
@@ -97,9 +113,7 @@ class openlayers_layer_type {
    *
    * @param array $default
    */
-  function options_form_validate($form, &$form_state) {
-
-  }
+  function options_form_validate($form, &$form_state) {}
 
   /**
    * Submit the options_form().

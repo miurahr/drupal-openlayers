@@ -31,9 +31,11 @@ define('OPENLAYERS_SUGGESTED_LIBRARY', 2.12);
  */
 define('OPENLAYERS_HOSTED_API_LIBRARY', 2.12);
 
+require_once 'includes/openlayers_projection.class.inc';
 require_once 'includes/openlayers_behavior.class.inc';
 require_once 'includes/openlayers_layer_type.class.inc';
 module_load_include('inc', 'openlayers','includes/openlayers.tools');
+module_load_include('inc', 'openlayers','includes/openlayers.projections');
 module_load_include('inc', 'openlayers','includes/openlayers.behaviors');
 module_load_include('inc', 'openlayers','includes/openlayers.layers');
 module_load_include('inc', 'openlayers','includes/openlayers.styles');
@@ -110,6 +112,9 @@ function openlayers_ctools_plugin_api($module, $api) {
         return array('version' => 1);
 
       case 'openlayers_layers':
+        return array('version' => 1);
+
+      case 'openlayers_projections':
         return array('version' => 1);
 
       case 'openlayers_styles':

@@ -110,6 +110,7 @@ function openlayers_ui_admin_settings() {
     '#default_value' => variable_get('openlayers_ui_preview_map', FALSE),
   );
 
+  $form['#validate'][] = 'openlayers_ui_admin_settings_validate';
   $form['#submit'][] = 'openlayers_ui_admin_settings_submit';
 
   // Make a system setting form and return
@@ -117,10 +118,24 @@ function openlayers_ui_admin_settings() {
 }
 
 /**
+ * Validate handler of the form.
+ */
+function openlayers_ui_admin_settings_validate($form, &$form_state) {
+  if ($form_state['values']['openlayers_source_type'] == 'external') {
+    if (!valid_url($form_state['values']['openlayers_source_external'], TRUE)) {
+      form_set_error(
+        'openlayers_source_external',
+        'This must be a valid external URL.'
+      );
+    }
+  }
+}
+
+/**
  * Submit handler of the form.
  */
 function openlayers_ui_admin_settings_submit() {
-  drupal_flush_all_caches();
+//  drupal_flush_all_caches();
 }
 
 /**

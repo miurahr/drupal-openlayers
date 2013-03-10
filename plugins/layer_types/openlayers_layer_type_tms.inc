@@ -38,10 +38,10 @@ class openlayers_layer_type_tms extends openlayers_layer_type {
    */
   function options_form($defaults = array()) {
     return array(
-      'base_url' => array(
+      'url' => array(
         '#type' => 'textarea',
         '#title' => t('Base URL'),
-        '#default_value' => !empty($this->data['base_url']) ? implode("\n", $this->data['base_url']) : '',
+        '#default_value' => !empty($this->data['url']) ? implode("\n", $this->data['url']) : '',
         '#description' => t('This is the base URL of the TMS service.  For example, if this was your tile scheme URL: http://example.com/tms/1.0.0/layer_name/{z}/{y}/{x}.png, then <em>http://example.com/tms/</em> would be the Base URL.'),
       ),
       'layername' => array(
@@ -84,7 +84,7 @@ class openlayers_layer_type_tms extends openlayers_layer_type {
   }
 
   function options_form_validate($form, &$form_state) {
-    $form_state['data']['base_url'] = explode("\n", $form_state['data']['base_url']);
+    $form_state['data']['url'] = explode("\n", $form_state['data']['url']);
     $form_state['data']['resolutions'] = array_map('floatval', array_values($form_state['data']['resolutions']));
     $form_state['data']['projection'] = array_values($form_state['data']['projection']);
     $form_state['data']['wrapDateLine'] = (bool) $form_state['data']['wrapDateLine'];

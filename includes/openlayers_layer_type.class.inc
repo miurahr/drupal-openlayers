@@ -38,6 +38,10 @@ class openlayers_layer_type {
     $this->map = $map;
   }
 
+  function attached() {
+    return array();
+  }
+
   /**
    * Provides the default options for the layer.
    *

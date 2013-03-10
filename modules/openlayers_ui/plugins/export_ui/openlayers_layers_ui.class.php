@@ -9,6 +9,7 @@ class openlayers_layers_ui extends ctools_export_ui {
     parent::edit_form($form, $form_state);
 
     $layer_types = openlayers_layer_types();
+
     $options = array('' => t('Select the layer type'));
 
     $layer = NULL;
@@ -34,8 +35,7 @@ class openlayers_layers_ui extends ctools_export_ui {
 
     // Go trough all layer types and get each options form.
     foreach ($layer_types as $layer_type) {
-
-      if (is_object($layer) && get_class($layer) == $layer_type['layer_type']['class']) {
+      if (is_object($layer) && get_class($layer) == $layer_type['class']) {
           // Layer is of current layer type.
         $layer_type_object = $layer;
       } else {

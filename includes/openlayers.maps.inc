@@ -241,19 +241,31 @@ function openlayers_render_map_data($map = array()) {
     $libs[] = $data['class'];
   }
 
-  $libraries_load = array();
+  $attached = array(
+    'js' => array(),
+    'css' => array(),
+    'libraries_load' => array()
+  );
+
   foreach ($libs as $lib) {
-    $libraries_load[] = array($lib);
+    $layer_type_object = new $lib();
+    $layer_attached = $layer_type_object->attached() + array(
+      'js' => array(),
+      'css' => array(),
+      'libraries_load' => array()
+    );
+
+    $attached['libraries_load'] += $layer_attached['libraries_load'];
+    $attached['js'] += $layer_attached['js'];
+    $attached['css'] += $layer_attached['css'];
+    $attached['libraries_load'][] = array($lib);
+    unset($layer_type_object);
   }
+  $attached['js'] += array($settings);
 
   $output = array(
     '#theme' => 'openlayers_map',
-    '#attached' => array(
-      'libraries_load' => $libraries_load,
-      'js' => array(
-        $settings
-      )
-    ),
+    '#attached' => $attached,
     'map' => $map
   );
 

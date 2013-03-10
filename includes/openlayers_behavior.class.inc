@@ -12,6 +12,10 @@ class openlayers_behavior {
     $this->map = $map;
   }
 
+  function attached() {
+    return array();
+  }
+
   /*
   * @return array of JavaScript functions required to be defined
   * in order for this function to work

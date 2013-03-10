@@ -116,34 +116,31 @@ class openlayers_layer_type_google extends openlayers_layer_type {
     );
   }
 
-  /**
-   * Render.
-   */
-  function render(&$map) {
-    static $google_maps_included;
+  function attached() {
+    $mapdomain = variable_get('openlayers_layers_google_mapdomain', 'maps.google.com');
+    $version = variable_get('openlayers_google_version', '3.5');
 
-    if (!isset($google_maps_included)) {
-      $mapdomain = variable_get('openlayers_layers_google_mapdomain', 'maps.google.com');
-      $version = variable_get('openlayers_google_version', '3.5');
-
-      if ($version == '2') {
-        // Create URL for google include
-        $url = '//' . $mapdomain . '/maps?file=api&sensor=false&v=' . $version;
-        $key = variable_get('openlayers_layers_google_api', variable_get('googlemap_api_key', ''));
-        $url .= !empty($key) ? '&key=' . $key : '';
-      }
-      else {
-        // Create URL for google include
-        $url = '//' . $mapdomain . '/maps/api/js?sensor=false&v=' . $version;
-      }
-
-      $lang = variable_get('openlayers_layers_google_language', '');
-      // Google v2 uses hl and v3 uses language
-      $url .= !empty($lang) ? '&hl=' . $lang : '';
-      $url .= !empty($lang) ? '&language=' . $lang : '';
-
-      drupal_add_js($url, 'external');
-      $google_maps_included = TRUE;
+    if ($version == '2') {
+      // Create URL for google include
+      $url = '//' . $mapdomain . '/maps?file=api&sensor=false&v=' . $version;
+      $key = variable_get('openlayers_layers_google_api', variable_get('googlemap_api_key', ''));
+      $url .= !empty($key) ? '&key=' . $key : '';
     }
+    else {
+      // Create URL for google include
+      $url = '//' . $mapdomain . '/maps/api/js?sensor=false&v=' . $version;
+    }
+
+    $lang = variable_get('openlayers_layers_google_language', '');
+    // Google v2 uses hl and v3 uses language
+    $url .= !empty($lang) ? '&hl=' . $lang : '';
+    $url .= !empty($lang) ? '&language=' . $lang : '';
+
+    return array(
+      'js' => array(
+        $url => array('type' => 'external', 'data' => $url),
+      )
+    );
   }
+
 }

@@ -68,7 +68,7 @@ function openlayers_layer_type_load($name, $reset = FALSE) {
     'openlayers',
     'layer_types',
     $name,
-    'layer_type')) {
+    'class')) {
     $layer_type = new $layer_type_class();
     return $layer_type;
   }
@@ -568,7 +568,7 @@ function _openlayers_openlayers_layers() {
         3 => 'http://d.tiles.mapbox.com/',
       ),
       'layername' => $item['layername'],
-      'layer_type' => 'openlayers_layer_type_mapbox',
+      'layer_type' => 'openlayers_layer_type_tms',
       'osm' => FALSE,
       'isBaseLayer' => TRUE,
       'type' => 'png',

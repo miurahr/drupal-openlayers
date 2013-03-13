@@ -8,9 +8,7 @@ function openlayers_add_js_projection_definition(openlayers_projection $projecti
   $openlayers_natively_supported = array('EPSG:4326', 'EPSG:900913');
   // Only load Proj4js if projection not supported by OpenLayers anyway
   if (!in_array($projection->identifier, $openlayers_natively_supported)) {
-    if (module_exists('proj4js')) {
-      proj4js_load_definition($projection->identifier, $projection->getDefinition());
-    }
+    proj4js_load_definition($projection->identifier, $projection->getDefinition());
   }
 }
 

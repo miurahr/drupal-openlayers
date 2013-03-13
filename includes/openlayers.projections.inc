@@ -310,6 +310,21 @@ function _openlayers_openlayers_projections() {
   $openlayers_projections->data = '';
   $projections[$openlayers_projections->identifier] = $openlayers_projections;
 
+  // Lambert Azimuthal Equal-Area, EPSG:3573 WGS 84 / North Pole LAEA Canada
+  $openlayers_projections = new stdClass();
+  $openlayers_projections->disabled = FALSE; /* Edit this to true to make a default openlayers_projections disabled initially */
+  $openlayers_projections->api_version = 1;
+  $openlayers_projections->identifier = 'EPSG:3573';
+  $openlayers_projections->authority = 'EPSG';
+  $openlayers_projections->code = '3573';
+  $openlayers_projections->definition = '+proj=laea +lat_0=90 +lon_0=-100 +ellps=WGS84 +datum=WGS84 +units=m';
+  $openlayers_projections->projectedextentleft = -9036842.762;
+  $openlayers_projections->projectedextentbottom = -9036842.7621;
+  $openlayers_projections->projectedextentright = 9036842.762;
+  $openlayers_projections->projectedextenttop = 9036842.762;
+  $openlayers_projections->data = '';
+  $projections[$openlayers_projections->identifier] = $openlayers_projections;
+
   // TODO Remove before publishing as replaced by EPSG:3857
   $openlayers_projections = new stdClass();
   $openlayers_projections->disabled = FALSE; /* Edit this to true to make a default openlayers_projections disabled initially */

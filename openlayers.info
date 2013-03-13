@@ -6,6 +6,7 @@ php = 5.2
 dependencies[] = libraries
 dependencies[] = proj4js
 dependencies[] = ctools
+dependencies[] = file
 
 ; Core files
 files[] = includes/openlayers_projection.class.inc

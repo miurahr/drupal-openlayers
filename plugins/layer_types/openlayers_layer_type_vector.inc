@@ -1,45 +1,45 @@
 <?php
 /**
  * @file
- * KML Layer Type
+ * Vector Layer Type
  */
 
 /**
  * Define the Ctools plugin options.
  */
-function openlayers_openlayers_layer_type_kml_openlayers_layer_types() {
+function openlayers_openlayers_layer_type_vector_openlayers_layer_types() {
   return array(
-    'title' => t('KML'),
-    'description' => t('<a href="!url">KML</a> overlay.',
-      array('!url' => 'http://en.wikipedia.org/wiki/Keyhole_Markup_Language')),
-    'class' => 'openlayers_layer_type_kml',
+    'title' => t('Vector'),
+    'description' => t('Vectors overlay.'),
+    'class' => 'openlayers_layer_type_vector',
   );
+
 }
 
 /**
- * OpenLayers KML Layer Type class
+ * OpenLayers Vector Layer Type class
  */
-class openlayers_layer_type_kml extends openlayers_layer_type {
+class openlayers_layer_type_vector extends openlayers_layer_type {
 
   /**
    * Provide initial values for options.
    */
   function options_init() {
     return array(
-      'layer_handler' => 'kml',
+      'layer_handler' => 'vector',
       'projection' => array('EPSG:4326'),
-      'resolutions' => openlayers_get_resolutions('EPSG:4326'),
-      'serverResolutions' => openlayers_get_resolutions('EPSG:4326'),
-      'maxExtent' => openlayers_get_extent('EPSG', '4326'),
-      'isBaseLayer' => FALSE,
+      'baselayer' => FALSE,
       'vector' => TRUE,
+      'url' => NULL,
+      'file' => '',
+      'format' => NULL,
       'formatOptions' => array(
-        'extractStyles' => TRUE,
-        'extractAttributes' => TRUE,
-        'extractTracks' => FALSE,
+        'extractWaypoints' => TRUE,
+        'extractTracks' => TRUE,
+        'extractRoutes' => TRUE,
+        'extractAttributes' => TRUE
       ),
-      'file' =>'',
-    ) + parent::options_init();
+    );
   }
 
   /**
@@ -53,7 +53,7 @@ class openlayers_layer_type_kml extends openlayers_layer_type {
           '' => 'Choose the method',
           'url' => 'Provides an URL',
           'file' => 'Upload a file',
-          'raw' => 'Write KML'
+          'raw' => 'Write'
         ),
         '#default_value' => isset($this->data['method']) ?
           $this->data['method'] : '',
@@ -61,75 +61,130 @@ class openlayers_layer_type_kml extends openlayers_layer_type {
       'url' => array(
         '#type' => 'textfield',
         '#title' => t('URL'),
-        '#description' => t('The URL of the KML file.'),
+        '#description' => t('The URL of the file.'),
         '#maxlength' => 2083,
         '#default_value' => isset($this->data['url']) ?
           $this->data['url'] : '',
         '#states' => array(
           'visible' => array(
-            ':input[name="openlayers_layer_type_kml[method]"]' => array('value' => 'url'),
+            ':input[name="openlayers_layer_type_vector[method]"]' => array('value' => 'url'),
           )
         )
       ),
       'file' => array(
         '#name' => 'files[imagelayer]',
         '#type' => 'managed_file',
-        '#title' => t('KML file'),
+        '#title' => t('File'),
         '#default_value' => isset($this->data['file']) ? $this->data['file'] : '',
         '#upload_location' =>  'public://',
         '#upload_validators' => array(
-          'file_validate_extensions' => array('kml')
+          'file_validate_extensions' => array('gpx kml')
         ),
         '#states' => array(
           'visible' => array(
-            ':input[name="openlayers_layer_type_kml[method]"]' => array('value' => 'file'),
+            ':input[name="openlayers_layer_type_vector[method]"]' => array('value' => 'file'),
           )
         )
       ),
       'raw' => array(
         '#type' => 'textarea',
-        '#title' => t('Raw KML'),
-        '#description' => t('Copy your KML in this textarea. Don\'t forget that this is not intented to have a big length.'),
+        '#title' => t('Raw'),
+        '#description' => t('Copy your raw vectors informations in this textarea. Don\'t forget that this is not intented to have a big length.'),
         '#default_value' => isset($this->data['raw']) ?
           $this->data['raw'] : '',
         '#states' => array(
           'visible' => array(
-            ':input[name="openlayers_layer_type_kml[method]"]' => array('value' => 'raw'),
+            ':input[name="openlayers_layer_type_vector[method]"]' => array('value' => 'raw'),
           )
         )
       ),
+      // TODO: To be refactored and provide all the format
+      // and format options from
+      // http://dev.openlayers.org/releases/OpenLayers-2.12/doc/apidocs/files/OpenLayers/Format-js.html
+      'format' => array(
+        '#type' => 'select',
+        '#options' => array(
+          'GPX' => 'GPX',
+          'KML' => 'KML',
+        ),
+        '#title' => t('Format'),
+        '#description' => t('Format of the uploaded file.'),
+        '#default_value' => isset($this->data['format']) ?
+          $this->data['format'] : ''
+      ),
       'formatOptions' => array(
+        'extractWaypoints' => array(
+          '#type' => 'checkbox',
+          '#title' => t('Extract Waypoints'),
+          '#description' => t('Extract waypoints from GPX.'),
+          '#default_value' => isset(
+          $this->data['formatOptions']['extractWaypoints']) ?
+            $this->data['formatOptions']['extractWaypoints'] : TRUE,
+          '#states' => array(
+            'visible' => array(
+              ':input[name="openlayers_layer_type_vector[format]"]' => array('value' => 'GPX'),
+            )
+          )
+        ),
+        'extractTracks' => array(
+          '#type' => 'checkbox',
+          '#title' => t('Extract Tracks'),
+          '#description' => t('Extract tracks.'),
+          '#default_value' => isset(
+          $this->data['formatOptions']['extractTracks']) ?
+            $this->data['formatOptions']['extractTracks'] : TRUE,
+          '#states' => array(
+            'visible' => array(
+              ':input[name="openlayers_layer_type_vector[format]"]' => array(array('value' => 'KML'), array('value' => 'GPX')),
+            )
+          )
+        ),
+        'extractRoutes' => array(
+          '#type' => 'checkbox',
+          '#title' => t('Extract Routes'),
+          '#description' => t('Extract routes from GPX.'),
+          '#default_value' => isset(
+          $this->data['formatOptions']['extractRoutes']) ?
+            $this->data['formatOptions']['extractRoutes'] : TRUE,
+          '#states' => array(
+            'visible' => array(
+              ':input[name="openlayers_layer_type_vector[format]"]' => array('value' => 'GPX'),
+            )
+          )
+        ),
+        'extractAttributes' => array(
+          '#type' => 'checkbox',
+          '#title' => t('Extract Attributes'),
+          '#description' => t('Extract attributes from GPX.'),
+          '#default_value' => isset(
+          $this->data['formatOptions']['extractAttributes']) ?
+            $this->data['formatOptions']['extractAttributes'] : TRUE,
+          '#states' => array(
+            'visible' => array(
+              ':input[name="openlayers_layer_type_vector[format]"]' => array(array('value' => 'KML'), array('value' => 'GPX')),
+            )
+          )
+        ),
         'extractStyles' => array(
           '#type' => 'checkbox',
           '#title' => t('Extract Styles'),
           '#description' => t('Extract styles from KML.'),
           '#default_value' => isset(
-            $this->data['formatOptions']['extractStyles']) ?
+          $this->data['formatOptions']['extractStyles']) ?
             $this->data['formatOptions']['extractStyles'] : TRUE,
-        ),
-        'extractTracks' => array(
-          '#type' => 'checkbox',
-          '#title' => t('Extract Tracks'),
-          '#description' => t('Extract tracks from KML.'),
-          '#default_value' => isset(
-          $this->data['formatOptions']['extractTracks']) ?
-            $this->data['formatOptions']['extractTracks'] : TRUE,
-        ),
-        'extractAttributes' => array(
-          '#type' => 'checkbox',
-          '#title' => t('Extract Attributes'),
-          '#description' => t('Extract attributes from KML.'),
-          '#default_value' => isset(
-            $this->data['formatOptions']['extractAttributes']) ?
-            $this->data['formatOptions']['extractAttributes'] : TRUE,
+          '#states' => array(
+            'visible' => array(
+              ':input[name="openlayers_layer_type_vector[format]"]' => array('value' => 'KML'),
+            )
+          )
         ),
       ),
     );
   }
 
-  /*
- * The file is mandatory.
- */
+  /**
+   * The file is mandatory.
+   */
   function options_form_validate($form, &$form_state) {
     $method = $form_state['data']['method'];
 
@@ -154,7 +209,7 @@ class openlayers_layer_type_kml extends openlayers_layer_type {
    * hook_submit() of the form.
    */
   function options_form_submit($form, &$form_state) {
-
+    global $user;
     $item = $form_state['item'];
     if (isset($item->data['file']) && $file = file_load($item->data['file'])) {
       file_delete($file);
@@ -163,11 +218,12 @@ class openlayers_layer_type_kml extends openlayers_layer_type {
     if (isset($form_state['values']['data']['file']) && $file = file_load($form_state['values']['data']['file'])) {
       $file->status = FILE_STATUS_PERMANENT;
       file_save($file);
+      file_usage_add($file, 'openlayers', 'layer_type', $user->uid);
       $form_state['values']['data']['url'] = file_create_url($file->uri);
     }
   }
 
-  /*
+  /**
    * What to do when we delete the layer: delete the file.
    */
   function delete($item) {

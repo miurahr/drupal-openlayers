@@ -521,9 +521,9 @@ function _openlayers_openlayers_maps() {
   $openlayers_maps = new stdClass();
   $openlayers_maps->disabled = FALSE; /* Edit this to true to make a default openlayers_maps disabled initially */
   $openlayers_maps->api_version = 1;
-  $openlayers_maps->name = 'example_kml';
-  $openlayers_maps->title = 'Example KML Map';
-  $openlayers_maps->description = 'A simple map with a KML layer.';
+  $openlayers_maps->name = 'example_vector';
+  $openlayers_maps->title = 'Example vector Map';
+  $openlayers_maps->description = 'A simple map with vectors layer.';
   $openlayers_maps->data = array(
     'width' => 'auto',
     'height' => '400px',
@@ -562,7 +562,7 @@ function _openlayers_openlayers_maps() {
       ),
       'openlayers_behavior_popup' => array(
         'layers' => array(
-          'openlayers_kml_example' => 'openlayers_kml_example',
+          'openlayers_vector_example' => 'openlayers_vector_example',
         ),
         'panMapIfOutOfView' => 0,
         'keepInMap' => 1,
@@ -580,10 +580,10 @@ function _openlayers_openlayers_maps() {
     'default_layer' => 'mapquest_osm',
     'layers' => array(
       'mapquest_osm' => 'mapquest_osm',
-      'openlayers_kml_example' => 'openlayers_kml_example',
+      'openlayers_vector_example' => 'openlayers_vector_example',
     ),
     'layer_activated' => array(
-      'openlayers_kml_example' => 'openlayers_kml_example',
+      'openlayers_vector_example' => 'openlayers_vector_example',
     ),
     'projection' => 'EPSG:3857',
     'displayProjection' => 'EPSG:4326',
@@ -593,9 +593,9 @@ function _openlayers_openlayers_maps() {
       'temporary' => 'default',
     ),
   );
-  $items['example_kml'] = $openlayers_maps;
+  $items['example_vector'] = $openlayers_maps;
 
-  // Example Virtual Earth map
+  // Example Bing map
   $openlayers_maps = new stdClass;
   $openlayers_maps->disabled = FALSE;
   $openlayers_maps->api_version = 1;

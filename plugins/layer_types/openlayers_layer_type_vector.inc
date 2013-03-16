@@ -46,13 +46,44 @@ class openlayers_layer_type_vector extends openlayers_layer_type {
    * Options form which generates layers
    */
   function options_form($defaults = array()) {
-    return array(
+
+    $views = views_get_all_views();
+
+    $options = array('' => '<none>');
+    foreach ($views as $view) {
+      foreach ($view->display as $display => $data) {
+        if ($data->display_plugin == 'openlayers') {
+          $options[$view->name . '::' . $display] = $view->human_name . ': ' . $display;
+        }
+      }
+    }
+
+    $default = NULL;
+    if (isset($this->data['views']['view']) && isset($this->data['views']['display'])) {
+      $default = $this->data['views']['view'] . '::' . $this->data['views']['display'];
+    }
+
+    $views_element = array(
+      '#type' => 'select',
+      '#options' => $options,
+      '#title' => 'View name',
+      '#default_value' => isset($this->data['views']) ?
+        $this->data['views'] : '',
+      '#states' => array(
+        'visible' => array(
+          ':input[name="openlayers_layer_type_vector[method]"]' => array('value' => 'views'),
+        )
+      )
+    );
+
+    $form = array(
       'method' => array(
         '#type' => 'select',
         '#options' => array(
           '' => 'Choose the method',
           'url' => 'Provides an URL',
           'file' => 'Upload a file',
+          'views' => 'From a view',
           'raw' => 'Write'
         ),
         '#default_value' => isset($this->data['method']) ?
@@ -86,6 +117,7 @@ class openlayers_layer_type_vector extends openlayers_layer_type {
           )
         )
       ),
+      'views' => $views_element,
       'raw' => array(
         '#type' => 'textarea',
         '#title' => t('Raw'),
@@ -106,6 +138,7 @@ class openlayers_layer_type_vector extends openlayers_layer_type {
         '#options' => array(
           'GPX' => 'GPX',
           'KML' => 'KML',
+          'features' => 'Raw features',
         ),
         '#title' => t('Format'),
         '#description' => t('Format of the uploaded file.'),
@@ -180,6 +213,7 @@ class openlayers_layer_type_vector extends openlayers_layer_type {
         ),
       ),
     );
+    return $form;
   }
 
   /**

@@ -76,15 +76,6 @@ function openlayers_views_views_api() {
 }
 
 /**
- * Implements hook_ctools_plugin_directory().
- */
-function openlayers_views_ctools_plugin_directory($module, $plugin) {
-  if ($module == 'openlayers' && !empty($plugin)) {
-    return 'plugins/' . $plugin;
-  }
-}
-
-/**
  * Implements hook_ctools_plugin_api().
  */
 function openlayers_views_ctools_plugin_api($module, $api) {
@@ -120,24 +111,42 @@ function openlayers_views_openlayers_layers() {
 
       // Check for OpenLayers Data Overlays
       if ($view->display_handler->get_option('style_plugin') == 'openlayers_data' && $display != 'default') {
+
+        $args = array();
+        // Retrieve args/filters from current view
+        // to pass on to our vector layer.
+        $current_view = views_get_current_view();
+        if (!empty($current_view)) {
+          $args = $current_view->args;
+          if (isset($current_view->exposed_input)) {
+            $view->set_exposed_input($current_view->exposed_input);
+          }
+        }
+
+        if (isset($view->arguments)) {
+          $args = $view->arguments;
+        }
+
+        $features = $view->execute_display($view->current_display, $args);
+
         //Build Layer
         $layer = new stdClass();
         $layer->api_version = 1;
         $layer->name = $view->name . '_' . $display;
-        $layer->title = empty($data->display_options['title']) ? $view->name : $data->display_options['title'];
+        $layer->title = empty($data->display_options['title']) ? $view->name : $view->display_options['title'];
         $layer->title .= ' - ' . $data->display_title;
         $layer->description = $view->description;
         $layer->data = array(
-          'layer_type' => 'openlayers_views_vector',
-          'layer_handler' => 'openlayers_views_vector',
+          'layer_type' => 'openlayers_layer_type_vector',
+          'layer_handler' => 'vector',
           'projection' => array('EPSG:4326'),
           'isBaseLayer' => FALSE,
           'vector' => TRUE,
           'type' => 'Vector',
-          'url' => array(),
-          'options' => array(),
-          'events' => array(),
-          'views' => array('view' => $view->name, 'display' => $display),
+          'method' => 'views',
+          'format' => 'features',
+          'views' => $view->name.'::'.$display,
+          'features' => isset($features) ? $features : array()
         );
         $layers[$layer->name] = $layer;
       }

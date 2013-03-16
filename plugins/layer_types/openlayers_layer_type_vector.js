@@ -4,11 +4,12 @@
  */
 
 /**
- * Openlayer layer handler for KML layer
+ * Openlayer layer handler for Vector layers
  */
 Drupal.openlayers.layer.vector = function(title, map, options) {
 
   var layer = new OpenLayers.Layer.Vector(title, {
+    projection: new OpenLayers.Projection(options.projection),
     drupalID: options.drupalID,
     layer_handler: options.layer_handler,
     styleMap: Drupal.openlayers.getStyleMap(map, options.drupalID)
@@ -23,30 +24,42 @@ Drupal.openlayers.layer.vector = function(title, map, options) {
     OpenLayers.Request.GET({
       url: uri,
       callback: function (response) {
-        addFeatures(response.responseText, options);
+        parseFeatures(response.responseText, options);
       }
     });
   }
 
   if (options.method == 'raw') {
-    addFeatures(options.raw, options);
+    parseFeatures(options.raw, options);
   }
 
-  function addFeatures(vector, options) {
+  if (options.method == 'views') {
+    parseFeatures(options.features, options);
+  }
+
+  function parseFeatures(vector, options) {
     switch(options.format) {
       case 'GPX':
         var format = new OpenLayers.Format.GPX(options.formatOptions);
+        var features = format.read(vector);
         break;
       case 'KML':
         var format = new OpenLayers.Format.KML(options.formatOptions);
+        var features = format.read(vector);
+        break;
+      case 'features':
+        // Create a method who extracts features properly
+        Drupal.openlayers.addFeatures(map, layer, options.features);
         break;
     }
-    var features = format.read(vector);
+
     // Add features, if needed
     if (features) {
       layer.addFeatures(features);
-      layer.events.triggerEvent('loadend');
     }
+
+    layer.events.triggerEvent('loadend');
+
   }
 
   return layer;

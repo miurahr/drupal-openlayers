@@ -43,7 +43,9 @@ function openlayers_layers_load($reset = FALSE) {
   if ($reset) ctools_export_load_object_reset('openlayers_layers');
   $layers = ctools_export_load_object('openlayers_layers', 'all', array());
   foreach ($layers as $layer) {
-    $layer_objects[$layer->name] = openlayers_get_layer_object($layer);
+    if ($layer_object = openlayers_get_layer_object($layer)) {
+      $layer_objects[$layer->name] = $layer_object;
+    }
   }
 
   return array_filter($layer_objects, 'openlayers_layer_sanity_check');

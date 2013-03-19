@@ -275,6 +275,7 @@ class openlayers_layer_type_vector extends openlayers_layer_type {
     if ($this->data['method'] == 'views') {
       list($view, $display) = explode('::', $this->data['views']);
 
+      $args = array();
       $view = views_get_view($view);
       if (isset($view->arguments)) {
         $args = $view->arguments;

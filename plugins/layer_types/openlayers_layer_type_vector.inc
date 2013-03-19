@@ -271,5 +271,16 @@ class openlayers_layer_type_vector extends openlayers_layer_type {
   /**
    * Render.
    */
-  function render(&$map) {}
+  function render(&$map) {
+    if ($this->data['method'] == 'views') {
+      list($view, $display) = explode('::', $this->data['views']);
+
+      $view = views_get_view($view);
+      if (isset($view->arguments)) {
+        $args = $view->arguments;
+      }
+
+      $this->data['features'] = $view->execute_display($display, $args);
+    }
+  }
 }

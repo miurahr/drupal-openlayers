@@ -61,25 +61,20 @@ Drupal.openlayers.layer.vector = function(title, map, options) {
     var features = [];
     switch(options.format) {
       case 'GPX':
-        var format = new OpenLayers.Format.GPX(options.formatOptions);
-        var features = format.read(vector);
         break;
       case 'KML':
-        var format = new OpenLayers.Format.KML(options.formatOptions);
-        var features = format.read(vector);
         break;
       case 'GeoJSON':
         options.formatOptions.internalProjection = new OpenLayers.Projection(map.projection);
         options.formatOptions.externalProjection = new OpenLayers.Projection(options.projection);
-        var format = new OpenLayers.Format.GeoJSON(options.formatOptions);
-        var features = format.read(vector);
         break;
       case 'features':
         // Create a method who extracts features properly
         Drupal.openlayers.addFeatures(map, layer, options.features);
+        return;
         break;
     }
 
-    return features;
+    return get_format(options.formatOptions).read(vector);
   }
 };

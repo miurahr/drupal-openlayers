@@ -172,11 +172,14 @@ function openlayers_views_openlayers_layers() {
         }
 
         $layer->data = array(
-          'layer_type' => 'openlayers_layer_type_geojson',
+          'layer_type' => 'openlayers_layer_type_vector',
+          'method' => 'url',
+          'format' => 'GeoJSON',
           'url' => url($view->display_handler->get_option('path'), array('absolute' => TRUE)),
-          'geojson_data' => '',
           'views' => array('view' => $view->name, 'display' => $display),
           'useBBOX' => $useBBOX,
+          'isBaseLayer' => false,
+          'projection' => array('EPSG:4326')
         );
         $layers[$layer->name] = $layer;
       }

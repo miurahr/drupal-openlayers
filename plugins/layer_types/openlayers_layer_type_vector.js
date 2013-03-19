@@ -69,6 +69,8 @@ Drupal.openlayers.layer.vector = function(title, map, options) {
         var features = format.read(vector);
         break;
       case 'GeoJSON':
+        options.formatOptions.internalProjection = new OpenLayers.Projection(map.projection);
+        options.formatOptions.externalProjection = new OpenLayers.Projection(options.projection);
         var format = new OpenLayers.Format.GeoJSON(options.formatOptions);
         var features = format.read(vector);
         break;

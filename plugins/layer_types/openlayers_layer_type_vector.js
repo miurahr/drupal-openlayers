@@ -6,9 +6,6 @@
 /**
  * Openlayer layer handler for Vector layers
  */
-
-(function($) {
-
 Drupal.openlayers.layer.vector = function(title, map, options) {
 
   var layer = new OpenLayers.Layer.Vector(title, {
@@ -17,9 +14,6 @@ Drupal.openlayers.layer.vector = function(title, map, options) {
     layer_handler: options.layer_handler,
     styleMap: Drupal.openlayers.getStyleMap(map, options.drupalID)
   });
-
-  options.formatOptions.internalProjection = new OpenLayers.Projection(map.projection);
-  options.formatOptions.externalProjection = new OpenLayers.Projection(options.projection);
 
   if (options.method == 'file' || options.method == 'url') {
     return new OpenLayers.Layer.Vector(title, {
@@ -55,11 +49,13 @@ Drupal.openlayers.layer.vector = function(title, map, options) {
   function get_format(options) {
     switch (options.format) {
       case 'GPX':
-        return new OpenLayers.Format.GPX();
+        return new OpenLayers.Format.GPX(options.formatOptions);
       case 'KML':
-        return new OpenLayers.Format.KML();
+        return new OpenLayers.Format.KML(options.formatOptions);
       case 'GeoJSON':
-        return new OpenLayers.Format.GeoJSON();
+        options.formatOptions.internalProjection = new OpenLayers.Projection(map.projection);
+        options.formatOptions.externalProjection = new OpenLayers.Projection(options.projection);
+        return new OpenLayers.Format.GeoJSON(options.formatOptions);
     }
   }
 
@@ -75,6 +71,8 @@ Drupal.openlayers.layer.vector = function(title, map, options) {
         var features = format.read(vector);
         break;
       case 'GeoJSON':
+        options.formatOptions.internalProjection = new OpenLayers.Projection(map.projection);
+        options.formatOptions.externalProjection = new OpenLayers.Projection(options.projection);
         var format = new OpenLayers.Format.GeoJSON(options.formatOptions);
         var features = format.read(vector);
         break;
@@ -87,5 +85,3 @@ Drupal.openlayers.layer.vector = function(title, map, options) {
     return features;
   }
 };
-
-})(jQuery);

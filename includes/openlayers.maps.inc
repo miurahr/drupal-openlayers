@@ -218,7 +218,7 @@ function openlayers_render_map_data($map = array()) {
     } else {
       // Client is able to reproject any possible projection because their definitions need to be
       // known to be able to set up a layer with a certain projection. Thus choice does not matter.
-      $layerProjectionIdentifier = $map['layers'][$layer_name]['projection'][0];
+      $layerProjectionIdentifier = array_shift($map['layers'][$layer_name]['projection']);
       $map['layers'][$layer_name]['projection'] = $layerProjectionIdentifier;
       // Provide client with projection definition so that it can reproject
       openlayers_add_js_projection_definition(

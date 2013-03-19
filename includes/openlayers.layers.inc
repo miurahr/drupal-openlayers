@@ -519,14 +519,14 @@ function _openlayers_openlayers_layers() {
   $layer->title = t('Example GeoJSON, "Picture This"');
   $layer->description = t('Example that puts GeoJSON directly in layer without Views.');
   $layer->data = array(
-    'resolutions' => openlayers_get_resolutions('EPSG:3857'),
-    'serverResolutions' => openlayers_get_resolutions('EPSG:4326'),
-    'layer_type' => 'openlayers_layer_type_geojson',
-    'layer_handler' => 'geojson',
+    'method' => 'raw',
+    'format' => 'GeoJSON',
+    'layer_type' => 'openlayers_layer_type_vector',
+    'layer_handler' => 'vector',
     'projection' => array('EPSG:4326'),
     'isBaseLayer' => FALSE,
     'vector' => TRUE,
-    'geojson_data' => '
+    'raw' => '
       {
         "type": "Feature",
         "properties": {

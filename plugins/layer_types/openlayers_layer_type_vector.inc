@@ -109,7 +109,7 @@ class openlayers_layer_type_vector extends openlayers_layer_type {
         '#default_value' => isset($this->data['file']) ? $this->data['file'] : '',
         '#upload_location' =>  'public://',
         '#upload_validators' => array(
-          'file_validate_extensions' => array('gpx kml')
+          'file_validate_extensions' => array('gpx kml json')
         ),
         '#states' => array(
           'visible' => array(
@@ -138,6 +138,7 @@ class openlayers_layer_type_vector extends openlayers_layer_type {
         '#options' => array(
           'GPX' => 'GPX',
           'KML' => 'KML',
+          'GeoJSON' => 'GeoJSON',
           'features' => 'Raw features',
         ),
         '#title' => t('Format'),

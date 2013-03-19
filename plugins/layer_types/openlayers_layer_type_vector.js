@@ -6,6 +6,9 @@
 /**
  * Openlayer layer handler for Vector layers
  */
+
+(function($) {
+
 Drupal.openlayers.layer.vector = function(title, map, options) {
 
   var layer = new OpenLayers.Layer.Vector(title, {
@@ -19,25 +22,49 @@ Drupal.openlayers.layer.vector = function(title, map, options) {
   options.formatOptions.externalProjection = new OpenLayers.Projection(options.projection);
 
   if (options.method == 'file' || options.method == 'url') {
-    var uri = options.url;
-    // Use an AJAX like call to get data from URL
-    OpenLayers.Request.GET({
-      url: uri,
-      callback: function (response) {
-        parseFeatures(response.responseText, options);
-      }
+    return new OpenLayers.Layer.Vector(title, {
+      drupalID: options.drupalID,
+      layer_handler: options.layer_handler,
+      styleMap: Drupal.openlayers.getStyleMap(map, options.drupalID),
+      projection: new OpenLayers.Projection(options.projection),
+      strategies: [new OpenLayers.Strategy.Fixed()],
+      protocol: new OpenLayers.Protocol.HTTP({
+        url: options.url,
+        format: get_format(options)
+      })
     });
   }
 
   if (options.method == 'raw') {
-    parseFeatures(options.raw, options);
+    var features = parseFeatures(options.raw, options);
   }
 
   if (options.method == 'views') {
-    parseFeatures(options.features, options);
+    var features = parseFeatures(options.features, options);
+  }
+
+  // Add features, if needed
+  if (features) {
+    layer.addFeatures(features);
+  }
+
+  layer.events.triggerEvent('loadend');
+
+  return layer;
+
+  function get_format(options) {
+    switch (options.format) {
+      case 'GPX':
+        return new OpenLayers.Format.GPX();
+      case 'KML':
+        return new OpenLayers.Format.KML();
+      case 'GeoJSON':
+        return new OpenLayers.Format.GeoJSON();
+    }
   }
 
   function parseFeatures(vector, options) {
+    var features = [];
     switch(options.format) {
       case 'GPX':
         var format = new OpenLayers.Format.GPX(options.formatOptions);
@@ -47,20 +74,18 @@ Drupal.openlayers.layer.vector = function(title, map, options) {
         var format = new OpenLayers.Format.KML(options.formatOptions);
         var features = format.read(vector);
         break;
+      case 'GeoJSON':
+        var format = new OpenLayers.Format.GeoJSON(options.formatOptions);
+        var features = format.read(vector);
+        break;
       case 'features':
         // Create a method who extracts features properly
         Drupal.openlayers.addFeatures(map, layer, options.features);
         break;
     }
 
-    // Add features, if needed
-    if (features) {
-      layer.addFeatures(features);
-    }
-
-    layer.events.triggerEvent('loadend');
-
+    return features;
   }
-
-  return layer;
 };
+
+})(jQuery);

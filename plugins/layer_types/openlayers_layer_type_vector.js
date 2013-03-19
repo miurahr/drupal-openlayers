@@ -75,6 +75,6 @@ Drupal.openlayers.layer.vector = function(title, map, options) {
         break;
     }
 
-    return get_format(options.formatOptions).read(vector);
+    return get_format(options).read(vector);
   }
 };

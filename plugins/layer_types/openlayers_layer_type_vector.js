@@ -9,18 +9,19 @@
 Drupal.openlayers.layer.vector = function(title, map, options) {
 
   var layer = new OpenLayers.Layer.Vector(title, {
-    projection: new OpenLayers.Projection(options.projection),
     drupalID: options.drupalID,
     layer_handler: options.layer_handler,
     styleMap: Drupal.openlayers.getStyleMap(map, options.drupalID)
   });
+
+  options.formatOptions.internalProjection = new OpenLayers.Projection(map.projection);
+  options.formatOptions.externalProjection = new OpenLayers.Projection(options.projection);
 
   if (options.method == 'file' || options.method == 'url') {
     return new OpenLayers.Layer.Vector(title, {
       drupalID: options.drupalID,
       layer_handler: options.layer_handler,
       styleMap: Drupal.openlayers.getStyleMap(map, options.drupalID),
-      projection: new OpenLayers.Projection(options.projection),
       strategies: [new OpenLayers.Strategy.Fixed()],
       protocol: new OpenLayers.Protocol.HTTP({
         url: options.url,
@@ -58,15 +59,12 @@ Drupal.openlayers.layer.vector = function(title, map, options) {
   }
 
   function parseFeatures(vector, options) {
-    var features = [];
     switch(options.format) {
       case 'GPX':
         break;
       case 'KML':
         break;
       case 'GeoJSON':
-        options.formatOptions.internalProjection = new OpenLayers.Projection(map.projection);
-        options.formatOptions.externalProjection = new OpenLayers.Projection(options.projection);
         break;
       case 'features':
         // Create a method who extracts features properly

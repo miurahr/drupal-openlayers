@@ -7,16 +7,14 @@
 /**
  * Ctools plugin definition.
  */
-$plugin = array(
-  'title' => t('Pan and Zoom Bar Controls'),
-  'description' => t('Gives user ability to pan and zoom, with a full zoom bar in the map interface.  Do not use with Pan Zoom Contols or Zoom Panel Controls.'),
-  'type' => 'map',
-  'behavior' => array(
-    'file' => 'openlayers_behavior_panzoombar.inc',
+function openlayers_openlayers_behavior_panzoombar_openlayers_behaviors() {
+  return array(
+    'title' => t('Pan and Zoom Bar Controls'),
+    'description' => t('Gives user ability to pan and zoom, with a full zoom bar in the map interface.  Do not use with Pan Zoom Contols or Zoom Panel Controls.'),
+    'type' => 'map',
     'class' => 'openlayers_behavior_panzoombar',
-    'parent' => 'openlayers_behavior',
-  ),
-);
+  );
+}
 
 /**
  * Pan Zoom Bar Behavior
@@ -29,6 +27,17 @@ class openlayers_behavior_panzoombar extends openlayers_behavior {
     return array(
       'zoomWorldIcon' => FALSE,
       'panIcons' => TRUE,
+    );
+  }
+
+  /**
+   * Returns an array of JS files.
+   * @return array
+   */
+  function js() {
+    return array(
+      drupal_get_path('module', 'openlayers') .
+        '/plugins/behaviors/openlayers_behavior_panzoombar.js'
     );
   }
 
@@ -57,8 +66,6 @@ class openlayers_behavior_panzoombar extends openlayers_behavior {
    * Render.
    */
   function render(&$map) {
-    drupal_add_js(drupal_get_path('module', 'openlayers') .
-      '/plugins/behaviors/openlayers_behavior_panzoombar.js');
     return $this->options;
   }
 }

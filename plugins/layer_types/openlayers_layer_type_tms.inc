@@ -7,45 +7,30 @@
 /**
  * Define the Ctools plugin options.
  */
-$plugin = array(
-  'title' => t('TMS'),
-  'description' => t('<a href="!url">Tile Map Service</a>',
-    array('!url' => 'http://en.wikipedia.org/wiki/Tile_Map_Service')),
-  'layer_type' => array(
-    'file' => 'openlayers_layer_type_tms.inc',
+function openlayers_openlayers_layer_type_tms_openlayers_layer_types() {
+  return array(
+    'title' => t('TMS'),
+    'description' => t('<a href="!url">Tile Map Service</a>',
+      array('!url' => 'http://en.wikipedia.org/wiki/Tile_Map_Service')),
     'class' => 'openlayers_layer_type_tms',
-    'parent' => 'openlayers_layer_type',
-  ),
-);
+  );
+}
 
 /**
  * OpenLayers TMS Layer Type class
  */
 class openlayers_layer_type_tms extends openlayers_layer_type {
 
-  function __construct($layer = array(), $map = array()) {
-    parent::__construct($layer, $map);
-    if (isset($this->data)) {
-      $this->data += $this->options_init();
-    }
-    else {
-      $this->data = $this->options_init();
-    }
-  }
-
   /**
    * Provide initial values for options.
    */
   function options_init() {
     return array(
-      'serverResolutions' => openlayers_get_resolutions('900913'),
-      'maxExtent' => openlayers_get_extent('900913'),
-      'projection' => array('900913'),
-      'baselayer' => TRUE,
       'layer_handler' => 'tms',
       'type' => 'png',
-      'wrapDateLine' => false,
-    );
+      'wrapDateLine' => FALSE,
+      'base_url' => array(),
+    ) + parent::options_init();
   }
 
   /**
@@ -53,11 +38,10 @@ class openlayers_layer_type_tms extends openlayers_layer_type {
    */
   function options_form($defaults = array()) {
     return array(
-      'base_url' => array(
-        '#type' => 'textfield',
+      'url' => array(
+        '#type' => 'textarea',
         '#title' => t('Base URL'),
-        '#default_value' => isset($this->data['base_url']) ?
-          $this->data['base_url'] : '',
+        '#default_value' => !empty($this->data['url']) ? implode("\n", $this->data['url']) : '',
         '#description' => t('This is the base URL of the TMS service.  For example, if this was your tile scheme URL: http://example.com/tms/1.0.0/layer_name/{z}/{y}/{x}.png, then <em>http://example.com/tms/</em> would be the Base URL.'),
       ),
       'layername' => array(
@@ -66,12 +50,6 @@ class openlayers_layer_type_tms extends openlayers_layer_type {
         '#default_value' => isset($this->data['layername']) ?
           $this->data['layername'] : '',
         '#description' => t('This is the base URL of the TMS service.  For example, if this was your tile scheme URL: http://example.com/tms/1.0.0/layer_name/{z}/{y}/{x}.png, then <em>layer_name</em> would be the Layer Name.'),
-      ),
-      'baselayer' => array(
-        '#type' => 'checkbox',
-        '#default_value' => $this->data['baselayer'],
-        '#title' => t('BaseLayer'),
-        '#description' => t('Whether or not this layer is a base layer.'),
       ),
       'type' => array(
         '#type' => 'select',
@@ -86,35 +64,35 @@ class openlayers_layer_type_tms extends openlayers_layer_type {
         '#type' => 'select',
         '#multiple' => TRUE,
         '#options' => array_combine(
-          array_map('strval', openlayers_get_resolutions('900913')),
-          range(0, 18)
+          array_map('strval', openlayers_get_resolutions('EPSG:900913')),
+          range(0, 21)
         ),
         '#title' => t('Zoom Level Range'),
         '#default_value' => isset($this->data['resolutions']) ?
           $this->data['resolutions'] :
-          array_map('strval', openlayers_get_resolutions('900913')),
+          array_map('strval', openlayers_get_resolutions('EPSG:900913')),
         '#description' => t('The available zoom levels for the tiles.'),
       ),
       'wrapDateLine' => array(
         '#type' => 'checkbox',
         '#title' => t('Wrap Dateline'),
-        '#default_value' => isset($this->data['type']) ?
-          $this->data['type'] : False,
+        '#default_value' => isset($this->data['wrapDateLine']) ?
+          $this->data['wrapDateLine'] : FALSE,
         '#description' => t('Wrapping the dateline will cause the map to appear to repeat itself when going east or west.  This may not be supported by all tilesets.'),
       ),
-      'layer_type' => array(
-        '#type' => 'hidden',
-        '#value' => 'openlayers_layer_type_tms'
-      ),
     );
+  }
+
+  function options_form_validate($form, &$form_state) {
+    $form_state['data']['url'] = explode("\n", $form_state['data']['url']);
+    $form_state['data']['resolutions'] = array_map('floatval', array_values($form_state['data']['resolutions']));
+    $form_state['data']['projection'] = array_values($form_state['data']['projection']);
+    $form_state['data']['wrapDateLine'] = (bool) $form_state['data']['wrapDateLine'];
   }
 
   /**
    * Render.
    */
   function render(&$map) {
-    drupal_add_js(drupal_get_path('module', 'openlayers') .
-      '/plugins/layer_types/openlayers_layer_type_tms.js');
-    return $this->options;
   }
 }

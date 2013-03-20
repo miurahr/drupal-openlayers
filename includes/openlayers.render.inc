@@ -28,6 +28,7 @@ function _openlayers_layers_process($layers = array(), &$map = array()) {
       }
       else $layers[$key]->weight = 0;
     }
+    else unset($layers[$key]);
   }
 
   // Sort layers
@@ -36,7 +37,9 @@ function _openlayers_layers_process($layers = array(), &$map = array()) {
   // Process into array-based layer data for the map
   foreach ($layers as $layer_object) {
     if (is_object($layer_object)) {
+      $class = get_class($layer_object);
       $layer_object->render($map);
+      $layer_object->data['class'] = $class;
       $layer_object->data['title'] = $layer_object->title;
       $layer_object->data['weight'] = $layer_object->weight;
       $layer_data[$layer_object->name] = $layer_object->data;
@@ -74,9 +77,9 @@ function _openlayers_behaviors_render($behaviors = array(), &$map = array()) {
   $rendered = array();
 
   foreach (openlayers_behaviors() as $key => $plugin) {
-    if (isset($behaviors[$key]) && $class = ctools_plugin_get_class($plugin, 'behavior')) {
+    if (isset($behaviors[$key]) && $class = ctools_plugin_get_class($plugin, 'class')) {
       $behavior = new $class($behaviors[$key], $map);
-      $rendered[$key] = $behavior->render($map);
+      $rendered[$class] = $behavior->render($map);
     }
   }
 
@@ -197,7 +200,7 @@ function openlayers_render_style($style = array()) {
  *   New map id
  */
 function _openlayers_create_map_id() {
-  return 'openlayers-map-' . substr(md5(uniqid(mt_rand())), 0, 8);
+  return drupal_html_id('openlayers-map');
 }
 
 /**
@@ -209,14 +212,19 @@ function _openlayers_create_map_id() {
  * it will decode values that maybe not specifically part of the
  * attribute replacement.
  *
+ * A value that is just a replacement value, ${value} should
+ * not be run through the file_create_url() function.
+ *
  * @param $path
  *   Path to process.
  * @return
  *   Processed path.
  */
 function openlayers_style_path($path) {
-    $path = url($path, array('absolute' => TRUE));
+  if (strpos($path, '${') !== 0) {
+    $path = file_create_url($path);
     $path = str_replace('%24%7B', '${', $path);
     $path = str_replace('%7D', '}', $path);
-    return $path;
+  }
+  return $path;
 }

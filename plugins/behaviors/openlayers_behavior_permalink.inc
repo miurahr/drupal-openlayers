@@ -7,16 +7,14 @@
 /**
  * Ctools plugin definition.
  */
-$plugin = array(
-  'title' => t('Permalink'),
-  'description' =>  t('Provides a link that will create an URL that will link to a specific map position.  Permalink is usually similar to: ?zoom=1&lat=11&lon=11&layers=B0F'),
-  'type' => 'map',
-  'behavior' => array(
-    'file' => 'openlayers_behavior_permalink.inc',
+function openlayers_openlayers_behavior_permalink_openlayers_behaviors() {
+  return array(
+    'title' => t('Permalink'),
+    'description' =>  t('Provides a link that will create an URL that will link to a specific map position.  Permalink is usually similar to: ?zoom=1&lat=11&lon=11&layers=B0F'),
+    'type' => 'map',
     'class' => 'openlayers_behavior_permalink',
-    'parent' => 'openlayers_behavior',
-  ),
-);
+  );
+}
 
 /**
  * PermaLink Behavior
@@ -28,6 +26,17 @@ class openlayers_behavior_permalink extends openlayers_behavior {
   function options_init() {
     return array(
       'anchor' => FALSE,
+    );
+  }
+
+  /**
+   * Returns an array of JS files.
+   * @return array
+   */
+  function js() {
+    return array(
+      drupal_get_path('module', 'openlayers') .
+        '/plugins/behaviors/openlayers_behavior_permalink.js'
     );
   }
 
@@ -50,8 +59,6 @@ class openlayers_behavior_permalink extends openlayers_behavior {
    * Render.
    */
   function render(&$map) {
-    drupal_add_js(drupal_get_path('module', 'openlayers') .
-      '/plugins/behaviors/openlayers_behavior_permalink.js');
     return $this->options;
   }
 }

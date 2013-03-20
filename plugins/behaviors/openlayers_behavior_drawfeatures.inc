@@ -7,17 +7,14 @@
 /**
  * Ctools plugin definition.
  */
-$plugin = array(
-   'title' => t('Draw Features'),
-   'description' => t('Provides functionality for adding features to a map.'),
-   'type' => 'layer',
-   'behavior' => array(
-    'file' => 'openlayers_behavior_drawfeatures.inc',
-     'class' => 'openlayers_behavior_drawfeatures',
-     'parent' => 'openlayers_behavior',
-   ),
-);
-
+function openlayers_openlayers_behavior_drawfeatures_openlayers_behaviors() {
+  return array(
+    'title' => t('Draw Features'),
+    'description' => t('Provides functionality for adding features to a map.'),
+    'type' => 'layer',
+    'class' => 'openlayers_behavior_drawfeatures',
+  );
+}
 /**
  * Draw Features behavior
  */
@@ -30,6 +27,28 @@ class openlayers_behavior_drawfeatures extends openlayers_behavior {
       'element_id' => '',
       'feature_types' => array(),
       'feature_limit' => 0,
+    );
+  }
+
+  /**
+   * Returns an array of JS files.
+   * @return array
+   */
+  function js() {
+    return array(
+      drupal_get_path('module', 'openlayers') .
+        '/plugins/behaviors/openlayers_behavior_drawfeatures.js'
+    );
+  }
+
+  /**
+   * Returns an array of CSS files.
+   * @return array
+   */
+  function css() {
+    return array(
+      drupal_get_path('module', 'openlayers')  .
+        '/plugins/behaviors/openlayers_behavior_drawfeatures.css'
     );
   }
 
@@ -53,15 +72,14 @@ class openlayers_behavior_drawfeatures extends openlayers_behavior {
         '#type' => 'textfield',
         '#description' => t('The number of features that are allowed to be
           drawn. Leave blank or at 0 for unlimited.'),
-        '#default_value' => isset($defaults['feature_limit']) ?
-          $defaults['feature_limit'] : 0,
+        '#default_value' => isset($defaults['feature_limit']) ? $defaults['feature_limit'] : 0,
       ),
       'element_id' => array(
         '#type' => 'textfield',
         '#default_value' => (isset($defaults['element_id'])) ?
           $defaults['element_id'] : '',
         '#title' => t('Element ID'),
-        '#description' => t('The DOM element ID that will be passed the value of the features.  This will probably be a textfield or textarea.'),
+        '#description' => t('The DOM element ID that will be passed the value of the features. This will probably be a textfield or textarea.'),
       )
     );
   }
@@ -70,10 +88,6 @@ class openlayers_behavior_drawfeatures extends openlayers_behavior {
    * Render.
    */
   function render(&$map) {
-    drupal_add_css(drupal_get_path('module', 'openlayers')  .
-      '/plugins/behaviors/openlayers_behavior_drawfeatures.css');
-    drupal_add_js(drupal_get_path('module', 'openlayers') .
-      '/plugins/behaviors/openlayers_behavior_drawfeatures.js');
     return $this->options;
   }
 }

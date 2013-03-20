@@ -7,15 +7,14 @@
 /**
  * Ctools plugin definition.
  */
-$plugin = array(
-  'title' => t('Geolocate Client'),
-  'description' => t('Provides the geolcoation control that simply zooms to users location on map load.  Based on HTML5 geolocation, so this will not be supported in all browsers.'),
-  'behavior' => array(
-    'file' => 'openlayers_behavior_geolocate.inc',
+function openlayers_openlayers_behavior_geolocate_openlayers_behaviors() {
+  return array(
+    'title' => t('Geolocate Client'),
+    'description' => t('Provides the geolcoation control that simply zooms to users location on map load.  Based on HTML5 geolocation, so this will not be supported in all browsers.'),
+    'type' => 'map',
     'class' => 'openlayers_behavior_geolocate',
-    'parent' => 'openlayers_behavior',
-  ),
-);
+  );
+}
 
 /**
  * Zoom Panel Behavior
@@ -35,6 +34,17 @@ class openlayers_behavior_geolocate extends openlayers_behavior {
         'timeout' => 7000,
       ),
       'zoom_level' => 12,
+    );
+  }
+
+  /**
+   * Returns an array of JS files.
+   * @return array
+   */
+  function js() {
+    return array(
+      drupal_get_path('module', 'openlayers') .
+        '/plugins/behaviors/openlayers_behavior_geolocate.js'
     );
   }
 
@@ -81,8 +91,6 @@ class openlayers_behavior_geolocate extends openlayers_behavior {
    * Render.
    */
   function render(&$map) {
-    drupal_add_js(drupal_get_path('module', 'openlayers') .
-      '/plugins/behaviors/openlayers_behavior_geolocate.js');
     return $this->options;
   }
 }

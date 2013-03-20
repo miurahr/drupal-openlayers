@@ -7,16 +7,14 @@
 /**
  * Ctools plugin definition.
  */
-$plugin = array(
-  'title' => t('Layer Switcher'),
-  'description' => t('Provides the ability to switch layers in the map interface.  This provides an expandable box on the map to enable and disable layers.'),
-  'type' => 'map',
-  'behavior' => array(
-    'file' => 'openlayers_behavior_layerswitcher.inc',
+function openlayers_openlayers_behavior_layerswitcher_openlayers_behaviors() {
+  return array(
+    'title' => t('Layer Switcher'),
+    'description' => t('Provides the ability to switch layers in the map interface.  This provides an expandable box on the map to enable and disable layers.'),
+    'type' => 'map',
     'class' => 'openlayers_behavior_layerswitcher',
-    'parent' => 'openlayers_behavior',
-  ),
-);
+  );
+}
 
 /**
  * Layer Switcher Behavior
@@ -32,6 +30,18 @@ class openlayers_behavior_layerswitcher extends openlayers_behavior {
       'sortBaseLayer' => '0',
       'roundedCorner' => TRUE,
       'roundedCornerColor' => '#222222',
+      'maximizeDefault' => FALSE,
+    );
+  }
+
+  /**
+   * Returns an array of JS files.
+   * @return array
+   */
+  function js() {
+    return array(
+      drupal_get_path('module', 'openlayers') .
+        '/plugins/behaviors/openlayers_behavior_layerswitcher.js'
     );
   }
 
@@ -66,6 +76,12 @@ class openlayers_behavior_layerswitcher extends openlayers_behavior {
         '#description' => t('For rounded corners, this is the CSS color to use for the corners.'),
         '#default_value' => isset($defaults['roundedCornerColor']) ? $defaults['roundedCornerColor'] : '#222222',
       ),
+      'maximizeDefault' => array(
+        '#type' => 'checkbox',
+        '#title' => t('Maximize by Default'),
+        '#description' => t('Turn on to have the Layer Switcher open by default.'),
+        '#default_value' => isset($defaults['maximizeDefault']) ? $defaults['maximizeDefault'] : FALSE,
+      ),
     );
   }
 
@@ -88,8 +104,6 @@ class openlayers_behavior_layerswitcher extends openlayers_behavior {
       }
     }
 
-    drupal_add_js(drupal_get_path('module', 'openlayers') .
-      '/plugins/behaviors/openlayers_behavior_layerswitcher.js');
     return $this->options;
   }
 }

@@ -3,7 +3,18 @@ description = "OpenLayers base API module"
 core = 7.x
 package = "OpenLayers"
 php = 5.2
+dependencies[] = libraries
+dependencies[] = proj4js
 dependencies[] = ctools
+dependencies[] = file
 
 ; Core files
+files[] = includes/openlayers_projection.class.inc
+files[] = includes/openlayers_behavior.class.inc
+files[] = includes/openlayers_layer_type.class.inc
+files[] = includes/openlayers.tools.inc
+files[] = includes/openlayers.layers.inc
+files[] = includes/openlayers.behaviors.inc
+files[] = includes/openlayers.styles.inc
+files[] = includes/openlayers.maps.inc
 files[] = openlayers.module

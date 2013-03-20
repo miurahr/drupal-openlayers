@@ -12,7 +12,11 @@ Drupal.openlayers.layer.xyz = function(title, map, options) {
   if (options.maxExtent !== undefined) {
     options.maxExtent = new OpenLayers.Bounds.fromArray(options.maxExtent) || new OpenLayers.Bounds(-20037508.34, -20037508.34, 20037508.34, 20037508.34);
   }
-  options.projection = 'EPSG:' + options.projection;
+
+  // Legacy goodnes
+  if (typeof options.base_url == 'string' && typeof options.url == 'undefined') {
+    options.url = options.base_url;
+  }
 
   // Server resolutions are very particular in OL 2.11
   var r = options.serverResolutions;
@@ -26,6 +30,7 @@ Drupal.openlayers.layer.xyz = function(title, map, options) {
     options.wrapDateLine = null;
   }
 
+  options.projection = new OpenLayers.Projection(options.projection);
   var layer = new OpenLayers.Layer.XYZ(title, options.url, options);
   layer.styleMap = styleMap;
   return layer;

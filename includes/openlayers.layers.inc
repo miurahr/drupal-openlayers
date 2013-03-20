@@ -1,11 +1,250 @@
 <?php
 
+module_load_include('inc', 'openlayers','includes/openlayers_layer_type.class.inc');
+
 /**
- * @file
+ * Menu loader for layers. (%openlayers_layer)
+ * @ingroup openlayers_api
  *
+ * @param $name
+ *   Layer name
+ * @return array
+ *   Layer export
+ */
+function openlayers_layer_load($name, $reset = FALSE) {
+  ctools_include('export');
+  if ($reset) ctools_export_load_object_reset('openlayers_layers');
+  $layer = ctools_export_load_object('openlayers_layers', 'names', array($name));
+
+
+  if (is_array($layer) && isset($layer[$name])) {
+    $layer_object = openlayers_get_layer_object($layer[$name]);
+    if (openlayers_layer_sanity_check($layer_object)) {
+      return $layer_object;
+    }
+  }
+  else {
+    return FALSE;
+  }
+}
+
+/**
+ * Get all openlayers layers as objects.
+ * @ingroup openlayers_api
+ *
+ * @param $reset
+ *   Boolean whether to reset cache or not
+ * @return array
+ *   array of layer info
+ */
+function openlayers_layers_load($reset = FALSE) {
+  ctools_include('export');
+  $layer_objects = array();
+  if ($reset) ctools_export_load_object_reset('openlayers_layers');
+  $layers = ctools_export_load_object('openlayers_layers', 'all', array());
+  foreach ($layers as $layer) {
+    if ($layer_object = openlayers_get_layer_object($layer)) {
+      $layer_objects[$layer->name] = $layer_object;
+    }
+  }
+
+  return array_filter($layer_objects, 'openlayers_layer_sanity_check');
+}
+
+/**
+ * Menu loader for layer types.
+ *
+ * @ingroup openlayers_api
+ *
+ * @param $name
+ *   String identifier of layer type.
+ * @param $reset
+ *   Boolean whether to reset cache or not.
+ * @return
+ *   An instantiated layer type object or FALSE if not found.
+ */
+function openlayers_layer_type_load($name, $reset = FALSE) {
+  ctools_include('plugins');
+
+  if ($layer_type_class = ctools_plugin_load_class(
+    'openlayers',
+    'layer_types',
+    $name,
+    'class')) {
+    $layer_type = new $layer_type_class();
+    return $layer_type;
+  }
+  return FALSE;
+}
+
+/**
+ * Get all layer types.
+ *
+ * @ingroup openlayers_api
+ *
+ * @param $reset
+ *   Boolean whether to reset cache or not.
+ * @return
+ *   Array of layer type info.
+ */
+function openlayers_layer_types($reset = FALSE) {
+  ctools_include('plugins');
+  $layers = ctools_get_plugins('openlayers', 'layer_types');
+
+  return array_filter($layers, '_openlayers_layer_definition_check');
+}
+
+/**
+ * Get layer object
+ *
+ * @ingroup openlayers_api
+ * @param $reset
+ *   Boolean whether to reset cache or not
+ * @return array
+ *   array of layer info
+ */
+function openlayers_get_layer_object($layer, $map = array()) {
+  // Static cache because this function will possibly be called in big loops
+  static $layer_types;
+  if (!isset($layer_types)) {
+    $layer_types = openlayers_layer_types();
+  }
+
+  $layer->title = t($layer->title);
+  $layer->description = t($layer->description);
+
+  // Attempt to get ctool class
+  if (isset($layer_types[$layer->data['layer_type']]) &&
+    $class = ctools_plugin_get_class(
+      $layer_types[$layer->data['layer_type']],
+      'class')
+  ) {
+    $layer_object = new $class($layer, $map);
+    return $layer_object;
+  }
+  else {
+    watchdog('openlayers', 'Layer !layer_name is unavailable because its
+      layer type or the module that provides its layer type is missing',
+      array('!layer_name' => $layer->title),
+      WATCHDOG_ERROR);
+    return FALSE;
+  }
+}
+
+
+/**
+ * Check layer to determine whether it has all the
+ * necessary attributes to be rendered. This is necessary
+ * because of API changes, and is a consolidation from other
+ * layer-error-checking in this module
+ *
+ * @param $layer
+ *  Layer object
+ * @param $projection
+ *  Projection number (EPSG) to check compatibility with
+ * @param $strict
+ *  reject invalid layers
+ * @return boolean
+ *  layer validity if strict is set, otherwise always true
+ */
+function openlayers_layer_sanity_check($layer, $projection = FALSE, $strict = FALSE) {
+  // Handle layers after they've been rendered for a map
+  $layer = (is_array($layer)) ? (object) $layer : $layer;
+
+  if (!isset($layer->name)) {
+    return !$strict;
+  }
+
+  if (!isset($layer->data['projection']) || !is_array($layer->data['projection'])) {
+    watchdog('openlayers', 'Layer %name does not have a projection set.',
+      array('%name' => $layer->name));
+    drupal_set_message(
+      t('OpenLayers layers failed the sanity check. See the
+      <a href="@drupallog">Drupal log</a> for details',
+        array('@drupallog' => url('admin/reports/dblog')))
+    );
+    return !$strict;
+  }
+
+  if (!isset($layer->data['layer_type'])) {
+    watchdog('openlayers', 'Layer %name does not have its layer_type set.',
+      array('%name' => $layer->name));
+    drupal_set_message(
+      t('OpenLayers layers failed the sanity check. See the
+      <a href="@drupallog">Drupal log</a> for details',
+        array('@drupallog' => url('admin/reports/dblog')))
+    );
+    return !$strict;
+  }
+
+  if ($projection && empty($layer->data['vector']) &&
+    (!in_array($projection, $layer->data['projection']))) {
+    watchdog('openlayers',
+      'The layer %layer_name cannot be reprojected to the map projection: EPSG: %map_proj',
+      array(
+        '%layer_name' => $layer->name,
+        // TODO: $map is not defined.
+        '%map_proj' => $map['projection'],
+      )
+    );
+    return !$strict;
+  }
+
+  return TRUE;
+}
+
+/**
+ * Check the plugin definition of a layer.
+ * Some field *MUST* be there to work correctly with OL.
+ *
+ * @ingroup openlayers_api
+ * @param $definition
+ * @return bool
+ */
+function _openlayers_layer_definition_check($definition) {
+  $mandatory_fields = array(
+    array('title'),
+    array('description'),
+    array('name'),
+    array('path'),
+    array('class')
+    /*
+    array('layer_type', 'file'),
+    array('layer_type', 'class'),
+    array('layer_type', 'parent'),
+    */
+  );
+
+  foreach ($mandatory_fields as $field) {
+    $missing = drupal_array_nested_key_exists($definition, $field);
+    if (!$missing) {
+      drupal_set_message(t("There's a problem in the plugin definition of the layer type <em>!type</em>. The layer will be disabled.", array('!type' => $definition['name'])), 'warning');
+      watchdog('openlayers', 'Layer !layer is unavailable because its
+                                plugin definition is incomplete.',
+        array('!layer' => $definition['name']),
+        WATCHDOG_ERROR);
+      return FALSE;
+    }
+  }
+
+  return TRUE;
+}
+
+/**
+ * Implements hook_openlayers_layers().
+ */
+function openlayers_openlayers_layers() {
+  module_load_include('inc', 'openlayers', 'includes/openlayers.layers');
+  return _openlayers_openlayers_layers();
+}
+
+/**
  * OpenLayers default packaged layers
  */
 function _openlayers_openlayers_layers() {
+  global $is_https;
+  $mapquest_host = $is_https ? '-s.mqcdn.com' : '.mqcdn.com';
+
   $layers = array();
 
   $layer = new stdClass();
@@ -14,9 +253,9 @@ function _openlayers_openlayers_layers() {
   $layer->title = 'Google Maps Satellite';
   $layer->description = 'Google Maps Satellite Imagery.';
   $layer->data = array(
-    'baselayer' => TRUE,
+    'isBaseLayer' => TRUE,
     'type' => 'satellite',
-    'projection' => array('900913'),
+    'projection' => array('EPSG:3857'),
     'layer_type' => 'openlayers_layer_type_google',
   );
   $layers[$layer->name] = $layer;
@@ -27,9 +266,9 @@ function _openlayers_openlayers_layers() {
   $layer->title = 'Google Maps Hybrid';
   $layer->description = 'Google Maps with roads and terrain.';
   $layer->data = array(
-    'baselayer' => TRUE,
+    'isBaseLayer' => TRUE,
     'type' => 'hybrid',
-    'projection' => array('900913'),
+    'projection' => array('EPSG:3857'),
     'layer_type' => 'openlayers_layer_type_google',
   );
   $layers[$layer->name] = $layer;
@@ -40,9 +279,9 @@ function _openlayers_openlayers_layers() {
   $layer->title = 'Google Maps Normal';
   $layer->description = 'Standard Google Maps Roads';
   $layer->data = array(
-    'baselayer' => TRUE,
+    'isBaseLayer' => TRUE,
     'type' => 'normal',
-    'projection' => array('900913'),
+    'projection' => array('EPSG:3857'),
     'layer_type' => 'openlayers_layer_type_google',
   );
   $layers[$layer->name] = $layer;
@@ -53,9 +292,9 @@ function _openlayers_openlayers_layers() {
   $layer->title = 'Google Maps Physical';
   $layer->description = 'Google Maps Hillshades';
   $layer->data = array(
-    'baselayer' => TRUE,
+    'isBaseLayer' => TRUE,
     'type' => 'physical',
-    'projection' => array('900913'),
+    'projection' => array('EPSG:3857'),
     'layer_type' => 'openlayers_layer_type_google',
   );
   $layers[$layer->name] = $layer;
@@ -66,23 +305,24 @@ function _openlayers_openlayers_layers() {
   $layer->title = 'MapQuest OSM';
   $layer->description = 'MapQuest’s rendering of OpenStreetMap.';
   $layer->data = array(
-    'baselayer' => TRUE,
-    'attribution' => t('&copy;<a href="@ccbysa">CCBYSA</a> 2010
-      <a href="@openstreetmap">OpenStreetMap.org</a> contributors',
+    'isBaseLayer' => TRUE,
+    'attribution' => t('&copy;<a href="@ccbysa">CCBYSA</a> '.
+      '<a href="@openstreetmap">&copy; OpenStreetMap contributors</a>',
       array(
-        '@openstreetmap' => 'http://www.openstreetmap.org/',
+        '@openstreetmap' => 'http://www.openstreetmap.org/copyright',
         '@ccbysa' => 'http://creativecommons.org/licenses/by-sa/2.0/',
       )
     ) . '. '. t('Tiles Courtesy of <a href="http://www.mapquest.com/">MapQuest</a>.'),
-    'projection' => array('900913'),
+    'projection' => array('EPSG:3857', 'EPSG:900913'),
     'layer_type' => 'openlayers_layer_type_xyz',
     'url' => array(
-      'http://otile1.mqcdn.com/tiles/1.0.0/osm/${z}/${x}/${y}.png',
-      'http://otile2.mqcdn.com/tiles/1.0.0/osm/${z}/${x}/${y}.png',
-      'http://otile3.mqcdn.com/tiles/1.0.0/osm/${z}/${x}/${y}.png',
-      'http://otile4.mqcdn.com/tiles/1.0.0/osm/${z}/${x}/${y}.png',
+      '//otile1' . $mapquest_host . '/tiles/1.0.0/osm/${z}/${x}/${y}.png',
+      '//otile2' . $mapquest_host . '/tiles/1.0.0/osm/${z}/${x}/${y}.png',
+      '//otile3' . $mapquest_host . '/tiles/1.0.0/osm/${z}/${x}/${y}.png',
+      '//otile4' . $mapquest_host . '/tiles/1.0.0/osm/${z}/${x}/${y}.png',
     ),
     'wrapDateLine' => TRUE,
+    'resolutions' => openlayers_get_resolutions('EPSG:900913', 0, 19)
   );
   $layers[$layer->name] = $layer;
 
@@ -92,96 +332,63 @@ function _openlayers_openlayers_layers() {
   $layer->title = 'MapQuest Open Aerial';
   $layer->description = 'MapQuest’s aerial photo map.';
   $layer->data = array(
-    'baselayer' => TRUE,
+    'isBaseLayer' => TRUE,
     'attribution' => t('Portions Courtesy NASA/JPL-Caltech and U.S. Depart. of Agriculture, Farm Service Agency.')
       . ' '. t('Tiles Courtesy of <a href="http://www.mapquest.com/">MapQuest</a>.'),
-    'projection' => array('900913'),
+    'projection' => array('EPSG:3857', 'EPSG:900913'),
     'layer_type' => 'openlayers_layer_type_xyz',
     'url' => array(
-      'http://oatile1.mqcdn.com/naip/${z}/${x}/${y}.png',
-      'http://oatile2.mqcdn.com/naip/${z}/${x}/${y}.png',
-      'http://oatile3.mqcdn.com/naip/${z}/${x}/${y}.png',
-      'http://oatile4.mqcdn.com/naip/${z}/${x}/${y}.png',
+      '//oatile1' . $mapquest_host . '/tiles/1.0.0/sat/${z}/${x}/${y}.png',
+      '//oatile2' . $mapquest_host . '/tiles/1.0.0/sat/${z}/${x}/${y}.png',
+      '//oatile3' . $mapquest_host . '/tiles/1.0.0/sat/${z}/${x}/${y}.png',
+      '//oatile4' . $mapquest_host . '/tiles/1.0.0/sat/${z}/${x}/${y}.png'
     ),
     'wrapDateLine' => TRUE,
   );
   $layers[$layer->name] = $layer;
 
+  // Bing Road
   $layer = new stdClass();
   $layer->api_version = 1;
-  $layer->name = 'yahoo_satellite';
-  $layer->title = 'Yahoo Maps Satellite';
-  $layer->description = 'Yahoo satellite imagery tiles.';
+  $layer->name = 'bing_road';
+  $layer->title = 'Bing Road';
+  $layer->description = 'Bing Road tiles.';
   $layer->data = array(
-    'baselayer' => TRUE,
-    'type' => 'satellite',
-    'projection' => array('900913'),
-    'layer_type' => 'openlayers_layer_type_yahoo',
+    'name' => 'Bing Road',
+    'isBaseLayer' => TRUE,
+    'type' => 'Road',
+    'projection' => array('EPSG:3857'),
+    'layer_type' => 'openlayers_layer_type_bing',
   );
   $layers[$layer->name] = $layer;
 
+  // Bing Aerial
   $layer = new stdClass();
   $layer->api_version = 1;
-  $layer->name = 'yahoo_street';
-  $layer->title = 'Yahoo Maps Street';
-  $layer->description = 'Yahoo streets tiles.';
+  $layer->name = 'bing_aerial';
+  $layer->title = 'Bing Aerial';
+  $layer->description = 'Bing Aerial tiles.';
   $layer->data = array(
-    'baselayer' => TRUE,
-    'type' => 'street',
-    'projection' => array('900913'),
-    'layer_type' => 'openlayers_layer_type_yahoo',
+    'name' => 'Bing Aerial',
+    'isBaseLayer' => TRUE,
+    'type' => 'Aerial',
+    'projection' => array('EPSG:3857'),
+    'layer_type' => 'openlayers_layer_type_bing',
   );
   $layers[$layer->name] = $layer;
 
+  // Bing Hybrid
   $layer = new stdClass();
   $layer->api_version = 1;
-  $layer->name = 'yahoo_hybrid';
-  $layer->title = 'Yahoo Maps Hybrid';
-  $layer->description = 'Yahoo hybrid of streets and satellite tiles.';
+  $layer->name = 'bing_hybrid';
+  $layer->title = 'Bing Hybrid';
+  $layer->description = 'Bing Hybrid tiles.';
   $layer->data = array(
-    'baselayer' => TRUE,
-    'type' => 'hybrid',
-    'projection' => array('900913'),
-    'layer_type' => 'openlayers_layer_type_yahoo',
-  );
-  $layers[$layer->name] = $layer;
-
-  $layer = new stdClass();
-  $layer->api_version = 1;
-  $layer->name = 'virtualearth_street';
-  $layer->title = 'Virtual Earth Street';
-  $layer->description = 'Virtual Earth (Bing) street tiles.';
-  $layer->data = array(
-    'baselayer' => TRUE,
-    'type' => 'street',
-    'projection' => array('900913'),
-    'layer_type' => 'openlayers_layer_type_virtualearth',
-  );
-  $layers[$layer->name] = $layer;
-
-  $layer = new stdClass();
-  $layer->api_version = 1;
-  $layer->name = 'virtualearth_satellite';
-  $layer->title = 'Virtual Earth Satellite';
-  $layer->description = 'Virtual Earth (Bing) satellite tiles.';
-  $layer->data = array(
-    'baselayer' => TRUE,
-    'type' => 'satellite',
-    'projection' => array('900913'),
-    'layer_type' => 'openlayers_layer_type_virtualearth',
-  );
-  $layers[$layer->name] = $layer;
-
-  $layer = new stdClass();
-  $layer->api_version = 1;
-  $layer->name = 'virtualearth_hybrid';
-  $layer->title = 'Virtual Earth Hybrid';
-  $layer->description = 'Virtual Earth (Bing) hybrid of streets and satellite tiles.';
-  $layer->data = array(
-    'baselayer' => TRUE,
-    'type' => 'hybrid',
-    'projection' => array('900913'),
-    'layer_type' => 'openlayers_layer_type_virtualearth',
+    'name' => 'Bing Hybrid',
+    'isBaseLayer' => TRUE,
+    'type' => 'AerialWithLabels',
+    'projection' => array('EPSG:3857'),
+    'layer_type' => 'openlayers_layer_type_bing',
   );
   $layers[$layer->name] = $layer;
 
@@ -192,39 +399,17 @@ function _openlayers_openlayers_layers() {
   $layer->title = 'OSM Mapnik';
   $layer->description = 'The main OpenStreetMap map';
   $layer->data = array(
-    'baselayer' => TRUE,
-    'attribution' => t('&copy;<a href="@ccbysa">CCBYSA</a> 2010
-      <a href="@openstreetmap">OpenStreetMap.org</a> contributors',
+    'isBaseLayer' => TRUE,
+    'attribution' => t('&copy;<a href="@ccbysa">CCBYSA</a> '.
+        '<a href="@openstreetmap">&copy; OpenStreetMap contributors</a>',
       array(
-        '@openstreetmap' => 'http://www.openstreetmap.org/',
+        '@openstreetmap' => 'http://www.openstreetmap.org/copyright',
         '@ccbysa' => 'http://creativecommons.org/licenses/by-sa/2.0/',
       )
     ),
-    'projection' => array('900913'),
+    'projection' => array('EPSG:3857'),
     'layer_type' => 'openlayers_layer_type_xyz',
-    'url' => 'http://tile.openstreetmap.org/${z}/${x}/${y}.png',
-    'wrapDateLine' => TRUE,
-  );
-  $layers[$layer->name] = $layer;
-
-  // OpenStreetMap Tiles @ Home
-  $layer = new stdClass();
-  $layer->api_version = 1;
-  $layer->name = 'osm_tah';
-  $layer->title = 'OSM Tiles@Home';
-  $layer->description = 'Alternative, community-rendered OpenStreetMap';
-  $layer->data = array(
-    'baselayer' => TRUE,
-    'attribution' => t('&copy;<a href="@ccbysa">CCBYSA</a> 2010
-      <a href="@openstreetmap">OpenStreetMap.org</a> contributors',
-      array(
-        '@openstreetmap' => 'http://www.openstreetmap.org/',
-        '@ccbysa' => 'http://creativecommons.org/licenses/by-sa/2.0/',
-      )
-    ),
-    'projection' => array('900913'),
-    'layer_type' => 'openlayers_layer_type_xyz',
-    'url' => 'http://tah.openstreetmap.org/Tiles/tile/${z}/${x}/${y}.png',
+    'url' => '//tile.openstreetmap.org/${z}/${x}/${y}.png',
     'wrapDateLine' => TRUE,
   );
   $layers[$layer->name] = $layer;
@@ -236,17 +421,17 @@ function _openlayers_openlayers_layers() {
   $layer->title = 'OSM Cycling Map';
   $layer->description = 'OpenStreetMap with highlighted bike lanes';
   $layer->data = array(
-    'baselayer' => TRUE,
-    'attribution' => t('&copy;<a href="@ccbysa">CCBYSA</a> 2010
-      <a href="@openstreetmap">OpenStreetMap.org</a> contributors',
+    'isBaseLayer' => TRUE,
+    'attribution' => t('&copy;<a href="@ccbysa">CCBYSA</a> '.
+        '<a href="@openstreetmap">&copy; OpenStreetMap contributors</a>',
       array(
-        '@openstreetmap' => 'http://www.openstreetmap.org/',
+        '@openstreetmap' => 'http://www.openstreetmap.org/copyright',
         '@ccbysa' => 'http://creativecommons.org/licenses/by-sa/2.0/',
       )
     ),
-    'projection' => array('900913'),
+    'projection' => array('EPSG:3857'),
     'layer_type' => 'openlayers_layer_type_xyz',
-    'url' => 'http://andy.sandbox.cloudmade.com/tiles/cycle/${z}/${x}/${y}.png',
+    'url' => '//a.tile.opencyclemap.org/cycle/${z}/${x}/${y}.png',
     'wrapDateLine' => TRUE,
   );
   $layers[$layer->name] = $layer;
@@ -259,24 +444,50 @@ function _openlayers_openlayers_layers() {
   $layer->description = 'Semi-transparent hybrid overlay. Projected into
     WSG84 for use on non spherical-mercator maps.';
   $layer->data = array(
-    'baselayer' => FALSE,
-    'attribution' => t('&copy;<a href="@ccbysa">CCBYSA</a> 2010
-      <a href="@openstreetmap">OpenStreetMap.org</a> contributors',
+    'isBaseLayer' => FALSE,
+    'attribution' => t('&copy;<a href="@ccbysa">CCBYSA</a> '.
+        '<a href="@openstreetmap">&copy; OpenStreetMap contributors</a>',
       array(
-        '@openstreetmap' => 'http://www.openstreetmap.org/',
+        '@openstreetmap' => 'http://www.openstreetmap.org/copyright',
         '@ccbysa' => 'http://creativecommons.org/licenses/by-sa/2.0/',
       )
     ),
-    'projection' => array('4326'),
+    'projection' => array('EPSG:4326'),
     'layer_type' => 'openlayers_layer_type_wms',
     'url' => 'http://oam.hypercube.telascience.org/tiles',
     'params' => array(
       'isBaseLayer' => FALSE,
-      'layers' => 'osm-4326-hybrid',
+      'layers' => array(
+        'osm-4326-hybrid'
+      ),
     ),
     'options' => array(
       'buffer' => 1,
     ),
+  );
+  $layers[$layer->name] = $layer;
+
+  /* Example with KML layer */
+  $layer = new stdClass();
+  $layer->disabled = FALSE; /* Edit this to true to make a default openlayers_layers disabled initially */
+  $layer->api_version = 1;
+  $layer->name = 'openlayers_vector_example';
+  $layer->title = 'Vector Example Layer';
+  $layer->description = 'A simple example of a Vector Layer Type.';
+  $layer->data = array(
+    'method' => 'raw',
+    'raw' => '<?xml version="1.0" encoding="UTF-8"?><kml xmlns="http://www.opengis.net/kml/2.2"><Placemark><name>Simple placemark</name><description>Attached to the ground. Intelligently places itself at the height of the underlying terrain.</description><Point><coordinates>-122.0822035425683,37.42228990140251,0</coordinates></Point></Placemark></kml>',
+    'format' => 'KML',
+    'formatOptions' => array(
+      'extractStyles' => TRUE,
+      'extractTracks' => FALSE,
+      'extractAttributes' => TRUE,
+    ),
+    'projection' => array('EPSG:4326'),
+    'isBaseLayer' => 0,
+    'layer_type' => 'openlayers_layer_type_vector',
+    'layer_handler' => 'vector',
+    'vector' => TRUE,
   );
   $layers[$layer->name] = $layer;
 
@@ -287,16 +498,16 @@ function _openlayers_openlayers_layers() {
   $layer->title = 'Default OpenLayers WMS';
   $layer->description = 'MetaCarta basemap of province and water boundaries';
   $layer->data = array(
-    'projection' => array('4326'),
-    'baselayer' => TRUE,
+    'projection' => array('EPSG:4326'),
+    'isBaseLayer' => TRUE,
     'layer_type' => 'openlayers_layer_type_wms',
-    'base_url' => 'http://labs.metacarta.com/wms-c/Basic.py',
+    'base_url' => '//labs.metacarta.com/wms-c/Basic.py',
     'params' => array(
       'isBaseLayer' => TRUE,
     ),
     'options' => array(
       'layers' => array('basic'),
-      'maxExtent' => openlayers_get_extent('4326'),
+      'maxExtent' => openlayers_get_extent('EPSG', '4326'),
     ),
   );
   $layers[$layer->name] = $layer;
@@ -308,12 +519,14 @@ function _openlayers_openlayers_layers() {
   $layer->title = t('Example GeoJSON, "Picture This"');
   $layer->description = t('Example that puts GeoJSON directly in layer without Views.');
   $layer->data = array(
-    'layer_type' => 'openlayers_layer_type_geojson',
-    'layer_handler' => 'geojson',
-    'projection' => array('4326'),
-    'baselayer' => FALSE,
+    'method' => 'raw',
+    'format' => 'GeoJSON',
+    'layer_type' => 'openlayers_layer_type_vector',
+    'layer_handler' => 'vector',
+    'projection' => array('EPSG:4326'),
+    'isBaseLayer' => FALSE,
     'vector' => TRUE,
-    'geojson_data' => '
+    'raw' => '
       {
         "type": "Feature",
         "properties": {
@@ -338,6 +551,35 @@ function _openlayers_openlayers_layers() {
   );
   $layers[$layer->name] = $layer;
 
+  $info = _mapbox_layers_info();
+  $resolutions = openlayers_get_resolutions('EPSG:900913');
+  $resolutions = array_combine(range(0, count($resolutions)-1), $resolutions);
+
+  foreach ($info as $key => $item) {
+    $openlayers_layers = new stdClass;
+    $openlayers_layers->disabled = FALSE; /* Edit this to true to make a default openlayers_layers disabled initially */
+    $openlayers_layers->api_version = 1;
+    $openlayers_layers->name = $key;
+    $openlayers_layers->title = $item['name'];
+    $openlayers_layers->description = $item['description'];
+    $openlayers_layers->data = array(
+      'url' => array(
+        0 => 'http://a.tiles.mapbox.com/',
+        1 => 'http://b.tiles.mapbox.com/',
+        2 => 'http://c.tiles.mapbox.com/',
+        3 => 'http://d.tiles.mapbox.com/',
+      ),
+      'layername' => $item['layername'],
+      'layer_type' => 'openlayers_layer_type_tms',
+      'osm' => FALSE,
+      'isBaseLayer' => TRUE,
+      'type' => 'png',
+      'resolutions' => array_intersect_key($resolutions, array_flip(range($item['minzoom'], $item['maxzoom']))),
+      'projection' => array('EPSG:3857'),
+    );
+    $layers[$key] = $openlayers_layers;
+  }
+
   return $layers;
 }
 
@@ -353,14 +595,13 @@ function _openlayers_openlayers_layers_i18n() {
     t('Google Maps Hybrid'),
     t('Google Maps Normal'),
     t('Google Maps Physical'),
+    t('Bing Road'),
+    t('Bing Aerial'),
+    t('Bing Hybrid'),
     t('Yahoo Maps Street'),
     t('Yahoo Maps Hybrid'),
     t('Yahoo Maps Satellite'),
-    t('Virtual Earth Street'),
-    t('Virtual Earth Satellite'),
-    t('Virtual Earth Hybrid'),
     t('OSM Mapnik'),
-    t('OSM Tiles@Home'),
     t('OSM Cycling Map'),
     t('OSM Overlay'),
     t('Default OpenLayers WMS'),
@@ -375,13 +616,51 @@ function _openlayers_openlayers_layers_i18n() {
       WSG84 for use on non spherical-mercator maps.'),
     t('Standard Google Maps Roads'),
     t('The main OpenStreetMap map'),
-    t('Virtual Earth (Bing) hybrid of streets and satellite tiles.'),
-    t('Virtual Earth (Bing) satellite tiles.'),
-    t('Virtual Earth (Bing) street tiles.'),
-    t('Yahoo hybrid of streets and satellite tiles.'),
-    t('Yahoo satellite imagery tiles.'),
-    t('Yahoo streets tiles.'),
+    t('Bing Road tiles.'),
+    t('Bing Aerial tiles.'),
+    t('Bing Hybrid tiles.'),
     t('MapQuest’s rendering of OpenStreetMap.'),
     t('MapQuest’s aerial photo map.'),
   );
+}
+
+function _mapbox_layers_info() {
+  $info = array();
+  $info['mapbox_world_bright'] = array(
+    'name' => t('MapBox World Bright'),
+    'description' => t('MapBox World Bright'),
+    'layername' => 'world-bright',
+    'minzoom' => 0,
+    'maxzoom' => 11,
+  );
+  $info['mapbox_world_dark'] = array(
+    'name' => t('MapBox World Dark'),
+    'description' => t('MapBox World Dark'),
+    'layername' => 'world-dark',
+    'minzoom' => 0,
+    'maxzoom' => 11,
+  );
+  $info['mapbox_world_light'] = array(
+    'name' => t('MapBox World Light'),
+    'description' => t('MapBox World Light'),
+    'layername' => 'world-light',
+    'minzoom' => 0,
+    'maxzoom' => 11,
+  );
+  $info['mapbox_world_print'] = array(
+    'name' => t('MapBox World Print'),
+    'description' => t('MapBox World Print'),
+    'layername' => 'world-print',
+    'minzoom' => 0,
+    'maxzoom' => 9,
+  );
+  $info['mapbox_world_black'] = array(
+    'name' => t('MapBox World Black'),
+    'description' => t('MapBox World Black'),
+    'layername' => 'world-black',
+    'minzoom' => 0,
+    'maxzoom' => 11,
+  );
+
+  return $info;
 }

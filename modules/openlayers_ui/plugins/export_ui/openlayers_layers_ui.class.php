@@ -111,9 +111,8 @@ class openlayers_layers_ui extends ctools_export_ui {
 
     unset($form_state['values']['layer_type']);
 
-    if (method_exists($layer, 'options_form_validate')) {
-      $layer->options_form_validate($form, $form_state['values']);
-    }
+    $layer->options_form_validate($form, $form_state['values']);
+
     parent::edit_form_validate($form, $form_state);
   }
 
@@ -122,10 +121,7 @@ class openlayers_layers_ui extends ctools_export_ui {
    */
   function edit_form_submit(&$form, &$form_state) {
     $layer = openlayers_layer_type_load($form_state['values']['data']['layer_type']);
-    if (method_exists($layer, 'options_form_submit')) {
-      $layer->options_form_submit($form, $form_state);
-    }
-
+    $layer->options_form_submit($form, $form_state);
     parent::edit_form_submit($form, $form_state);
   }
 

@@ -60,7 +60,7 @@ function openlayers_layers_load($reset = FALSE) {
  *   String identifier of layer type.
  * @param $reset
  *   Boolean whether to reset cache or not.
- * @return
+ * @return openlayers_layer_type
  *   An instantiated layer type object or FALSE if not found.
  */
 function openlayers_layer_type_load($name, $reset = FALSE) {

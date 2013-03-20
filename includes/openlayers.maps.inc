@@ -196,6 +196,7 @@ function openlayers_build_map($map = array()) {
  *   Map HTML.
  */
 function openlayers_render_map_data($map = array()) {
+
   // Run map through build process
   $map = openlayers_build_map($map);
 
@@ -282,13 +283,16 @@ function openlayers_render_map_data($map = array()) {
       'libraries_load' => array()
     );
 
-    $attached['libraries_load'] += $layer_attached['libraries_load'];
+    $attached['libraries_load'][] = array($lib);
+    if (!empty($layer_attached['libraries_load'])) {
+      $attached['libraries_load'][] = $layer_attached['libraries_load'];
+    }
     $attached['js'] += $layer_attached['js'];
     $attached['css'] += $layer_attached['css'];
-    $attached['libraries_load'][] = array($lib);
     unset($layer_type_object);
   }
   $attached['js'] += array($settings);
+  $attached['libraries_load'] = array_values($attached['libraries_load']);
 
   $output = array(
     '#theme' => 'openlayers_map',

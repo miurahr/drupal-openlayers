@@ -11,7 +11,7 @@ Drupal.openlayers.addBehavior('openlayers_behavior_zoomtolayer', function (data,
   var layers = map.getLayersBy('drupalID', {
     test: function(id) {
       for (var i in options.zoomtolayer) {
-        if (options.zoomtolayer[i] == id) {
+        if (options.zoomtolayer[i] == id && options.layer_handler == 'vector') {
           return true;
         }
       }
@@ -23,27 +23,22 @@ Drupal.openlayers.addBehavior('openlayers_behavior_zoomtolayer', function (data,
   map.fullExtent = new OpenLayers.Bounds();
   for (var i in layers) {
     if (layers[i].features !== undefined) {
-      if (layers[i].layer_handler == 'vector') {
-        zoom_to_layer();
-        layers[i].events.register('loadend', layers[i], 'zoom_to_layer');
-      } else {
-        var layerextent = layers[i].getDataExtent();
-        // Check for valid layer extent
-        if (layerextent != null) {
-          map.fullExtent.extend(layerextent);
-          map.zoomToExtent(map.fullExtent);
+      layers[i].events.register('loadend', layers[i], function() {
+        var zoomtolayer_scale = data.map.behaviors['openlayers_behavior_zoomtolayer'].zoomtolayer_scale;
+        var layerextent = layers[i].getDataExtent().scale(zoomtolayer_scale);
+        map.fullExtent.extend(layerextent);
+        map.zoomToExtent(map.fullExtent);
+        if (layerextent.getWidth() == 0.0) {
+          map.zoomTo(options.point_zoom_level);
         }
+      });
+    } else {
+      var layerextent = layers[i].getDataExtent();
+      // Check for valid layer extent
+      if (layerextent != null) {
+        map.fullExtent.extend(layerextent);
+        map.zoomToExtent(map.fullExtent);
       }
-    }
-  }
-
-  function zoom_to_layer() {
-    var zoomtolayer_scale = data.map.behaviors['openlayers_behavior_zoomtolayer'].zoomtolayer_scale;
-    var layerextent = layers[i].getDataExtent().scale(zoomtolayer_scale);
-    map.fullExtent.extend(layerextent);
-    map.zoomToExtent(map.fullExtent);
-    if (layerextent.getWidth() == 0.0) {
-      map.zoomTo(options.point_zoom_level);
     }
   }
 

@@ -18,10 +18,16 @@ Drupal.openlayers.layer.tms = function(title, map, options) {
       var x = Math.round((bounds.left - this.maxExtent.left) / (res * this.tileSize.w));
       var y = Math.round((bounds.bottom - this.tileOrigin.lat) / (res * this.tileSize.h));
       var z = this.map.getZoom();
-      return this.url + z + '/' + x + '/' + y + '.' + this.type;
+      if (x >= 0 && y >= 0) {
+        return this.url + z + "/" + x + "/" + y + "." + this.type;
+      } else {
+        return "http://www.maptiler.org/img/none.png";
+      }
     }
   }
 
+  options.tileOrigin = new OpenLayers.LonLat.fromArray(options.tileOrigin);
   options.projection = new OpenLayers.Projection(options.projection);
+
   return new OpenLayers.Layer.TMS(title, options.url, options);
 };

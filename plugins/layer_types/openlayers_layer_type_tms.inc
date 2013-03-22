@@ -32,7 +32,8 @@ class openlayers_layer_type_tms extends openlayers_layer_type {
       'serviceVersion' => '1.0.0',
       'wrapDateLine' => FALSE,
       'zoomOffset' => 0,
-      'url' => array()
+      'url' => array(),
+      'tileOrigin' => array('0', '0')
     ) + parent::options_init();
   }
 
@@ -97,6 +98,22 @@ class openlayers_layer_type_tms extends openlayers_layer_type {
           $this->data['zoomOffset'] : 0,
         '#description' => t('If your cache has more zoom levels than you want to provide access to with this layer, supply a zoomOffset.  This zoom offset is added to the current map zoom level to determine the level for a requested tile.  For example, if you supply a zoomOffset of 3, when the map is at the zoom 0, tiles will be requested from level 3 of your cache.  Default is 0 (assumes cache level and map zoom are equivalent).  Using zoomOffset is an alternative to setting serverResolutions if you only want to expose a subset of the server resolutions.'),
       ),
+      'tileOrigin' => array(
+        'lon' => array(
+          '#type' => 'textfield',
+          '#title' => t('Longitude'),
+          '#default_value' => isset($this->data['tileOrigin'][0]) ?
+            $this->data['tileOrigin'][0] : 0,
+          '#description' => t('Origin longitude.'),
+        ),
+        'lat' => array(
+          '#type' => 'textfield',
+          '#title' => t('Latitude'),
+          '#default_value' => isset($this->data['tileOrigin'][1]) ?
+            $this->data['tileOrigin'][1] : 0,
+          '#description' => t('Origin latitude.'),
+        ),
+      ),
       'maptiler' => array(
         '#type' => 'checkbox',
         '#title' => t('Rewrite the getUrl method for MapTiler ?'),
@@ -118,6 +135,13 @@ class openlayers_layer_type_tms extends openlayers_layer_type {
     $form_state['values']['data']['wrapDateLine'] = (bool) $form_state['values']['data']['wrapDateLine'];
     $form_state['values']['data']['zoomOffset'] = intval($form_state['values']['data']['zoomOffset'], 10);
     $form_state['values']['data']['maptiler'] = (bool) $form_state['values']['data']['maptiler'];
+    $form_state['values']['data']['tileOrigin'] = array_map(
+      'floatval',
+      array(
+        $form_state['values']['data']['tileOrigin']['lon'],
+        $form_state['values']['data']['tileOrigin']['lon']
+      )
+    );
   }
 
 

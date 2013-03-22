@@ -36,9 +36,10 @@ class openlayers_layer_type_wmts extends openlayers_layer_type {
   function options_form($defaults = array()) {
     return array(
       'url' => array(
-        '#type' => 'textfield',
-        '#title' => t('Base URL'),
-        '#default_value' => isset($this->data['url']) ? $this->data['url'] : '',
+        '#type' => 'textarea',
+        '#title' => t('Base URL (template)'),
+        '#default_value' => !empty($this->data['url']) ? implode("\n", (array) $this->data['url']) : '',
+        '#maxlength' => 2083,
         '#description' => t('The base URL or request URL template for the WMTS service. Must be provided.'),
       ),
       'layer' => array(
@@ -86,8 +87,7 @@ class openlayers_layer_type_wmts extends openlayers_layer_type {
       ),
       'serverResolutions' => array(
         '#type' => 'textfield',
-        '#title' => t('Server Resoultions'),
-        '#maxlength'=>500,
+        '#title' => t('Server Resolutions'),
         '#default_value' => isset($this->data['serverResolutions']) ? $this->data['serverResolutions'] : '',
         '#description' => t('A list of all resolutions available on the server.  Only set this property if the map resolutions differ from the server.'),
         '#maxlength' => 400
@@ -101,11 +101,20 @@ class openlayers_layer_type_wmts extends openlayers_layer_type {
     );
   }
 
+  function options_form_validate($form, &$form_state) {
+    //parent::options_form_validate($form, $form_state);
+    $form_state['data']['resolutions'] = array_map('floatval', explode(' ', $form_state['data']['resolutions']));
+    $form_state['data']['serverResolutions'] = array_map('floatval', explode(' ', $form_state['data']['serverResolutions']));
+    $form_state['data']['url'] = explode("\n", $form_state['data']['url']);
+  }
+
+  function options_form_submit($form, &$form_state) {
+    //parent::options_form_submit($form, $form_state);
+  }
+
   /**
    * Render.
    */
   function render(&$map) {
-    drupal_add_js(drupal_get_path('module', 'openlayers') .
-      '/plugins/layer_types/openlayers_layer_type_wmts.js');
   }
 }

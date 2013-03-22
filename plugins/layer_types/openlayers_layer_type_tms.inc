@@ -138,8 +138,8 @@ class openlayers_layer_type_tms extends openlayers_layer_type {
     $form_state['values']['data']['tileOrigin'] = array_map(
       'floatval',
       array(
-        $form_state['values']['data']['tileOrigin'][0],
-        $form_state['values']['data']['tileOrigin'][1]
+        $form_state['values']['data']['tileOrigin']['lon'],
+        $form_state['values']['data']['tileOrigin']['lat']
       )
     );
   }

@@ -68,6 +68,14 @@ class openlayers_layer_type_google extends openlayers_layer_type {
     );
   }
 
+  function options_form_validate($form, &$form_state) {
+    parent::options_form_validate($form, $form_state);
+  }
+
+  function options_form_submit($form, &$form_state) {
+    parent::options_form_submit($form, $form_state);
+  }
+
   /**
    * Layer-type-wide settings form
    */

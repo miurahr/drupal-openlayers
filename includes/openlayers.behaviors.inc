@@ -16,8 +16,8 @@ function _openlayers_behavior_definition_check($definition) {
     array('title'),
     array('description'),
     array('name'),
-    array('path'),
-    array('type'),
+    //array('path'),
+    //array('type'),
     array('class')
   );
 

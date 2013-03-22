@@ -40,6 +40,14 @@ class openlayers_layer_type_raw extends openlayers_layer_type {
     return array();
   }
 
+  function options_form_validate($form, &$form_state) {
+    parent::options_form_validate($form, $form_state);
+  }
+
+  function options_form_submit($form, &$form_state) {
+    parent::options_form_submit($form, $form_state);
+  }
+
   /**
    * Render.
    */

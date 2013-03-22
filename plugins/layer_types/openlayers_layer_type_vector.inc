@@ -221,6 +221,7 @@ class openlayers_layer_type_vector extends openlayers_layer_type {
    * The file is mandatory.
    */
   function options_form_validate($form, &$form_state) {
+    parent::options_form_validate($form, $form_state);
     $method = $form_state['data']['method'];
 
     if (empty($form_state['data'][$method])) {
@@ -244,6 +245,7 @@ class openlayers_layer_type_vector extends openlayers_layer_type {
    * hook_submit() of the form.
    */
   function options_form_submit($form, &$form_state) {
+    parent::options_form_submit($form, $form_state);
     global $user;
     $item = $form_state['item'];
     if (isset($item->data['file']) && $file = file_load($item->data['file'])) {

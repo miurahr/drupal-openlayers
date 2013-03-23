@@ -73,7 +73,8 @@ class openlayers_layer_type {
       'resolutions' => openlayers_get_resolutions('EPSG:900913'),
       'base_url' => NULL,
       'transitionEffect' => 'resize',
-      'weight' => 0
+      'weight' => 0,
+      'opacity' => 1
     );
   }
 
@@ -105,6 +106,13 @@ class openlayers_layer_type {
         '#default_value' => !empty($default->data['isBaseLayer']) ?
           $default->data['isBaseLayer'] : FALSE
       ),
+      'opacity' => array(
+        '#type' => 'textfield',
+        '#title' => t('Opacity'),
+        '#description' => t('The layer’s opacity.  Float number between 0.0 and 1.0.  Default is 1.'),
+        '#default_value' => !empty($default->data['opacity']) ?
+          $default->data['opacity'] : 1
+      ),
     );
   }
 
@@ -124,6 +132,7 @@ class openlayers_layer_type {
    */
   function options_form_submit($form, &$form_state) {
     $form_state['values']['data']['projection'] = array_keys($form_state['values']['data']['projection']);
+    $form_state['values']['data']['opacity'] = floatval($form_state['values']['data']['opacity']);
   }
 
   /**

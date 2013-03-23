@@ -579,30 +579,6 @@ function _openlayers_openlayers_layers() {
     );
     $layers[$key] = $openlayers_layers;
   }
-
-  $info = _openweathermap_layers_info();
-
-  foreach ($info as $key) {
-    $url = 'http://${s}.tile.openweathermap.org/map/' . $key . '/${z}/${x}/${y}.png';
-    $openlayers_layers = new stdClass;
-    $openlayers_layers->disabled = FALSE; /* Edit this to true to make a default openlayers_layers disabled initially */
-    $openlayers_layers->api_version = 1;
-    $openlayers_layers->name = 'owm_layer_' . $key;
-    $openlayers_layers->title = 'OpenWeatherMap layer' . $key;
-    $openlayers_layers->description = 'http://openweathermap.org/';
-    $openlayers_layers->data = array(
-      'layer_type' => 'openlayers_layer_type_xyz',
-      'url' => array(
-        0 => $url,
-      ),
-      'isBaseLayer' => FALSE,
-      'opacity' => 0.5,
-      'projection' => array('EPSG:900913'),
-    );
-    $layers[$key] = $openlayers_layers;
-  }
-
-  return $layers;
 }
 
 /**

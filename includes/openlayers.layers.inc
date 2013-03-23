@@ -579,6 +579,8 @@ function _openlayers_openlayers_layers() {
     );
     $layers[$key] = $openlayers_layers;
   }
+
+  return $layers;
 }
 
 /**

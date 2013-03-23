@@ -624,22 +624,6 @@ function _openlayers_openlayers_layers_i18n() {
   );
 }
 
-function _openweathermap_layers_info() {
-  return array(
-    'precipitation',
-    'precipitation_cls',
-    'rain',
-    'rain_cls',
-    'snow',
-    'clouds',
-    'clouds_cls',
-    'pressure',
-    'pressure_cntr',
-    'temp',
-    'wind',
-  );
-}
-
 function _mapbox_layers_info() {
   $info = array();
   $info['mapbox_world_bright'] = array(

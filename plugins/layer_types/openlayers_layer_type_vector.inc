@@ -5,18 +5,6 @@
  */
 
 /**
- * Define the Ctools plugin options.
- */
-function openlayers_openlayers_layer_type_vector_openlayers_layer_types() {
-  return array(
-    'title' => t('Vector'),
-    'description' => t('Vectors overlay.'),
-    'class' => 'openlayers_layer_type_vector',
-  );
-
-}
-
-/**
  * OpenLayers Vector Layer Type class
  */
 class openlayers_layer_type_vector extends openlayers_layer_type {

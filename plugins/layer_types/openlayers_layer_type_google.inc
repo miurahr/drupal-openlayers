@@ -5,17 +5,6 @@
  */
 
 /**
- * Define the Ctools plugin options.
- */
-function openlayers_openlayers_layer_type_google_openlayers_layer_types() {
-  return array(
-    'title' => t('Google'),
-    'description' => t('Google Maps API Map'),
-    'class' => 'openlayers_layer_type_google',
-  );
-}
-
-/**
  * OpenLayers Google Layer Type class
  */
 class openlayers_layer_type_google extends openlayers_layer_type {

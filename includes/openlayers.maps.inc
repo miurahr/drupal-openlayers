@@ -10,14 +10,6 @@
 require_once 'openlayers.projections.inc';
 
 /**
- * Implements hook_openlayers_maps().
- */
-function openlayers_openlayers_maps() {
-  module_load_include('inc', 'openlayers', 'includes/openlayers.maps');
-  return _openlayers_openlayers_maps();
-}
-
-/**
  * Get maps from DB or code, via cache.
  *
  * @ingroup openlayers_api
@@ -336,14 +328,9 @@ function openlayers_render_map($map = '') {
 }
 
 /**
- * Map definitions
- *
- * Internal callback for openlayers map implementation.
- *
- * @return
- *   Array of maps
+ * Implements hook_openlayers_maps().
  */
-function _openlayers_openlayers_maps() {
+function openlayers_openlayers_maps() {
   $items = array();
 
   // Default map with MapQuest

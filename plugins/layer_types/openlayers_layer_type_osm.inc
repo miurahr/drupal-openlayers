@@ -5,16 +5,6 @@
  * OSM Layer Type
  */
 
-/**
- * Define the Ctools plugin options.
- */
-function openlayers_openlayers_layer_type_osm_openlayers_layer_types() {
-  return array(
-    'title' => t('OSM'),
-    'description' => t('OpenStreetMap Standard'),
-    'class' => 'openlayers_layer_type_osm',
-  );
-}
 
 /**
  * OpenLayers OSM Layer Type class

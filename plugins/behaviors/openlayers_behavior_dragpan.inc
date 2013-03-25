@@ -5,18 +5,6 @@
  */
 
 /**
- * Ctools plugin definition.
- */
-function openlayers_openlayers_behavior_dragpan_openlayers_behaviors() {
-  return array(
-    'title' => t('Mouse Drag Pan'),
-    'description' => t('Provides the ability to pan in the map interface with the mouse.  The Navigation Control includes this control.  You should only use this behavior if you want fine control over what interactions you want on your map.'),
-    'type' => 'map',
-    'class' => 'openlayers_behavior_dragpan',
-  );
-}
-
-/**
  * DragPan Behavior
  */
 class openlayers_behavior_dragpan extends openlayers_behavior {

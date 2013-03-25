@@ -5,18 +5,6 @@
  */
 
 /**
- * Ctools plugin definition.
- */
-function openlayers_openlayers_behavior_scaleline_openlayers_behaviors() {
-  return array(
-    'title' => t('Scale Line'),
-    'description' => t('Provides a line of scale in the map interface.'),
-    'type' => 'map',
-    'class' => 'openlayers_behavior_scaleline',
-  );
-}
-
-/**
  * Scaleline Behavior
  */
 class openlayers_behavior_scaleline extends openlayers_behavior {

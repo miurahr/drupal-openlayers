@@ -72,17 +72,6 @@ function openlayers_get_all_projections() {
  * @return array<openlayers_projection>
  */
 function openlayers_openlayers_projections() {
-  module_load_include('inc', 'openlayers', 'includes/openlayers.projections');
-  return _openlayers_openlayers_projections();
-}
-
-/**
- * @file
- * Defines default projections so that most users don't need to bother about setting up projections.
- *
- * @return array<stdClass>
- */
-function _openlayers_openlayers_projections() {
   $projections = array();
 
   // CH1903+ / LV95

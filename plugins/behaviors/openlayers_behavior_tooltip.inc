@@ -5,18 +5,6 @@
  */
 
 /**
- * Ctools plugin definition.
- */
-function openlayers_openlayers_behavior_tooltip_openlayers_behaviors() {
-  return array(
-    'title' => t('Tooltip for Features'),
-    'description' => t('Adds info boxes on hover to points or shapes on maps.  This does not work with the Popup behavior due to limitation of event handling in the OpenLayers library.'),
-    'type' => 'layer',
-    'class' => 'openlayers_behavior_tooltip',
-  );
-}
-
-/**
  * Attribution Behavior
  */
 class openlayers_behavior_tooltip extends openlayers_behavior {

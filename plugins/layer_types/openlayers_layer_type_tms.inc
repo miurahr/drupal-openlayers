@@ -5,18 +5,6 @@
  */
 
 /**
- * Define the Ctools plugin options.
- */
-function openlayers_openlayers_layer_type_tms_openlayers_layer_types() {
-  return array(
-    'title' => t('TMS'),
-    'description' => t('<a href="!url">Tile Map Service</a>',
-      array('!url' => 'http://en.wikipedia.org/wiki/Tile_Map_Service')),
-    'class' => 'openlayers_layer_type_tms',
-  );
-}
-
-/**
  * OpenLayers TMS Layer Type class
  */
 class openlayers_layer_type_tms extends openlayers_layer_type {

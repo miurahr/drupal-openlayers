@@ -5,17 +5,6 @@
  */
 
 /**
- * Ctools plugin definition.
- */
-function openlayers_openlayers_behavior_drawfeatures_openlayers_behaviors() {
-  return array(
-    'title' => t('Draw Features'),
-    'description' => t('Provides functionality for adding features to a map.'),
-    'type' => 'layer',
-    'class' => 'openlayers_behavior_drawfeatures',
-  );
-}
-/**
  * Draw Features behavior
  */
 class openlayers_behavior_drawfeatures extends openlayers_behavior {

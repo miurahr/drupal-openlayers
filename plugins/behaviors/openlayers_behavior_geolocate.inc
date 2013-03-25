@@ -5,18 +5,6 @@
  */
 
 /**
- * Ctools plugin definition.
- */
-function openlayers_openlayers_behavior_geolocate_openlayers_behaviors() {
-  return array(
-    'title' => t('Geolocate Client'),
-    'description' => t('Provides the geolcoation control that simply zooms to users location on map load.  Based on HTML5 geolocation, so this will not be supported in all browsers.'),
-    'type' => 'map',
-    'class' => 'openlayers_behavior_geolocate',
-  );
-}
-
-/**
  * Zoom Panel Behavior
  * http://dev.openlayers.org/docs/files/OpenLayers/Control/Geolocate-js.html
  */

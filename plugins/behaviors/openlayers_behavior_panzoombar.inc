@@ -5,18 +5,6 @@
  */
 
 /**
- * Ctools plugin definition.
- */
-function openlayers_openlayers_behavior_panzoombar_openlayers_behaviors() {
-  return array(
-    'title' => t('Pan and Zoom Bar Controls'),
-    'description' => t('Gives user ability to pan and zoom, with a full zoom bar in the map interface.  Do not use with Pan Zoom Contols or Zoom Panel Controls.'),
-    'type' => 'map',
-    'class' => 'openlayers_behavior_panzoombar',
-  );
-}
-
-/**
  * Pan Zoom Bar Behavior
  */
 class openlayers_behavior_panzoombar extends openlayers_behavior {

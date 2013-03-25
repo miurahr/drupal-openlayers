@@ -6,15 +6,6 @@
  */
 
 /**
- * Define the Ctools plugin options.
- */
-$plugin = array(
-  'title' => t('Bing'),
-  'description' => t('Microsoft Bing'),
-  'class' => 'openlayers_layer_type_bing',
-);
-
-/**
  * OpenLayers Bing Layer Type class
  */
 class openlayers_layer_type_bing extends openlayers_layer_type {

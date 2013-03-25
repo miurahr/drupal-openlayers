@@ -70,7 +70,7 @@ function openlayers_layer_type_load($name, $reset = FALSE) {
     'openlayers',
     'layer_types',
     $name,
-    'class')) {
+    'name')) {
     $layer_type = new $layer_type_class();
     return $layer_type;
   }
@@ -205,14 +205,10 @@ function _openlayers_layer_definition_check($definition) {
   $mandatory_fields = array(
     array('title'),
     array('description'),
-    array('name'),
+    array('class'),
+    array('file'),
     array('path'),
-    array('class')
-    /*
-    array('layer_type', 'file'),
-    array('layer_type', 'class'),
-    array('layer_type', 'parent'),
-    */
+    array('parent')
   );
 
   foreach ($mandatory_fields as $field) {
@@ -663,4 +659,63 @@ function _mapbox_layers_info() {
   );
 
   return $info;
+}
+
+function openlayers_openlayers_layer_types() {
+
+  $layers['openlayers_layer_type_bing'] = array(
+    'title' => t('Bing'),
+    'description' => t('Microsoft Bing'),
+  );
+  $layers['openlayers_layer_type_cloudmade'] = array(
+    'title' => t('CloudMade'),
+    'description' => t('<a href="!url">CloudMade</a> Custom Map',
+      array('!url' => 'http://cloudmade.com/')),
+  );
+  $layers['openlayers_layer_type_google'] = array(
+    'title' => t('Google'),
+    'description' => t('Google Maps API Map'),
+  );
+  $layers['openlayers_layer_type_osm'] = array(
+    'title' => t('OSM'),
+    'description' => t('OpenStreetMap Standard'),
+  );
+  $layers['openlayers_layer_type_raw'] = array(
+    'title' => t('Raw'),
+    'description' => t('Layer type for raw data input - not meant to be added with the UI.'
+    ),
+  );
+  $layers['openlayers_layer_type_tms'] = array(
+    'title' => t('TMS'),
+    'description' => t('<a href="!url">Tile Map Service</a>',
+      array('!url' => 'http://en.wikipedia.org/wiki/Tile_Map_Service')),
+  );
+  $layers['openlayers_layer_type_vector'] = array(
+    'title' => t('Vector'),
+    'description' => t('Vectors overlay.'),
+  );
+  $layers['openlayers_layer_type_wms'] = array(
+    'title' => t('WMS'),
+    'description' => t('<a href="!url">Web Map Service</a>',
+      array('!url' => 'http://en.wikipedia.org/wiki/Web_Map_Service')),
+  );
+  $layers['openlayers_layer_type_wmts'] = array(
+    'title' => t('WMTS'),
+    'description' => t('<a href="!url">Web Map Tile Service</a>',
+      array('!url' => 'http://en.wikipedia.org/wiki/Tile_Map_Service')),
+  );
+  $layers['openlayers_layer_type_xyz'] = array(
+    'title' => t('XYZ'),
+    'description' => t('XYZ layer type.  These are tiles sets usually in the form of {z}/{x}/{y}.png.'),
+  );
+
+  foreach ($layers as $key => $data) {
+    $layers[$key]['name'] = $key;
+    $layers[$key]['class'] = $key;
+    $layers[$key]['file'] = $key . '.inc';
+    $layers[$key]['parent'] = 'openlayers_layer_type';
+    $layers[$key]['path'] = drupal_get_path('module', 'openlayers') . '/plugins/layer_types';
+  }
+
+  return $layers;
 }

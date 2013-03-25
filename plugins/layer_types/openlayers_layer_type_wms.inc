@@ -5,18 +5,6 @@
  */
 
 /**
- * Define the Ctools plugin options.
- */
-function openlayers_openlayers_layer_type_wms_openlayers_layer_types() {
-  return array(
-    'title' => t('WMS'),
-    'description' => t('<a href="!url">Web Map Service</a>',
-      array('!url' => 'http://en.wikipedia.org/wiki/Web_Map_Service')),
-    'class' => 'openlayers_layer_type_wms',
-  );
-}
-
-/**
  * OpenLayers WMS Layer Type class
  */
 class openlayers_layer_type_wms extends openlayers_layer_type {

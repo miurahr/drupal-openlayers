@@ -5,17 +5,6 @@
  */
 
 /**
- * Ctools plugin definition.
- */
-function openlayers_openlayers_behavior_graticule_openlayers_behaviors() {
-  return array(
-    'title' => t('Graticule'),
-    'description' => t('Adds a graticule control to the map to display a grid of latitude and longitude.'),
-    'type' => 'layer',
-    'class' => 'openlayers_behavior_graticule',
-  );
-}
-/**
  * Attribution Behavior
  */
 class openlayers_behavior_graticule extends openlayers_behavior {

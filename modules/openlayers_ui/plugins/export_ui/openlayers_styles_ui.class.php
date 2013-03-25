@@ -37,7 +37,6 @@ class openlayers_styles_ui extends ctools_export_ui {
         an icon. Note that, when using icons, this value should be half the
         width of the icon image.'),
         'type' => 'integer',
-        'element_validate' => array('element_validate_integer_positive'),
       ),
       'fillColor' => array(
         'default' => '#EE9900',

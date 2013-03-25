@@ -89,9 +89,6 @@ function openlayers_ctools_plugin_type() {
       'classes' => array('handler'),
       'use hooks' => TRUE
     ),
-    'projections' => array(
-      'use hooks' => TRUE
-    )
   );
 }
 

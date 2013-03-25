@@ -234,6 +234,16 @@ Drupal.openlayers = {
   'addFeatures': function(map, layer, features) {
     var newFeatures = [];
 
+    newFeatures = this.getFeatures(map, layer, features);
+
+    // Add new features if there are any
+    if (newFeatures.length !== 0) {
+      layer.addFeatures(newFeatures);
+    }
+  },
+  'getFeatures': function(map, layer, features) {
+    var newFeatures = [];
+
     // Go through features
     for (var key in features) {
       var feature = features[key];
@@ -283,8 +293,8 @@ Drupal.openlayers = {
           // Add style information
           if (feature.style) {
             newFeature.style = jQuery.extend({},
-                OpenLayers.Feature.Vector.style['default'],
-                feature.style);
+              OpenLayers.Feature.Vector.style['default'],
+              feature.style);
           }
 
           // Push new features
@@ -293,12 +303,8 @@ Drupal.openlayers = {
       }
     }
 
-    // Add new features if there are any
-    if (newFeatures.length !== 0) {
-      layer.addFeatures(newFeatures);
-    }
+    return newFeatures;
   },
-
   'getStyleMap': function(map, layername) {
     if (map.styles) {
       var stylesAdded = {};

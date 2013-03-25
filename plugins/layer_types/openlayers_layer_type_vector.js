@@ -66,10 +66,9 @@ Drupal.openlayers.layer.vector = function(title, map, options) {
         break;
       case 'GeoJSON':
         break;
-      case 'features':
+      case 'raw':
         // Create a method who extracts features properly
-        Drupal.openlayers.addFeatures(map, layer, options.features);
-        return;
+        return Drupal.openlayers.getFeatures(map, layer, options.features);
         break;
     }
 

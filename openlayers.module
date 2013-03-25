@@ -82,15 +82,14 @@ function openlayers_theme($existing, $type, $theme, $path) {
 function openlayers_ctools_plugin_type() {
   return array(
     'behaviors' => array(
-      'classes' => array('behavior'),
+      'classes' => array('handler'),
       'use hooks' => TRUE
     ),
     'layer_types' => array(
-      'classes' => array('layer_types'),
+      'classes' => array('handler'),
       'use hooks' => TRUE
     ),
     'projections' => array(
-      'classes' => array('projection'),
       'use hooks' => TRUE
     )
   );
@@ -132,7 +131,7 @@ function openlayers_libraries_info() {
   $ol_variant = variable_get('openlayers_source_internal_variant', 'original');
 
   foreach ($ctools_objects as $key => $plugin) {
-    $class = $plugin['class'];
+    $class = $plugin['handler']['class'];
     $plugin['files'] = !empty($plugin['files']) ? (array) $plugin['files'] : array();
 
     // Autodetect if any CSS or JS files.

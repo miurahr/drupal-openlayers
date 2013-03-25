@@ -258,7 +258,7 @@ function openlayers_render_map_data($map = array()) {
 
   // Get class from layer name.
   foreach($map['layers'] as $name => $data) {
-    $libs[] = $data['class'];
+    $libs[] = $data['handler']['class'];
   }
 
   $attached = array(
@@ -274,7 +274,6 @@ function openlayers_render_map_data($map = array()) {
       'css' => array(),
       'libraries_load' => array()
     );
-
     $attached['libraries_load'][] = array($lib);
     if (!empty($layer_attached['libraries_load'])) {
       $attached['libraries_load'][] = $layer_attached['libraries_load'];

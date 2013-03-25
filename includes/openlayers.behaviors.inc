@@ -17,6 +17,9 @@ function _openlayers_behavior_definition_check($definition) {
     array('description'),
     array('name'),
     array('type'),
+    array('handler', 'class'),
+    array('handler', 'file'),
+    array('handler', 'parent'),
   );
 
   foreach ($mandatory_fields as $field) {
@@ -196,11 +199,18 @@ function openlayers_openlayers_behaviors() {
   );
 
   foreach ($behaviors as $key => $data) {
-    $behaviors[$key]['name'] = $key;
+    $behaviors[$key]['path'] = drupal_get_path('module', 'openlayers') . '/plugins/behaviors';
+    $behaviors[$key]['handler'] = array(
+      'class' => $key,
+      'file' => $key . '.inc',
+      'parent' => 'openlayers_behavior',
+    );
+    /*
     $behaviors[$key]['class'] = $key;
     $behaviors[$key]['file'] = $key . '.inc';
     $behaviors[$key]['parent'] = 'openlayers_behaviors';
     $behaviors[$key]['path'] = drupal_get_path('module', 'openlayers') . '/plugins/behaviors';
+    */
   }
 
   return $behaviors;

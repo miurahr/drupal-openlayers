@@ -117,7 +117,7 @@ function openlayers_get_layer_object($layer, $map = array()) {
   if (isset($layer_types[$layer->data['layer_type']]) &&
     $class = ctools_plugin_get_class(
       $layer_types[$layer->data['layer_type']],
-      'class')
+      'handler')
   ) {
     $layer_object = new $class($layer, $map);
     return $layer_object;
@@ -205,10 +205,6 @@ function _openlayers_layer_definition_check($definition) {
   $mandatory_fields = array(
     array('title'),
     array('description'),
-    array('class'),
-    array('file'),
-    array('path'),
-    array('parent')
   );
 
   foreach ($mandatory_fields as $field) {
@@ -299,7 +295,7 @@ function _openlayers_openlayers_layers() {
   $layer->api_version = 1;
   $layer->name = 'mapquest_osm';
   $layer->title = 'MapQuest OSM';
-  $layer->description = 'MapQuest’s rendering of OpenStreetMap.';
+  $layer->description = 'MapQuest?s rendering of OpenStreetMap.';
   $layer->data = array(
     'isBaseLayer' => TRUE,
     'attribution' => t('&copy;<a href="@ccbysa">CCBYSA</a> '.
@@ -326,7 +322,7 @@ function _openlayers_openlayers_layers() {
   $layer->api_version = 1;
   $layer->name = 'mapquest_openaerial';
   $layer->title = 'MapQuest Open Aerial';
-  $layer->description = 'MapQuest’s aerial photo map.';
+  $layer->description = 'MapQuest?s aerial photo map.';
   $layer->data = array(
     'isBaseLayer' => TRUE,
     'attribution' => t('Portions Courtesy NASA/JPL-Caltech and U.S. Depart. of Agriculture, Farm Service Agency.')
@@ -615,8 +611,8 @@ function _openlayers_openlayers_layers_i18n() {
     t('Bing Road tiles.'),
     t('Bing Aerial tiles.'),
     t('Bing Hybrid tiles.'),
-    t('MapQuest’s rendering of OpenStreetMap.'),
-    t('MapQuest’s aerial photo map.'),
+    t('MapQuest?s rendering of OpenStreetMap.'),
+    t('MapQuest?s aerial photo map.'),
   );
 }
 
@@ -710,11 +706,20 @@ function openlayers_openlayers_layer_types() {
   );
 
   foreach ($layers as $key => $data) {
+    $layers[$key]['path'] = drupal_get_path('module', 'openlayers') . '/plugins/layer_types';
+    $layers[$key]['handler'] = array(
+      'class' => $key,
+      'file' => $key . '.inc',
+      'parent' => 'openlayers_layer_type',
+      'path' => drupal_get_path('module', 'openlayers') . '/plugins/layer_types'
+    );
+    /*
     $layers[$key]['name'] = $key;
     $layers[$key]['class'] = $key;
     $layers[$key]['file'] = $key . '.inc';
     $layers[$key]['parent'] = 'openlayers_layer_type';
     $layers[$key]['path'] = drupal_get_path('module', 'openlayers') . '/plugins/layer_types';
+    */
   }
 
   return $layers;

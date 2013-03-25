@@ -39,7 +39,7 @@ function _openlayers_layers_process($layers = array(), &$map = array()) {
     if (is_object($layer_object)) {
       $class = get_class($layer_object);
       $layer_object->render($map);
-      $layer_object->data['class'] = $class;
+      $layer_object->data['handler']['class'] = $class;
       $layer_object->data['title'] = $layer_object->title;
       $layer_object->data['weight'] = $layer_object->weight;
       $layer_data[$layer_object->name] = $layer_object->data;
@@ -77,7 +77,7 @@ function _openlayers_behaviors_render($behaviors = array(), &$map = array()) {
   $rendered = array();
 
   foreach (openlayers_behaviors() as $key => $plugin) {
-    if (isset($behaviors[$key]) && $class = ctools_plugin_get_class($plugin, 'class')) {
+    if (isset($behaviors[$key]) && $class = ctools_plugin_get_class($plugin, 'handler')) {
       $behavior = new $class($behaviors[$key], $map);
       $rendered[$class] = $behavior->render($map);
     }

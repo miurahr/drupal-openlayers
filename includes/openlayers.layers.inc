@@ -205,6 +205,11 @@ function _openlayers_layer_definition_check($definition) {
   $mandatory_fields = array(
     array('title'),
     array('description'),
+    array('name'),
+    array('path'),
+    array('handler', 'class'),
+    array('handler', 'file'),
+    array('handler', 'parent'),
   );
 
   foreach ($mandatory_fields as $field) {
@@ -711,15 +716,7 @@ function openlayers_openlayers_layer_types() {
       'class' => $key,
       'file' => $key . '.inc',
       'parent' => 'openlayers_layer_type',
-      'path' => drupal_get_path('module', 'openlayers') . '/plugins/layer_types'
     );
-    /*
-    $layers[$key]['name'] = $key;
-    $layers[$key]['class'] = $key;
-    $layers[$key]['file'] = $key . '.inc';
-    $layers[$key]['parent'] = 'openlayers_layer_type';
-    $layers[$key]['path'] = drupal_get_path('module', 'openlayers') . '/plugins/layer_types';
-    */
   }
 
   return $layers;

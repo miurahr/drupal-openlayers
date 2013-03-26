@@ -677,6 +677,10 @@ function openlayers_openlayers_layer_types() {
     'title' => t('Google'),
     'description' => t('Google Maps API Map'),
   );
+  $layers['openlayers_layer_type_image'] = array(
+    'title' => t('Image'),
+    'description' => t('Use an image as a layer.'),
+  );
   $layers['openlayers_layer_type_osm'] = array(
     'title' => t('OSM'),
     'description' => t('OpenStreetMap Standard'),

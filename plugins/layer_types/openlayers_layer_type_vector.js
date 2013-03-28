@@ -41,6 +41,7 @@ Drupal.openlayers.layer.vector = function(title, map, options) {
   // Add features, if needed
   if (features) {
     layer.addFeatures(features);
+    layer.events.triggerEvent('featuresadded');
   }
 
   layer.events.triggerEvent('loadend');

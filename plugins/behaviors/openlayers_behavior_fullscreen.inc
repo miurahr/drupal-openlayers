@@ -18,28 +18,6 @@ class openlayers_behavior_fullscreen extends openlayers_behavior {
   }
 
   /**
-   * Returns an array of JS files.
-   * @return array
-   */
-  function js() {
-    return array(
-      drupal_get_path('module', 'openlayers') .
-        '/plugins/behaviors/openlayers_behavior_fullscreen.js'
-    );
-  }
-
-  /**
-   * Returns an array of CSS files.
-   * @return array
-   */
-  function css() {
-    return array(
-      drupal_get_path('module', 'openlayers')  .
-        '/plugins/behaviors/openlayers_behavior_fullscreen.css'
-    );
-  }
-
-  /**
    * Provide form for configurations per map.
    */
   function options_form($defaults = array()) {

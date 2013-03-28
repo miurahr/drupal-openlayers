@@ -137,11 +137,6 @@ function openlayers_openlayers_behaviors() {
     'description' => t('Provides the ability to navigate the map interface.  This is just for user interactions and does not show any visual controls.  This behavior automatically includes the Pan Zoom, Zoom Box, and Pinch Zoom controls.'),
     'type' => 'map',
   );
-  $behaviors['openlayers_behavior_fullscreen'] = array(
-    'title' => t('Pan and Zoom Control'),
-    'description' => t('Provides controls with the ability to pan and zoom in the map interface.  Do not use with the Pan Zoom Bar Control or the Zoom Panel Control.'),
-    'type' => 'map',
-  );
   $behaviors['openlayers_behavior_panzoom'] = array(
     'title' => t('Pan and Zoom Control'),
     'description' => t('Provides controls with the ability to pan and zoom in the map interface.  Do not use with the Pan Zoom Bar Control or the Zoom Panel Control.'),
@@ -162,7 +157,11 @@ function openlayers_openlayers_behaviors() {
     'description' => t('Adds clickable info boxes to points or shapes on maps.  This does not work with the Tooltip behavior due to limitation of event handling in the OpenLayers library.'),
     'type' => 'layer',
   );
-
+  $behaviors['openlayers_behavior_refresh'] = array(
+    'title' => t('Refresh Layer Strategy'),
+    'description' => t(''),
+    'type' => 'layer',
+  );
   $behaviors['openlayers_behavior_scaleline'] = array(
     'title' => t('Scale Line'),
     'description' => t('Provides a line of scale in the map interface.'),
@@ -206,12 +205,6 @@ function openlayers_openlayers_behaviors() {
       'file' => $key . '.inc',
       'parent' => 'openlayers_behavior',
     );
-    /*
-    $behaviors[$key]['class'] = $key;
-    $behaviors[$key]['file'] = $key . '.inc';
-    $behaviors[$key]['parent'] = 'openlayers_behaviors';
-    $behaviors[$key]['path'] = drupal_get_path('module', 'openlayers') . '/plugins/behaviors';
-    */
   }
 
   return $behaviors;

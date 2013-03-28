@@ -422,7 +422,7 @@ Drupal.openlayers = {
       Drupal.behaviors.proj4js.attach(context, settings);
     }
   },
-  
+
   /**
    * Logging implementation that logs using the browser's logging API.
    * Falls back to doing nothing in case no such API is available. Simulates

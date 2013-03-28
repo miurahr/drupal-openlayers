@@ -28,7 +28,7 @@ Drupal.openlayers.addBehavior('openlayers_behavior_zoomtolayer', function (data,
 
     if (layer instanceof OpenLayers.Layer.Vector) {
 
-      if (layer.features !== undefined) {
+      if (layer.getDataExtent() !== null) {
         var layerextent = layer.getDataExtent().scale(zoomtolayer_scale);
         map.fullExtent.extend(layerextent);
         map.zoomToExtent(map.fullExtent);

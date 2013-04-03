@@ -26,11 +26,21 @@ function _openlayers_behavior_definition_check($definition) {
   foreach ($mandatory_fields as $field) {
     $missing = drupal_array_nested_key_exists($definition, $field);
     if (!$missing) {
-      drupal_set_message(t("There's a problem in the definition of the behavior <em>!behavior</em>. The behavior will be disabled.", array('!behavior' => $definition['name'])), 'warning');
-      watchdog('openlayers', 'Behavior !behavior is unavailable because its
-                                plugin definition is incomplete.',
+      drupal_set_message(
+        t("Key !key is missing in the definition of the behavior <em>!behavior</em>. The behavior will be disabled.",
+          array(
+            '!key' => htmlspecialchars(implode(', ', $field)),
+            '!behavior' => htmlspecialchars($definition['name']),
+          )
+        ),
+        'warning'
+      );
+      watchdog(
+        'openlayers',
+        'Behavior !behavior is unavailable because its plugin definition is incomplete.',
         array('!behavior' => $definition['name']),
-        WATCHDOG_ERROR);
+        WATCHDOG_ERROR
+      );
       return FALSE;
     }
   }

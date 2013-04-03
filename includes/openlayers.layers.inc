@@ -215,11 +215,20 @@ function _openlayers_layer_definition_check($definition) {
   foreach ($mandatory_fields as $field) {
     $missing = drupal_array_nested_key_exists($definition, $field);
     if (!$missing) {
-      drupal_set_message(t("There's a problem in the plugin definition of the layer type <em>!type</em>. The layer will be disabled.", array('!type' => $definition['name'])), 'warning');
-      watchdog('openlayers', 'Layer !layer is unavailable because its
-                                plugin definition is incomplete.',
+      drupal_set_message(t("Key !key is missing in in the plugin definition of the layer type <em>!type</em>. The layer will be disabled.",
+          array(
+            '!key' => htmlspecialchars(implode(', ', $field)),
+            '!type' => htmlspecialchars($definition['name']),
+          )
+        ),
+        'warning'
+      );
+      watchdog(
+        'openlayers',
+        'Layer !layer is unavailable because its plugin definition is incomplete.',
         array('!layer' => $definition['name']),
-        WATCHDOG_ERROR);
+        WATCHDOG_ERROR
+      );
       return FALSE;
     }
   }

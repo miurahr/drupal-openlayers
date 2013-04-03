@@ -192,6 +192,9 @@ function openlayers_render_map_data($map = array()) {
   // Run map through build process
   $map = openlayers_build_map($map);
 
+  // Restrict map to its projection extent (data outwith cannot be represented).
+  // Layer can additionally specfiy their maxExtent in case they use
+  // non-default grids.
   $projection = openlayers_get_projection_by_identifier($map['projection']);
   $map['maxExtent'] = $projection->getProjectedExtent();
 
@@ -218,6 +221,9 @@ function openlayers_render_map_data($map = array()) {
         openlayers_get_projection_by_identifier($layerProjectionIdentifier)
       );
     }
+
+    // Ensure JavaScript gets proper type.
+    $map['layers'][$layer_name]['isBaseLayer'] = (boolean)($map['layers'][$layer_name]['isBaseLayer']);
   }
 
   // Ensure projections in use are known to the client (loads Proj4js if required)
@@ -352,7 +358,6 @@ function openlayers_openlayers_maps() {
     'image_path' => drupal_get_path('module', 'openlayers') . '/themes/default_dark/img/',
     'css_path' => drupal_get_path('module', 'openlayers') . '/themes/default_dark/style.css',
     'displayProjection' => 'EPSG:4326',
-    'maxExtent' => openlayers_get_extent('EPSG', '4326'),
     'behaviors' => array(
       'openlayers_behavior_panzoombar' => array(),
       'openlayers_behavior_layerswitcher' => array(),

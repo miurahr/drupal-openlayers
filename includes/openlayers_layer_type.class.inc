@@ -69,7 +69,6 @@ class openlayers_layer_type {
       'isBaseLayer' => TRUE,
       'projection' => array('EPSG:900913'),
       'serverResolutions' => openlayers_get_resolutions('EPSG:900913'),
-      'maxExtent' => openlayers_get_extent('EPSG', '900913'),
       'resolutions' => openlayers_get_resolutions('EPSG:900913'),
       'base_url' => NULL,
       'transitionEffect' => 'resize',

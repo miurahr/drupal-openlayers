@@ -164,6 +164,28 @@ function openlayers_build_map($map = array()) {
   $map['behaviors'] = _openlayers_behaviors_render($map['behaviors'], $map);
   $map['styles'] = _openlayers_styles_process($map['styles'], $map['layer_styles'], $map['layer_styles_select'], $map['layer_styles_temporary'], $map);
 
+  // Restrict map to its projection extent (data outwith cannot be represented).
+  // Layer can additionally specfiy their maxExtent in case they use
+  // non-default grids.
+  $projection = openlayers_get_projection_by_identifier($map['projection']);
+  $map['maxExtent'] = $projection->getProjectedExtent();
+
+  // In case the layer offers the same projection as the map, use this and do not provide
+  // projection definition to client. Otherwise rely on the client to reproject on the fly.
+  foreach ($map['layers'] as $layer_name => $layer) {
+    if(in_array($map['projection'], $map['layers'][$layer_name]['projection'])){
+      $map['layers'][$layer_name]['projection'] = $map['projection'];
+    } else {
+      // Client is able to reproject any possible projection because their definitions need to be
+      // known to be able to set up a layer with a certain projection. Thus choice does not matter.
+      $layerProjectionIdentifier = $map['layers'][$layer_name]['projection'][0];
+      $map['layers'][$layer_name]['projection'] = $layerProjectionIdentifier;
+    }
+
+    // Ensure JavaScript gets proper type.
+    $map['layers'][$layer_name]['isBaseLayer'] = (boolean)($map['layers'][$layer_name]['isBaseLayer']);
+  }
+
   // Hook to alter map one last time.  Final modification to existing
   // styles, behaviors, layers can happen here, but adding new styles,
   // behaviors will not get rendered.
@@ -193,12 +215,6 @@ function openlayers_render_map_data($map = array()) {
   // Run map through build process
   $map = openlayers_build_map($map);
 
-  // Restrict map to its projection extent (data outwith cannot be represented).
-  // Layer can additionally specfiy their maxExtent in case they use
-  // non-default grids.
-  $projection = openlayers_get_projection_by_identifier($map['projection']);
-  $map['maxExtent'] = $projection->getProjectedExtent();
-
   if (!empty($map['errors'])) {
     $output = array(
       '#markup' => 'Error while building the map.'
@@ -210,27 +226,14 @@ function openlayers_render_map_data($map = array()) {
   // In case the layer offers the same projection as the map, use this and do not provide
   // projection definition to client. Otherwise rely on the client to reproject on the fly.
   foreach ($map['layers'] as $layer_name => $layer) {
-    if(in_array($map['projection'], $map['layers'][$layer_name]['projection'])){
-      $map['layers'][$layer_name]['projection'] = $map['projection'];
-    } else {
-      // Client is able to reproject any possible projection because their definitions need to be
-      // known to be able to set up a layer with a certain projection. Thus choice does not matter.
-      $layerProjectionIdentifier = $map['layers'][$layer_name]['projection'][0];
-      $map['layers'][$layer_name]['projection'] = $layerProjectionIdentifier;
-      // Provide client with projection definition so that it can reproject
-      openlayers_add_js_projection_definition(
-        openlayers_get_projection_by_identifier($layerProjectionIdentifier)
-      );
-    }
-
-    // Ensure JavaScript gets proper type.
-    $map['layers'][$layer_name]['isBaseLayer'] = (boolean)($map['layers'][$layer_name]['isBaseLayer']);
+    openlayers_add_js_projection_definition(
+      openlayers_get_projection_by_identifier($map['layers'][$layer_name]['projection'])
+    );
   }
 
   // Ensure projections in use are known to the client (loads Proj4js if required)
-  openlayers_add_js_projection_definition($projection);
-  $display_projection = openlayers_get_projection_by_identifier($map['displayProjection']);
-  openlayers_add_js_projection_definition($display_projection);
+  openlayers_add_js_projection_definition(openlayers_get_projection_by_identifier($map['projection']));
+  openlayers_add_js_projection_definition(openlayers_get_projection_by_identifier($map['displayProjection']));
 
   // Given hide_empty_map flag, check if the map has any features
   // defined. If not, assume it is an empty map and shouldn't be displayed.
@@ -607,8 +610,8 @@ function openlayers_openlayers_maps() {
     'hide_empty_map' => 0,
     'center' => array(
       'initial' => array(
-        'centerpoint' => '-63.281250000007, -20.46819494553',
-        'zoom' => '2',
+        'centerpoint' => '0, 0',
+        'zoom' => '3',
       ),
       'restrict' => array(
         'restrictextent' => 0,
@@ -667,8 +670,8 @@ function openlayers_openlayers_maps() {
     'hide_empty_map' => 0,
     'center' => array(
       'initial' => array(
-        'centerpoint' => '-0.093009923589588, 51.500381463117',
-        'zoom' => '12',
+        'centerpoint' => '0, 0',
+        'zoom' => '3',
       ),
       'restrict' => array(
         'restrictextent' => 0,

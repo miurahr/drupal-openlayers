@@ -512,8 +512,7 @@ function _openlayers_openlayers_layers() {
       'isBaseLayer' => TRUE,
     ),
     'options' => array(
-      'layers' => array('basic'),
-      'maxExtent' => openlayers_get_extent('EPSG', '4326'),
+      'layers' => array('basic')
     ),
   );
   $layers[$layer->name] = $layer;

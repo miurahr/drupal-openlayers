@@ -17,6 +17,7 @@ class openlayers_layer_type_image extends openlayers_layer_type {
     return array(
       'layer_handler' => 'image',
       'file' => NULL,
+      'image_style' => NULL,
       'opacity' => 1,
       'factors' => array(
         'x' => 1,
@@ -38,18 +39,24 @@ class openlayers_layer_type_image extends openlayers_layer_type {
         '#default_value' => isset($this->data['file']) ? $this->data['file'] : '',
         '#upload_location' =>  'public://',
       ),
+      'image_style' => array(
+        '#type' => 'select',
+        '#options' => array(''=> 'None (original image)') + image_style_options(FALSE),
+        '#default_value' => isset($this->data['image_style']) ? $this->data['image_style'] : NULL,
+        '#description' => t('Apply an image style.'),
+      ),
       'factors' => array(
         '#tree' => TRUE,
         'x' => array(
-           '#title' => 'Width divider',
-           '#type' => 'textfield',
-           '#default_value' => isset($this->data['factors']['x']) ? $this->data['factors']['x'] : 1
-        ),
+          '#title' => 'Width divider',
+          '#type' => 'textfield',
+          '#default_value' => isset($this->data['factors']['x']) ? $this->data['factors']['x'] : 1,
+          '#description' => t('Width divider.'),        ),
         'y' => array(
-           '#title' => 'Height divider',
-           '#type' => 'textfield',
-           '#default_value' => isset($this->data['factors']['y']) ? $this->data['factors']['y'] : 1
-        ),
+          '#title' => 'Height divider',
+          '#type' => 'textfield',
+          '#default_value' => isset($this->data['factors']['y']) ? $this->data['factors']['y'] : 1,
+          '#description' => t('Height divider.'),        ),
       ),
       'maxExtent' => array(
         '#type' => 'textfield',
@@ -98,7 +105,17 @@ class openlayers_layer_type_image extends openlayers_layer_type {
       file_save($file);
       file_usage_add($file, 'openlayers', 'openlayers_layer_type', $user->uid);
     }
-    $infos = image_get_info($file->uri);
+
+    $style = $form_state['values']['data']['image_style'];
+
+    if (!empty($style)) {
+      $uri = image_style_path($style, $file->uri);
+      image_style_create_derivative(image_style_load($style), $file->uri, $uri);
+    } else {
+      $uri = $file->uri;
+    }
+
+    $infos = image_get_info($uri);
     $form_state['values']['data']['size'] = array();
     $form_state['values']['data']['size']['w'] = $infos['width'];
     $form_state['values']['data']['size']['h'] = $infos['height'];
@@ -124,7 +141,12 @@ class openlayers_layer_type_image extends openlayers_layer_type {
     if (isset($this->data['file'])) {
       if ($file = file_load($this->data['file'])) {
         $this->data['file'] = array();
-        $this->data['file'] = file_create_url($file->uri);
+        if (!empty($this->data['image_style'])) {
+          $this->data['file'] = image_style_url($this->data['image_style'] ,$file->uri);
+        } else {
+          $this->data['file'] = file_create_url($file->uri);
+        }
+        unset($this->data['image_style']);
       }
     }
   }

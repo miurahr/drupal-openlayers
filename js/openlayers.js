@@ -58,7 +58,9 @@ Drupal.behaviors.openlayers = {
             options.displayProjection = new OpenLayers.Projection(map.displayProjection);
 
             // Restrict map to its extent (usually projection extent).
-            options.maxExtent = new OpenLayers.Bounds.fromArray(map.maxExtent);
+            if (OpenLayers.Util.isArray(options.maxExtent)) {
+              options.maxExtent = new OpenLayers.Bounds.fromArray(map.maxExtent);
+            }
 
             options.maxResolution = 'auto'; // 1.40625;
             options.controls = [];

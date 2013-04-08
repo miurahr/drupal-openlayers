@@ -9,15 +9,16 @@ Drupal.openlayers.layer.image = function(title, map, options) {
   } else {
     maxExtent = options.maxExtent;
   }
+
   return new OpenLayers.Layer.Image(
     title,
     options.file,
-    new OpenLayers.Bounds.fromArray(maxExtent),
+    OpenLayers.Bounds.fromArray(maxExtent),
     new OpenLayers.Size(options.size.w/options.factors.x, options.size.h/options.factors.y),
     {
       numZoomLevels: options.numZoomLevels,
       opacity: options.opacity,
-      projection: options.projection,
+      projection: new OpenLayers.Projection(options.projection),
       transitionEffect: options.transitionEffect,
       isBaseLayer: options.isBaseLayer,
       attribution: options.attribution

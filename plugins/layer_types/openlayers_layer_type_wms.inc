@@ -15,12 +15,8 @@ class openlayers_layer_type_wms extends openlayers_layer_type {
   function options_init() {
     return array(
       'layer_handler' => 'wms',
-    ) + parent::options_init();
-
-    // Discard hard-codes resolution because the client can calculate them usually
-    unset($options['serverResolutions']);
-    unset($options['maxExtent']);
-    unset($options['resolutions']);
+      'options' => array() + parent::options_init()
+    );
 
     return $options;
   }
@@ -42,8 +38,8 @@ class openlayers_layer_type_wms extends openlayers_layer_type {
         // TODO: validate the field, only positive integers shall be allowed
         'buffer' => array(
           '#type' => 'textfield',
-          '#default_value' => isset($this->data['params']['buffer']) ?
-            $this->data['params']['buffer'] : 2,
+          '#default_value' => isset($this->data['options']['buffer']) ?
+            $this->data['options']['buffer'] : 2,
           '#title' => t('Buffer'),
           '#description' => t('Used only when not in single-tile mode, this specifies umber of extra rows and colums of tiles on each side which will surround the minimum grid tiles to cover the map')
         ),
@@ -51,24 +47,31 @@ class openlayers_layer_type_wms extends openlayers_layer_type {
         //       numbers below 1 might also not make much sense
         'ratio' => array(
           '#type' => 'textfield',
-          '#default_value' => isset($this->data['params']['ratio']) ?
-            $this->data['params']['ratio'] : 1.5,
+          '#default_value' => isset($this->data['options']['ratio']) ?
+            $this->data['options']['ratio'] : 1.5,
           '#title' => t('Ratio'),
           '#description' => t('Used only when in single-tile mode, this specifies the ratio of the size of the single tile to the size of the map')
         ),
         'singleTile' => array(
           '#type' => 'checkbox',
-          '#default_value' => isset($this->data['params']['singleTile']) ?
-            $this->data['params']['singleTile'] : FALSE,
+          '#default_value' => isset($this->data['options']['singleTile']) ?
+            $this->data['options']['singleTile'] : FALSE,
           '#title' => t('Single tile'),
+          '#return_value' => 'true',
           '#description' => t('Check to make this layer untiled')
+        ),
+        'maxExtent' => array(
+          '#type' => 'textfield',
+          '#title' => t('Max Extent'),
+          '#default_value' => isset($this->data['options']['maxExtent']) ? implode(', ', $this->data['options']['maxExtent']) : '',
+          '#description' => t('Should consist of four values (left, bottom, right, top). The maximum extent for the layer. Image is stretched to cover whole map if left empty.'),
         )
       ),
       'params' => array(
-        'TRANSPARENT' => array(
+        'transparent' => array(
           '#type' => 'checkbox',
-          '#default_value' => isset($this->data['options']['TRANSPARENT']) ?
-            $this->data['options']['TRANSPARENT'] : FALSE,
+          '#default_value' => isset($this->data['params']['transparent']) ?
+            $this->data['params']['transparent'] : FALSE,
           '#return_value' => 'true',
           '#title' => t('Transparent'),
           '#description' => t('When a PNG, make the background color transparent')
@@ -79,8 +82,8 @@ class openlayers_layer_type_wms extends openlayers_layer_type {
           '#options' => array(
             'application/vnd.ogc.se_xml' => 'application/vnd.ogc.se_xml',
             'application/vnd.ogc.se_inimage' => 'application/vnd.ogc.se_inimage'),
-          '#default_value' => isset($this->data['options']['exceptions']) ?
-            $this->data['options']['exceptions'] : 'application/vnd.ogc.se_inimage',
+          '#default_value' => isset($this->data['params']['exceptions']) ?
+            $this->data['params']['exceptions'] : 'application/vnd.ogc.se_inimage',
           '#description' => t('Select the exception handler')
         ),
         'format' => array(
@@ -90,28 +93,22 @@ class openlayers_layer_type_wms extends openlayers_layer_type {
             'image/png' => 'image/png',
             'image/gif' => 'image/gif',
             'image/jpeg' => 'image/jpeg'),
-          '#default_value' => isset($this->data['options']['format']) ?
-            $this->data['options']['format'] : 'image/png'
+          '#default_value' => isset($this->data['params']['format']) ?
+            $this->data['params']['format'] : 'image/png'
         ),
         'layers' => array(
           '#type' => 'textarea',
           '#title' => t('Layers'),
-          '#default_value' => !empty($this->data['options']['layers']) ?
-            implode("\r\n", $this->data['options']['layers']) : '',
+          '#default_value' => !empty($this->data['params']['layers']) ?
+            implode("\r\n", $this->data['params']['layers']) : '',
           '#description' => t('Specifies which layers to show. One per line.')
         ),
         'styles' => array(
           '#type' => 'textfield',
           '#title' => t('Styles'),
-          '#default_value' => isset($this->data['options']['styles']) ?
-            $this->data['options']['styles'] : ''
+          '#default_value' => isset($this->data['params']['styles']) ?
+            $this->data['params']['styles'] : ''
         ),
-        'maxExtent' => array(
-          '#type' => 'textfield',
-          '#title' => t('Max Extent'),
-          '#default_value' => isset($this->data['options']['maxExtent']) ? implode(', ', $this->data['options']['maxExtent']) : '',
-          '#description' => t('Should consist of four values (left, bottom, right, top). The maximum extent for the layer. Image is stretched to cover whole map if left empty.'),
-        )
       ),
     );
   }
@@ -127,6 +124,8 @@ class openlayers_layer_type_wms extends openlayers_layer_type {
    * Hook_submit().
    */
   function options_form_submit($form, &$form_state) {
+    $form_state['values']['data']['options']['buffer'] = intval($form_state['values']['data']['options']['buffer']);
+    $form_state['values']['data']['options']['ratio'] = intval($form_state['values']['data']['options']['ratio']);
     $form_state['values']['data']['options']['maxExtent'] = array_map('floatval', explode(",", $form_state['values']['data']['options']['maxExtent']));
     if(count($form_state['values']['data']['options']['maxExtent'])!==4){
       // Ignore invalid input.

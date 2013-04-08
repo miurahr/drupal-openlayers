@@ -8,14 +8,6 @@
  * Openlayer layer handler for WMS layer
  */
 Drupal.openlayers.layer.wms = function(title, map, options) {
-  /* TODO: have PHP take care of the casts here, not JS! */
-  if (options.options.buffer) {
-    options.options.buffer = parseInt(options.options.buffer, 10);
-  }
-  if (options.options.ratio) {
-    options.options.ratio = parseFloat(options.options.ratio);
-  }
-
   if (OpenLayers.Util.isArray(options.options.maxExtent)) {
     options.options.maxExtent = OpenLayers.Bounds.fromArray(options.options.maxExtent);
   } else {
@@ -26,19 +18,21 @@ Drupal.openlayers.layer.wms = function(title, map, options) {
 
   // Set isBaseLayer explicitly so that OpenLayers does not guess from transparency
   options.options.isBaseLayer = Boolean(options.isBaseLayer);
+  options.options.singleTile = Boolean(options.options.singleTile);
 
   // Convert to representation that match with WMS specification
   var paramsClone = jQuery.extend(true, {}, options.params);
-  if(paramsClone.hasOwnProperty("TRANSPARENT") && paramsClone.TRANSPARENT===0){
-    paramsClone.TRANSPARENT = "FALSE";
+  if(paramsClone.hasOwnProperty("transparent") && paramsClone.transparent===0){
+    paramsClone.transparent = false;
   }
-  if(paramsClone.hasOwnProperty("TRANSPARENT") && paramsClone.TRANSPARENT===1){
-    paramsClone.TRANSPARENT = "FALSE";
+  if(paramsClone.hasOwnProperty("transparent") && paramsClone.transparent===1){
+    paramsClone.transparent = false;
   }
 
   var optionsClone = jQuery.extend(true, {}, options.options);
   // OpenLayers can calculate the resolutions usually if provided with the number of zoom levels and tile sizes
   optionsClone.numZoomLevels=18;
 
-  return new OpenLayers.Layer.WMS(title, options.base_url, paramsClone, optionsClone);
+  var layer = new OpenLayers.Layer.WMS(title, options.base_url, paramsClone, optionsClone);
+  return layer;
 };

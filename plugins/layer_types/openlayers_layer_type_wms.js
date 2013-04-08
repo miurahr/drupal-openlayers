@@ -33,6 +33,5 @@ Drupal.openlayers.layer.wms = function(title, map, options) {
   // OpenLayers can calculate the resolutions usually if provided with the number of zoom levels and tile sizes
   optionsClone.numZoomLevels=18;
 
-  var layer = new OpenLayers.Layer.WMS(title, options.base_url, paramsClone, optionsClone);
-  return layer;
+  return new OpenLayers.Layer.WMS(title, options.base_url, paramsClone, optionsClone);
 };

@@ -116,6 +116,11 @@ function openlayers_openlayers_behaviors() {
     'description' => t('Adds a graticule control to the map to display a grid of latitude and longitude.'),
     'type' => 'layer',
   );
+  $behaviors['openlayers_behavior_hover'] = array(
+    'title' => t('Hover features'),
+    'description' => t('Provides on hover behavior on features. A temporary style will be applied on features when hovering them.'),
+    'type' => 'layer',
+  );
   $behaviors['openlayers_behavior_keyboarddefaults'] = array(
     'title' => t('Keyboard Controls'),
     'description' => t('Provides keyboard shortcuts to pan and zoom the map, such as the up, down, left, and right arrows.  This is included with the Navigation control.  This should not be enabled unless you want to have finer control on how the user interacts with the map.'),

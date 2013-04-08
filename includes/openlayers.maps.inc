@@ -157,11 +157,12 @@ function openlayers_build_map($map = array()) {
   $map['styles'] = isset($map['styles']) ? $map['styles'] : array();
   $map['layer_styles'] = isset($map['layer_styles']) ? $map['layer_styles'] : array();
   $map['layer_styles_select'] = isset($map['layer_styles_select']) ? $map['layer_styles_select'] : array();
+  $map['layer_styles_temporary'] = isset($map['layer_styles_temporary']) ? $map['layer_styles_temporary'] : array();
 
   // Process map parts.
   $map['layers'] = _openlayers_layers_process($map['layers'], $map);
   $map['behaviors'] = _openlayers_behaviors_render($map['behaviors'], $map);
-  $map['styles'] = _openlayers_styles_process($map['styles'], $map['layer_styles'], $map['layer_styles_select'], $map);
+  $map['styles'] = _openlayers_styles_process($map['styles'], $map['layer_styles'], $map['layer_styles_select'], $map['layer_styles_temporary'], $map);
 
   // Hook to alter map one last time.  Final modification to existing
   // styles, behaviors, layers can happen here, but adding new styles,

@@ -419,6 +419,14 @@ class openlayers_maps_ui extends ctools_export_ui {
             $defaults['layer_styles_select'][$id] : '',
         );
 
+        // Layer temporary style.
+        $form['layerstyles']['layer_styles_temporary'][$id] = array(
+          '#type' => 'select',
+          '#options' => array('<' . t('use default style') . '>') + openlayers_ui_get_style_options(),
+          '#default_value' => !empty($defaults['layer_styles_temporary'][$id]) ?
+            $defaults['layer_styles_temporary'][$id] : '',
+        );
+
         // Weight of layer.  This will affect how the layer shows up in the
         // switcher and is rendered.
         $form['layerstyles']['layer_weight'][$id] = array(

@@ -38,8 +38,7 @@ class openlayers_layer_type_wms extends openlayers_layer_type {
           $this->data['base_url'] : ''
       ),
 
-      // TODO: swap terms
-      'params' => array(
+      'options' => array(
         // TODO: validate the field, only positive integers shall be allowed
         'buffer' => array(
           '#type' => 'textfield',
@@ -65,7 +64,7 @@ class openlayers_layer_type_wms extends openlayers_layer_type {
           '#description' => t('Check to make this layer untiled')
         )
       ),
-      'options' => array(
+      'params' => array(
         'TRANSPARENT' => array(
           '#type' => 'checkbox',
           '#default_value' => isset($this->data['options']['TRANSPARENT']) ?
@@ -107,6 +106,12 @@ class openlayers_layer_type_wms extends openlayers_layer_type {
           '#default_value' => isset($this->data['options']['styles']) ?
             $this->data['options']['styles'] : ''
         ),
+        'maxExtent' => array(
+          '#type' => 'textfield',
+          '#title' => t('Max Extent'),
+          '#default_value' => isset($this->data['options']['maxExtent']) ? implode(', ', $this->data['options']['maxExtent']) : '',
+          '#description' => t('Should consist of four values (left, bottom, right, top). The maximum extent for the layer. Image is stretched to cover whole map if left empty.'),
+        )
       ),
     );
   }
@@ -116,6 +121,17 @@ class openlayers_layer_type_wms extends openlayers_layer_type {
    */
   function options_form_validate($form, &$form_state) {
     $form_state['data']['options']['layers'] = explode("\r\n", $form_state['data']['options']['layers']);
+  }
+
+  /**
+   * Hook_submit().
+   */
+  function options_form_submit($form, &$form_state) {
+    $form_state['values']['data']['options']['maxExtent'] = array_map('floatval', explode(",", $form_state['values']['data']['options']['maxExtent']));
+    if(count($form_state['values']['data']['options']['maxExtent'])!==4){
+      // Ignore invalid input.
+      $form_state['values']['data']['options']['maxExtent'] = NULL;
+    }
   }
 
   /**

@@ -120,7 +120,7 @@ class openlayers_layer_type_wms extends openlayers_layer_type {
    * hook_validate()
    */
   function options_form_validate($form, &$form_state) {
-    $form_state['data']['options']['layers'] = explode("\r\n", $form_state['data']['options']['layers']);
+    $form_state['data']['params']['layers'] = explode("\r\n", $form_state['data']['params']['layers']);
   }
 
   /**

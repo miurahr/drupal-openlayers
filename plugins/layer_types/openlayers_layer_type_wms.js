@@ -9,11 +9,11 @@
  */
 Drupal.openlayers.layer.wms = function(title, map, options) {
   /* TODO: have PHP take care of the casts here, not JS! */
-  if (options.params.buffer) {
-    options.params.buffer = parseInt(options.params.buffer, 10);
+  if (options.options.buffer) {
+    options.options.buffer = parseInt(options.options.buffer, 10);
   }
-  if (options.params.ratio) {
-    options.params.ratio = parseFloat(options.params.ratio);
+  if (options.options.ratio) {
+    options.options.ratio = parseFloat(options.options.ratio);
   }
 
   if (OpenLayers.Util.isArray(options.options.maxExtent)) {

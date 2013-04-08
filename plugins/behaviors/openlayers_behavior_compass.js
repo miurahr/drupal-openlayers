@@ -9,7 +9,8 @@
 Drupal.openlayers.addBehavior('openlayers_behavior_compass', function (data, options) {
   var map = data.openlayers;
 
-  var layer = new OpenLayers.Layer.Vector("north", {
+  var layer = new OpenLayers.Layer.Vector('Compass', {
+    displayInLayerSwitcher:false,
     styleMap: new OpenLayers.StyleMap({
       "default": options.style
     })

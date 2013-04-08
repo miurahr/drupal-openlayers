@@ -4,7 +4,7 @@
  */
 
 /**
- * Compass Line Behavior
+ * Compass Behavior
  */
 Drupal.openlayers.addBehavior('openlayers_behavior_compass', function (data, options) {
   var map = data.openlayers;

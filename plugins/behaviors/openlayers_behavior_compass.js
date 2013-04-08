@@ -21,15 +21,19 @@ Drupal.openlayers.addBehavior('openlayers_behavior_compass', function (data, opt
     // TODO: Find a way to calculate the pixel automatically.
     var pixel = new OpenLayers.Pixel(map.size.w-90, 90);
     var coords = map.getLonLatFromPixel(pixel);
-    var azimuth = 0;
     // TODO: Is this really necessary ?
+    var azimuth = 0;
     if (map.zoom > 0) {
-      var npole = new OpenLayers.LonLat(0, 90).transform(new OpenLayers.Projection('EPSG:4326'), map.getProjectionObject());
-      var center = map.getCenter();
+      var npole = new OpenLayers.LonLat(0, 90.0).transform(new OpenLayers.Projection('EPSG:4326'), map.getProjectionObject());
+      var center = coords;
       var deltay = npole.lat - center.lat;
       deltay = deltay != 0 ? deltay : 0.0000001;
       var deltax = npole.lon - center.lon;
       azimuth = Math.atan(deltax / deltay) * (180.0/Math.PI);
+
+      if (azimuth > 0) {
+        azimuth -= 180;
+      }
     }
     var feature = new OpenLayers.Feature.Vector(
       new OpenLayers.Geometry.Point(coords.lon, coords.lat), {angle: azimuth}

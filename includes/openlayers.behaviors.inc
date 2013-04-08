@@ -91,6 +91,11 @@ function openlayers_openlayers_behaviors() {
     'description' => t('Provides vector layer features clustering by proximity.  This will not always respect the styles that assigned to the layer.'),
     'type' => 'layer',
   );
+  $behaviors['openlayers_behavior_compass'] = array(
+    'title' => t('Compass'),
+    'description' => t('Display a compass on the top right of the map.'),
+    'type' => 'layer',
+  );
   $behaviors['openlayers_behavior_dragpan'] = array(
     'title' => t('Mouse Drag Pan'),
     'description' => t('Provides the ability to pan in the map interface with the mouse.  The Navigation Control includes this control.  You should only use this behavior if you want fine control over what interactions you want on your map.'),

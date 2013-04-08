@@ -167,5 +167,19 @@ function _openlayers_openlayers_styles() {
   );
   $styles[$style->name] = $style;
 
+  $style = new stdClass();
+  $style->api_version = 1;
+  $style->name = 'compass';
+  $style->title = t('Compass');
+  $style->description = t('Simple compass in black and white. (Source: http://commons.wikimedia.org/wiki/File:Simple_compass_rose-fr.svg)');
+  $style->data = array(
+    'externalGraphic' => file_create_url(drupal_get_path('module', 'openlayers') .
+      '/themes/default_dark/img/compass.svg'),
+    'graphicHeight' => 150,
+    'rotation' => '${angle}',
+    'fillOpacity' => 0.9
+  );
+  $styles[$style->name] = $style;
+
   return $styles;
 }

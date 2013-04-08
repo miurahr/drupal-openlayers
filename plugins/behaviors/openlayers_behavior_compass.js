@@ -4,7 +4,7 @@
  */
 
 /**
- * Scale Line Behavior
+ * Compass Line Behavior
  */
 Drupal.openlayers.addBehavior('openlayers_behavior_compass', function (data, options) {
   var map = data.openlayers;
@@ -21,8 +21,8 @@ Drupal.openlayers.addBehavior('openlayers_behavior_compass', function (data, opt
     // TODO: Find a way to calculate the pixel automatically.
     var pixel = new OpenLayers.Pixel(map.size.w-90, 90);
     var coords = map.getLonLatFromPixel(pixel);
-    // TODO: Is this really necessary ?
     var azimuth = 0;
+    // TODO: Is this really necessary ?
     if (map.zoom > 0) {
       var npole = new OpenLayers.LonLat(0, 90).transform(new OpenLayers.Projection('EPSG:4326'), map.getProjectionObject());
       var center = map.getCenter();

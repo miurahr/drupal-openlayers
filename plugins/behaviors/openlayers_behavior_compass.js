@@ -15,6 +15,7 @@ Drupal.openlayers.addBehavior('openlayers_behavior_compass', function (data, opt
       "default": options.style
     })
   });
+
   layer.events.register('moveend', layer, function(event) {
     layer.removeAllFeatures();
     // TODO: Find a way to calculate the pixel automatically.
@@ -23,10 +24,10 @@ Drupal.openlayers.addBehavior('openlayers_behavior_compass', function (data, opt
 
     coords1.transform(map.getProjectionObject(), epsg4326);
     if (parseFloat(coords1.lat) < 0) {
-      var coords2 = new OpenLayers.LonLat(0, -90.0).transform(epsg4326, map.getProjectionObject());
+      var coords2 = new OpenLayers.LonLat(0, -89.999999).transform(epsg4326, map.getProjectionObject());
       var reverse = 180;
     } else {
-      var coords2 = new OpenLayers.LonLat(0, 90.0).transform(epsg4326, map.getProjectionObject());
+      var coords2 = new OpenLayers.LonLat(0, 89.999999).transform(epsg4326, map.getProjectionObject());
       var reverse = 0;
     }
     coords1.transform(epsg4326, map.getProjectionObject());
@@ -40,6 +41,7 @@ Drupal.openlayers.addBehavior('openlayers_behavior_compass', function (data, opt
     var feature = new OpenLayers.Feature.Vector(
       new OpenLayers.Geometry.Point(coords1.lon, coords1.lat), {angle: azimuth}
     );
+
     layer.addFeatures(feature);
   });
 

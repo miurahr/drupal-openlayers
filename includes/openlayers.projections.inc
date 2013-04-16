@@ -56,11 +56,14 @@ function openlayers_get_projection_by_identifier($identifier) {
 /**
  * @return array<openlayers_projection>
  */
-function openlayers_get_all_projections() {
+function openlayers_get_all_projections($reset = FALSE, $include_disabled = FALSE) {
   ctools_include('export');
   $projections = array();
 
-  foreach (ctools_export_crud_load_all('openlayers_projections') as $record) {
+  foreach (ctools_export_crud_load_all('openlayers_projections', $reset) as $record) {
+    if (!$include_disabled && isset($record->disabled) && $record->disabled) {
+      continue;
+    }
     $projections[] = openlayers_projection_from_record($record);
   }
 

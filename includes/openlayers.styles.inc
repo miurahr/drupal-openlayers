@@ -25,13 +25,20 @@ function openlayers_openlayers_styles() {
  * @return
  *   Array of all available styles.
  */
-function openlayers_styles($reset = FALSE) {
+function openlayers_styles($reset = FALSE, $include_disabled = FALSE) {
   ctools_include('export');
   if ($reset) {
     ctools_export_load_object_reset('openlayers_styles');
   }
 
   $styles = ctools_export_load_object('openlayers_styles', 'all', array());
+
+  if (!$include_disabled) {
+    $styles = array_filter($styles, function($style) {
+      return !(isset($style->disabled) && $style->disabled);
+    });
+  }
+
   return $styles;
 }
 

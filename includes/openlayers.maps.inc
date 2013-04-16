@@ -19,14 +19,20 @@ require_once 'openlayers.projections.inc';
  * @return
  *   Return array of maps.
  */
-function openlayers_maps($reset = FALSE) {
+function openlayers_maps($reset = FALSE, $include_disabled = FALSE) {
   ctools_include('export');
   if ($reset) {
     ctools_export_load_object_reset('openlayers_maps');
   }
 
-  $maps = ctools_export_load_object(
-    'openlayers_maps', 'all', array());
+  $maps = ctools_export_load_object('openlayers_maps', 'all', array());
+
+  if (!$include_disabled) {
+    $maps = array_filter($maps, function($map) {
+      return !(isset($map->disabled) && $map->disabled);
+    });
+  }
+
   return $maps;
 }
 

@@ -37,12 +37,15 @@ function openlayers_layer_load($name, $reset = FALSE) {
  * @return array
  *   array of layer info
  */
-function openlayers_layers_load($reset = FALSE) {
+function openlayers_layers_load($reset = FALSE, $include_disabled = FALSE) {
   ctools_include('export');
   $layer_objects = array();
   if ($reset) ctools_export_load_object_reset('openlayers_layers');
   $layers = ctools_export_load_object('openlayers_layers', 'all', array());
   foreach ($layers as $layer) {
+    if (!$include_disabled && isset($layer->disabled) && $layer->disabled) {
+      continue;
+    }
     if ($layer_object = openlayers_get_layer_object($layer)) {
       $layer_objects[$layer->name] = $layer_object;
     }
@@ -87,9 +90,15 @@ function openlayers_layer_type_load($name, $reset = FALSE) {
  * @return
  *   Array of layer type info.
  */
-function openlayers_layer_types($reset = FALSE) {
+function openlayers_layer_types($reset = FALSE, $include_disabled = FALSE) {
   ctools_include('plugins');
   $layers = ctools_get_plugins('openlayers', 'layer_types');
+
+  if (!$include_disabled) {
+    $layers = array_filter($layers, function($layer) {
+      return (!isset($layer->disabled) || !$layer->disabled);
+    });
+  }
 
   return array_filter($layers, '_openlayers_layer_definition_check');
 }

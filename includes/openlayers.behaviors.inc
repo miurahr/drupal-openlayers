@@ -60,9 +60,15 @@ function _openlayers_behavior_definition_check($definition) {
  * @return
  *   Array of behavior info.
  */
-function openlayers_behaviors($reset = FALSE) {
+function openlayers_behaviors($reset = FALSE, $include_disabled = FALSE) {
   ctools_include('plugins');
   $behaviors = ctools_get_plugins('openlayers', 'behaviors');
+
+  if (!$include_disabled) {
+    $behaviors = array_filter($behaviors, function($behavior) {
+      return (!isset($behavior->disabled) || !$behavior->disabled);
+    });
+  }
 
   return array_filter($behaviors, '_openlayers_behavior_definition_check');
 }

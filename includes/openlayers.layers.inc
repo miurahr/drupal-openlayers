@@ -270,7 +270,7 @@ function _openlayers_openlayers_layers() {
   $layer->data = array(
     'isBaseLayer' => TRUE,
     'type' => 'satellite',
-    'projection' => array('EPSG:3857'),
+    'projection' => array('EPSG:3857', 'EPSG:900913'),
     'layer_type' => 'openlayers_layer_type_google',
   );
   $layers[$layer->name] = $layer;
@@ -283,7 +283,7 @@ function _openlayers_openlayers_layers() {
   $layer->data = array(
     'isBaseLayer' => TRUE,
     'type' => 'hybrid',
-    'projection' => array('EPSG:3857'),
+    'projection' => array('EPSG:3857', 'EPSG:900913'),
     'layer_type' => 'openlayers_layer_type_google',
   );
   $layers[$layer->name] = $layer;
@@ -296,7 +296,7 @@ function _openlayers_openlayers_layers() {
   $layer->data = array(
     'isBaseLayer' => TRUE,
     'type' => 'normal',
-    'projection' => array('EPSG:3857'),
+    'projection' => array('EPSG:3857', 'EPSG:900913'),
     'layer_type' => 'openlayers_layer_type_google',
   );
   $layers[$layer->name] = $layer;
@@ -309,7 +309,7 @@ function _openlayers_openlayers_layers() {
   $layer->data = array(
     'isBaseLayer' => TRUE,
     'type' => 'physical',
-    'projection' => array('EPSG:3857'),
+    'projection' => array('EPSG:3857', 'EPSG:900913'),
     'layer_type' => 'openlayers_layer_type_google',
   );
   $layers[$layer->name] = $layer;

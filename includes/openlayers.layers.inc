@@ -318,7 +318,7 @@ function _openlayers_openlayers_layers() {
   $layer->api_version = 1;
   $layer->name = 'mapquest_osm';
   $layer->title = 'MapQuest OSM';
-  $layer->description = 'MapQuest?s rendering of OpenStreetMap.';
+  $layer->description = 'MapQuest\'s rendering of OpenStreetMap.';
   $layer->data = array(
     'isBaseLayer' => TRUE,
     'attribution' => t('&copy;<a href="@ccbysa">CCBYSA</a> '.
@@ -345,7 +345,7 @@ function _openlayers_openlayers_layers() {
   $layer->api_version = 1;
   $layer->name = 'mapquest_openaerial';
   $layer->title = 'MapQuest Open Aerial';
-  $layer->description = 'MapQuest?s aerial photo map.';
+  $layer->description = 'MapQuest\'s aerial photo map.';
   $layer->data = array(
     'isBaseLayer' => TRUE,
     'attribution' => t('Portions Courtesy NASA/JPL-Caltech and U.S. Depart. of Agriculture, Farm Service Agency.')
@@ -633,8 +633,8 @@ function _openlayers_openlayers_layers_i18n() {
     t('Bing Road tiles.'),
     t('Bing Aerial tiles.'),
     t('Bing Hybrid tiles.'),
-    t('MapQuest?s rendering of OpenStreetMap.'),
-    t('MapQuest?s aerial photo map.'),
+    t('MapQuest\'s rendering of OpenStreetMap.'),
+    t('MapQuest\'s aerial photo map.'),
   );
 }
 

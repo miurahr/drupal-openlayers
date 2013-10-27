@@ -63,7 +63,7 @@ class openlayers_layer_type_osm extends openlayers_layer_type {
         '#multiple' => TRUE,
         '#options' => array_combine(
           array_map('strval', openlayers_get_resolutions('900913')),
-          range(0, 18)),
+          range(0, 19)),
         '#title' => t('Zoom Level Range'),
         '#default_value' => isset($this->data['resolutions']) ?
           $this->data['resolutions'] : 

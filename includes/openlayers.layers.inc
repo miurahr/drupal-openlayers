@@ -146,11 +146,9 @@ function _openlayers_openlayers_layers() {
   $layer->description = 'The main OpenStreetMap map';
   $layer->data = array(
     'baselayer' => TRUE,
-    'attribution' => t('&copy;<a href="@ccbysa">CCBYSA</a> 2010
-      <a href="@openstreetmap">OpenStreetMap.org</a> contributors',
+    'attribution' => t('<a href="@odbl">&copy;OpenStreetmap ontributors',
       array(
-        '@openstreetmap' => 'http://www.openstreetmap.org/',
-        '@ccbysa' => 'http://creativecommons.org/licenses/by-sa/2.0/',
+        '@odbl' => 'http://www.openstreetmap.org/copyright',
       )
     ),
     'projection' => array('900913'),
@@ -188,11 +186,9 @@ function _openlayers_openlayers_layers() {
   $layer->description = 'OpenStreetMap with highlighted bike lanes';
   $layer->data = array(
     'baselayer' => TRUE,
-    'attribution' => t('&copy;<a href="@ccbysa">CCBYSA</a> 2010
-      <a href="@openstreetmap">OpenStreetMap.org</a> contributors',
+    'attribution' => t('<a href="@odbl">&copy;OpenStreetmap ontributors',
       array(
-        '@openstreetmap' => 'http://www.openstreetmap.org/',
-        '@ccbysa' => 'http://creativecommons.org/licenses/by-sa/2.0/',
+        '@odbl' => 'http://www.openstreetmap.org/copyright',
       )
     ),
     'projection' => array('900913'),
@@ -210,11 +206,9 @@ function _openlayers_openlayers_layers() {
     WSG84 for use on non spherical-mercator maps.';
   $layer->data = array(
     'baselayer' => FALSE,
-    'attribution' => t('&copy;<a href="@ccbysa">CCBYSA</a> 2010
-      <a href="@openstreetmap">OpenStreetMap.org</a> contributors',
+    'attribution' => t('<a href="@odbl">&copy;OpenStreetmap ontributors',
       array(
-        '@openstreetmap' => 'http://www.openstreetmap.org/',
-        '@ccbysa' => 'http://creativecommons.org/licenses/by-sa/2.0/',
+        '@odbl' => 'http://www.openstreetmap.org/copyright',
       )
     ),
     'projection' => array('4326'),

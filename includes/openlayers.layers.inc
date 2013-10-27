@@ -252,12 +252,10 @@ function _openlayers_openlayers_layers_i18n() {
     t('Virtual Earth Satellite'),
     t('Virtual Earth Hybrid'),
     t('OSM Mapnik'),
-    t('OSM Tiles@Home'),
     t('OSM Cycling Map'),
     t('OSM Overlay'),
     t('Default OpenLayers WMS'),
     // descriptions
-    t('Alternative, community-rendered OpenStreetMap'),
     t('Google Maps Hillshades'),
     t('Google Maps Satellite Imagery.'),
     t('Google Maps with roads and terrain.'),

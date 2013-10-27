@@ -43,6 +43,12 @@ class openlayers_layer_type_xyz extends openlayers_layer_type {
         '#default_value' => isset($this->data['base_url']) ?
           $this->data['base_url'] : ''
       ),
+      'attribution' => array(
+        '#type' => 'textfield',
+        '#title' => t('Attributtion'),
+        '#default_value' => isset($this->data['attribution']) ?
+          $this->data['attribution'] : ''
+      ),
       'layer_type' => array(
         '#type' => 'hidden',
         '#value' => 'openlayers_layer_type_xyz'
